@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sorteio dos Jogos</title>
+<style>
+  * {
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+  }
+  body {
+    margin: 0;
+    background: #f4f7fb;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 10px;
+  }
+  .container {
+    background: white;
+    width: 100%;
+    max-width: 420px;
+    padding: 20px 15px;
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    overflow: hidden;
+  }
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    position: relative;
+  }
+  .header img {
+    height: 40px;
+    width: 40px;
+    object-fit: contain;
+    position: absolute;
+    left: 0;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+  }
+  .header img:hover {
+    transform: scale(1.2) rotate(360deg);
+    box-shadow: 0 0 10px rgba(0, 147, 255, 0.7); /* Brilho azul no hover */
+  }
+  .header img:active {
+    animation: pulse 0.2s ease;
+  }
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+  }
+  .header h1 {
+    color: #0093ff;
+    font-size: 1.6rem;
+    margin: 0;
+    text-align: center;
+    width: 100%;
+  }
+  .trophy-icon {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #ffd700;
+    transition: 0.3s;
+  }
+  .trophy-icon:hover {
+    transform: translateY(-50%) scale(1.1);
+  }
+  .inputs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font-size: 0.95rem;
+  }
+  .jogador-ativo {
+    background: #e8f4ff;
+    border: 2px solid #0093ff;
+  }
+  .jogador-fora {
+    background: #f0f0f0;
+    border: 1px solid #ccc;
+    color: #666;
+  }
+  .info {
+    text-align: center;
+    font-size: 0.9rem;
+    color: #555;
+    margin-bottom: 15px;
+  }
+  button {
+    display: block;
+    width: 100%;
+    max-width: 260px;
+    margin: 0 auto;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 30px;
+    background: linear-gradient(90deg, #0093ff, #00c8ff);
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  button:hover {
+    transform: scale(1.03);
+  }
+  .result {
+    margin-top: 20px;
+  }
+  .dupla {
+    background: #e8f4ff;
+    margin-bottom: 10px;
+    border-radius: 15px;
+    padding: 10px 15px;
+    text-align: center;
+    font-weight: 500;
+    font-size: 0.95rem;
+    border: 1px solid #0093ff;
+  }
+  .dupla-vencedora {
+    background: #e6ffed;
+    border: 1px solid #28a745;
+  }
+  .dupla-perdedora {
+    background: #ffe6e6;
+    border: 1px solid #dc3545;
+  }
+  .loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80px;
+  }
+  .ball {
+    width: 18px;
+    height: 18px;
+    margin: 0 5px;
+    border-radius: 50%;
+    background: #e4ff1a;
+    animation: bounce 0.9s infinite alternate ease-in-out;
+  }
+  .ball:nth-child(2) { animation-delay: 0.3s; }
+  .ball:nth-child(3) { animation-delay: 0.6s; }
+  @keyframes bounce {
+    from { transform: translateY(0); }
+    to { transform: translateY(-18px); }
+  }
+  select {
+    width: 100%;
+    max-width: 260px;
+    margin: 10px auto;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    display: block;
+  }
+  .ranking-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+  }
+  .ranking-content {
+    background-color: white;
+    margin: 10% auto;
+    padding: 20px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 400px;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  .ranking-content h2 {
+    text-align: center;
+    color: #0093ff;
+    margin-bottom: 15px;
+  }
+  .ranking-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    margin-bottom: 5px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid #ffd700;
+  }
+  .ranking-name {
+    font-weight: 500;
+  }
+  .ranking-trophies {
+    color: #1a3c34; /* Verde escuro para maior legibilidade */
+    font-size: 1.2rem;
+  }
+  .close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-bottom: 10px;
+  }
+  .close:hover {
+    color: #000;
+  }
+  @media (max-width: 360px) {
+    .header h1 { font-size: 1.3rem; }
+    input { font-size: 0.85rem; padding: 8px; }
+    button { font-size: 0.9rem; padding: 10px 15px; }
+    .dupla { font-size: 0.9rem; }
+    .header img { height: 64px; width: 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <img src="https://i.imgur.com/rDZCHiH.png" alt="Logo" onclick="this.classList.add('pulse'); setTimeout(() => this.classList.remove('pulse'), 200);">
+      <h1>Sorteio dos Jogos</h1>
+      <span class="trophy-icon" onclick="abrirRanking()">🏆</span>
+    </div>
+    <div class="inputs">
+      <input type="text" id="p1" value="Eduardo" class="jogador-ativo">
+      <input type="text" id="p2" value="Julio" class="jogador-ativo">
+      <input type="text" id="p3" value="Savio" class="jogador-ativo">
+      <input type="text" id="p4" value="Wagner" class="jogador-ativo">
+      <input type="text" id="p5" value="Ozimar" class="jogador-fora">
+      <input type="text" id="p6" value="Artur" class="jogador-fora">
+    </div>
+    <p class="info">Apenas os 4 primeiros jogadores (em azul) são sorteados para a primeira partida. Os outros estão de fora inicialmente.</p>
+    <button id="sortear">🎾 Sortear Times</button>
+    <div class="result" id="resultado"></div>
+  </div>
+
+  <!-- Modal do Ranking -->
+  <div id="rankingModal" class="ranking-modal">
+    <div class="ranking-content">
+      <span class="close" onclick="fecharRanking()">&times;</span>
+      <h2>Ranking de Troféus</h2>
+      <div id="rankingList"></div>
+    </div>
+  </div>
+
+<script>
+  const botao = document.getElementById("sortear");
+  const resultado = document.getElementById("resultado");
+  let partidas = [];
+  let ultimaDupla = null;
+
+  function embaralhar(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  }
+
+  function isDuplaRepetida(dupla, partidas) {
+    return partidas.some(p => 
+      (p.dupla1[0] === dupla[0] && p.dupla1[1] === dupla[1]) ||
+      (p.dupla1[1] === dupla[0] && p.dupla1[0] === dupla[1]) ||
+      (p.dupla2[0] === dupla[0] && p.dupla2[1] === dupla[1]) ||
+      (p.dupla2[1] === dupla[0] && p.dupla2[0] === dupla[1])
+    );
+  }
+
+  function abrirRanking() {
+    const nomes = [
+      document.getElementById("p1").value.trim(),
+      document.getElementById("p2").value.trim(),
+      document.getElementById("p3").value.trim(),
+      document.getElementById("p4").value.trim(),
+      document.getElementById("p5").value.trim(),
+      document.getElementById("p6").value.trim(),
+    ];
+    const trofeus = {};
+    nomes.forEach(nome => trofeus[nome] = 0);
+
+    partidas.forEach(p => {
+      if (p.vencedor) {
+        const duplaVencedora = p.vencedor === "1" ? p.dupla1 : p.dupla2;
+        duplaVencedora.forEach(jogador => {
+          if (trofeus[jogador] !== undefined) {
+            trofeus[jogador]++;
+          }
+        });
+      }
+    });
+
+    const ranking = Object.entries(trofeus)
+      .sort(([,a], [,b]) => b - a)
+      .map(([jogador, count]) => `
+        <div class="ranking-item">
+          <span class="ranking-name">${jogador}</span>
+          <span class="ranking-trophies">${count} 🏆</span>
+        </div>
+      `).join('');
+
+    document.getElementById("rankingList").innerHTML = ranking;
+    document.getElementById("rankingModal").style.display = "block";
+  }
+
+  function fecharRanking() {
+    document.getElementById("rankingModal").style.display = "none";
+  }
+
+  function criarPrimeiraPartida() {
+    const nomes = [
+      document.getElementById("p1").value.trim(),
+      document.getElementById("p2").value.trim(),
+      document.getElementById("p3").value.trim(),
+      document.getElementById("p4").value.trim(),
+      document.getElementById("p5").value.trim(),
+      document.getElementById("p6").value.trim(),
+    ];
+    if (nomes.some(n => n === "")) {
+      resultado.innerHTML = `<p style="color:red;text-align:center;">Preencha todos os 6 nomes!</p>`;
+      return;
+    }
+    const primeirosQuatro = nomes.slice(0, 4);
+    const embaralhados = embaralhar([...primeirosQuatro]);
+    const dupla1 = [embaralhados[0], embaralhados[1]];
+    const dupla2 = [embaralhados[2], embaralhados[3]];
+    const deFora = nomes.filter(j => !primeirosQuatro.includes(j));
+    partidas = [{
+      numero: 1,
+      dupla1,
+      dupla2,
+      deFora,
+      vencedor: null
+    }];
+    mostrarPartidas();
+  }
+
+  function mostrarPartidas() {
+    let html = "";
+    partidas.forEach(p => {
+      const isPartidaAtual = p.numero === partidas.length && p.vencedor === null;
+      const vencedorClass1 = !isPartidaAtual && p.vencedor === "1" ? "dupla-vencedora" : (!isPartidaAtual && p.vencedor === "2" ? "dupla-perdedora" : "dupla");
+      const vencedorClass2 = !isPartidaAtual && p.vencedor === "2" ? "dupla-vencedora" : (!isPartidaAtual && p.vencedor === "1" ? "dupla-perdedora" : "dupla");
+      html += `<h3 style='text-align:center;'>Partida ${p.numero}</h3>`;
+      html += `<div class="${vencedorClass1}"><strong>Dupla 1:</strong> ${p.dupla1[0]} & ${p.dupla1[1]}${p.vencedor === "1" ? " 🏆" : ""}</div>`;
+      html += `<div class="${vencedorClass2}"><strong>Dupla 2:</strong> ${p.dupla2[0]} & ${p.dupla2[1]}${p.vencedor === "2" ? " 🏆" : ""}</div>`;
+      html += `<div class="dupla"><strong>De fora:</strong> ${p.deFora.join(" & ")}</div>`;
+      if (isPartidaAtual) {
+        html += `
+          <select id="vencedor">
+            <option value="">Selecione a dupla vencedora</option>
+            <option value="1">Dupla 1: ${p.dupla1[0]} & ${p.dupla1[1]}</option>
+            <option value="2">Dupla 2: ${p.dupla2[0]} & ${p.dupla2[1]}</option>
+          </select>
+          <button id="confirmar">Confirmar Vencedor</button>
+        `;
+      }
+    });
+    resultado.innerHTML = html;
+    if (partidas.length > 0 && partidas[partidas.length - 1].vencedor === null) {
+      document.getElementById("confirmar").addEventListener("click", confirmarVencedor);
+    }
+  }
+
+  function confirmarVencedor() {
+    const vencedor = document.getElementById("vencedor").value;
+    if (!vencedor) {
+      resultado.innerHTML += `<p style="color:red;text-align:center;">Selecione uma dupla vencedora!</p>`;
+      return;
+    }
+    const ultimaPartida = partidas[partidas.length - 1];
+    ultimaPartida.vencedor = vencedor;
+    gerarProximaPartida();
+  }
+
+  function gerarProximaPartida() {
+    const nomes = [
+      document.getElementById("p1").value.trim(),
+      document.getElementById("p2").value.trim(),
+      document.getElementById("p3").value.trim(),
+      document.getElementById("p4").value.trim(),
+      document.getElementById("p5").value.trim(),
+      document.getElementById("p6").value.trim(),
+    ];
+    const ultimaPartida = partidas[partidas.length - 1];
+    const numeroPartida = partidas.length + 1;
+    let vencedores = ultimaPartida.vencedor === "1" ? ultimaPartida.dupla1 : ultimaPartida.dupla2;
+    let perdedores = ultimaPartida.vencedor === "1" ? ultimaPartida.dupla2 : ultimaPartida.dupla1;
+    let deFora = ultimaPartida.deFora;
+
+    let jogadoresAtivos = [];
+
+    if (partidas.length === 1) {
+      // Para a segunda partida, manter vencedores e trazer os dois de fora na ordem
+      jogadoresAtivos = [...vencedores, ...deFora];
+      // Misturar duplas, evitando repetir a dupla vencedora
+      const embaralhados = embaralhar([...jogadoresAtivos]);
+      let dupla1, dupla2;
+      for (let i = 0; i < 10; i++) {
+        dupla1 = [embaralhados[0], embaralhados[1]];
+        dupla2 = [embaralhados[2], embaralhados[3]];
+        if (!(dupla1[0] === vencedores[0] && dupla1[1] === vencedores[1]) &&
+            !(dupla1[0] === vencedores[1] && dupla1[1] === vencedores[0]) &&
+            !(dupla2[0] === vencedores[0] && dupla2[1] === vencedores[1]) &&
+            !(dupla2[0] === vencedores[1] && dupla2[1] === vencedores[0])) {
+          break;
+        }
+        embaralhar(embaralhados);
+      }
+      const novaPartida = {
+        numero: numeroPartida,
+        dupla1: dupla1,
+        dupla2: dupla2,
+        deFora: perdedores,
+        vencedor: null
+      };
+      partidas.push(novaPartida);
+      ultimaDupla = vencedores;
+      mostrarPartidas();
+      return;
+    }
+
+    // Para partidas subsequentes, selecionar jogadores
+    const penultimaPartida = partidas[partidas.length - 2];
+    const jogadoresPenultima = [...penultimaPartida.dupla1, ...penultimaPartida.dupla2];
+
+    // Manter vencedores que não jogaram 2 partidas seguidas
+    vencedores = vencedores.filter(j => !jogadoresPenultima.includes(j));
+    jogadoresAtivos = [...vencedores];
+
+    // Manter perdedores que jogaram apenas 1 partida
+    const perdedoresValidos = perdedores.filter(j => !jogadoresPenultima.includes(j));
+    jogadoresAtivos = [...jogadoresAtivos, ...perdedoresValidos];
+
+    // Adicionar jogadores que estavam de fora
+    jogadoresAtivos = [...jogadoresAtivos, ...deFora];
+
+    // Garantir exatamente 4 jogadores
+    jogadoresAtivos = jogadoresAtivos.slice(0, 4);
+
+    // Misturar duplas, evitando repetições de duplas anteriores
+    let dupla1, dupla2;
+    for (let i = 0; i < 10; i++) {
+      const embaralhados = embaralhar([...jogadoresAtivos]);
+      dupla1 = [embaralhados[0], embaralhados[1]];
+      dupla2 = [embaralhados[2], embaralhados[3]];
+      if (!isDuplaRepetida(dupla1, partidas) && !isDuplaRepetida(dupla2, partidas)) {
+        break;
+      }
+    }
+
+    const novaPartida = {
+      numero: numeroPartida,
+      dupla1: dupla1,
+      dupla2: dupla2,
+      deFora: nomes.filter(j => !jogadoresAtivos.includes(j)),
+      vencedor: null
+    };
+    partidas.push(novaPartida);
+    ultimaDupla = vencedores;
+    mostrarPartidas();
+  }
+
+  botao.addEventListener("click", () => {
+    resultado.innerHTML = `
+      <div class="loading">
+        <div class="ball"></div>
+        <div class="ball"></div>
+        <div class="ball"></div>
+      </div>
+      <p style="text-align:center;">Sorteando as duplas...</p>
+    `;
+    setTimeout(() => {
+      partidas = [];
+      ultimaDupla = null;
+      criarPrimeiraPartida();
+    }, 2000);
+  });
+
+  // Fechar modal ao clicar fora
+  window.onclick = function(event) {
+    const modal = document.getElementById("rankingModal");
+    if (event.target == modal) {
+      fecharRanking();
+    }
+  }
+</script>
+</body>
+</html>
