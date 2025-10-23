@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Sorteio dos Jogos</title>
+<style>
+  *{box-sizing:border-box;font-family:"Poppins",sans-serif;}
+  body{margin:0;background:#f4f7fb;display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:10px;}
+  .container{background:white;width:100%;max-width:420px;padding:20px 15px;border-radius:20px;box-shadow:0 4px 12px rgba(0,0,0,0.1);}
+  .header{display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:20px;}
+  .header img{height:60px;width:60px;object-fit:contain;position:absolute;left:0;cursor:pointer;}
+  .header h1{color:#0093ff;font-size:1.6rem;margin:0;text-align:center;width:100%;}
+  .menu-icon{position:absolute;right:0;top:50%;transform:translateY(-50%);font-size:1.6rem;cursor:pointer;color:#333;}
+  .menu-dropdown{display:none;position:absolute;right:0;top:60px;background:white;border-radius:8px;box-shadow:0 4px 8px rgba(0,0,0,0.2);z-index:1000;min-width:190px;}
+  .menu-dropdown a{display:flex;align-items:center;padding:10px 15px;color:#333;text-decoration:none;font-size:.95rem;transition:background .2s;}
+  .menu-dropdown a:hover{background:#e8f4ff;}
+  .menu-dropdown a.trofeus::before{content:"🏆";margin-right:8px;}
+  .menu-dropdown a.historicoTrofeus::before{content:"📅";margin-right:8px;}
+  .menu-dropdown a.historicoPartidas::before{content:"🎾";margin-right:8px;}
+  .menu-dropdown a.encerrarMes::before{content:"📦";margin-right:8px;}
+  .menu-dropdown a.nova::before{content:"🔄";margin-right:8px;}
+  .menu-dropdown a.regras::before{content:"📘";color:#0093ff;margin-right:8px;}
+  .menu-dropdown a.sobre::before{content:"ℹ️";margin-right:8px;}
+  .menu-dropdown a.admin::before{content:"🔐";margin-right:8px;}
+
+  .inputs{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:20px;}
+  input{width:100%;padding:10px;border:1px solid #ddd;border-radius:10px;font-size:.95rem;}
+  .jogador-ativo{background:#e8f4ff;border:2px solid #0093ff;}
+  .jogador-fora{background:#f0f0f0;border:1px solid #ccc;color:#666;}
+
+  button{display:block;width:100%;max-width:260px;margin:0 auto;padding:12px 20px;border:none;border-radius:30px;background:linear-gradient(90deg,#0093ff,#00c8ff);color:white;font-size:1rem;cursor:pointer;transition:.3s;}
+  button:hover{transform:scale(1.03);}
+  .dupla{background:#e8f4ff;margin-bottom:10px;border-radius:15px;padding:10px 15px;border:1px solid #0093ff;font-weight:500;}
+  .dupla-vencedora{background:#e6ffed!important;border-color:#28a745!important;}
+  .dupla-perdedora{background:#ffe6e6!important;border-color:#dc3545!important;color:#444!important;}
+  .dupla-fora{background:#f0f0f0;border:1px solid #ccc;color:#666;border-radius:15px;padding:10px 15px;font-weight:500;margin-bottom:10px;}
+
+  .trofeus-dia-container{background:#f9f9f9;border-radius:12px;padding:10px 15px;margin-top:20px;box-shadow:0 2px 5px rgba(0,0,0,0.05);}
+  .trofeus-dia-container h3{text-align:center;color:#b89b00;margin-bottom:10px;}
+  .trofeus-dia-item{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:#f8f9fa;border-radius:8px;margin-bottom:5px;}
+
+  .modal{display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;background-color:rgba(0,0,0,.5);}
+  .modal-content{background:white;margin:10% auto;padding:20px;border-radius:15px;width:90%;max-width:400px;}
+  .modal-content h2{text-align:center;color:#0093ff;margin-bottom:15px;}
+  .close{color:#aaa;float:right;font-size:28px;font-weight:bold;cursor:pointer;}
+  .close:hover{color:#000;}
+  .regras-list p{margin:8px 0;font-size:.93rem;}
+  .regras-list span{color:#0093ff;font-weight:bold;}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <img src="https://i.imgur.com/rDZCHiH.png" alt="Logo">
+    <h1>Sorteio dos Jogos</h1>
+    <span class="menu-icon" id="menuIcon">☰</span>
+    <div class="menu-dropdown" id="menuDropdown">
+      <a href="#" class="trofeus">Troféus do mês</a>
+      <a href="#" class="historicoTrofeus">Histórico de troféus</a>
+      <a href="#" class="historicoPartidas">Histórico de partidas</a>
+      <a href="#" class="encerrarMes">Encerrar mês</a>
+      <a href="#" class="nova">Nova rodada</a>
+      <a href="#" class="regras">Regras</a>
+      <a href="#" class="sobre">Sobre</a>
+      <a href="#" class="admin">Administrador</a>
+    </div>
+  </div>
+
+  <div class="inputs">
+    <input type="text" id="p1" value="Eduardo" class="jogador-ativo">
+    <input type="text" id="p2" value="Julio" class="jogador-ativo">
+    <input type="text" id="p3" value="Savio" class="jogador-ativo">
+    <input type="text" id="p4" value="Wagner" class="jogador-ativo">
+    <input type="text" id="p5" value="Ozimar" class="jogador-fora">
+    <input type="text" id="p6" value="Artur" class="jogador-fora">
+  </div>
+
+  <button id="sortear" style="
+  display:block;
+  width:100%;
+  max-width:260px;
+  margin:0 auto;
+  padding:12px 22px;
+  border:none;
+  border-radius:30px;
+  background:rgba(0,147,255,0.85);
+  backdrop-filter:blur(6px);
+  color:white;
+  font-size:1.05rem;
+  font-weight:600;
+  letter-spacing:0.5px;
+  box-shadow:0 4px 12px rgba(0,147,255,0.3);
+  cursor:pointer;
+  transition:all 0.25s ease;
+">
+  Sortear Primeira Partida
+</button>
+<script>
+document.getElementById("sortear").onmouseover=function(){this.style.background="rgba(0,147,255,1)";this.style.transform="scale(1.04)";};
+document.getElementById("sortear").onmouseout=function(){this.style.background="rgba(0,147,255,0.85)";this.style.transform="scale(1)";};
+</script>
+
+<div id="resultado"></div>
+
+<div id="trofeusDiaContainer" class="trofeus-dia-container" style="display:none;">
+  <h3>🏅 Troféus do dia</h3>
+  <div id="trofeusDiaLista"></div>
+</div>
+<!-- ========================= MODAIS ========================= -->
+<div id="rankingModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>Troféus do mês</h2>
+    <div id="rankingList"></div>
+  </div>
+</div>
+
+<div id="historicoTrofeusModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>📅 Histórico de Troféus</h2>
+    <label for="mesSelect">Selecione o mês:</label>
+    <select id="mesSelect" style="width:100%;padding:8px;border-radius:8px;border:1px solid #ccc;margin-top:8px;"></select>
+    <div id="historicoTrofeusList" style="margin-top:15px;"></div>
+  </div>
+</div>
+
+<div id="historicoPartidasModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>🎾 Histórico de Partidas</h2>
+    <label for="mesPartidasSelect">Selecione o mês:</label>
+    <select id="mesPartidasSelect" style="width:100%;padding:8px;border-radius:8px;border:1px solid #ccc;margin-top:8px;"></select>
+    <div id="listaPartidasDoMes" style="margin-top:15px;"></div>
+    <div id="detalhesPartida" style="margin-top:15px;"></div>
+  </div>
+</div>
+
+<div id="regrasModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>📘 Regras do Aplicativo</h2>
+    <div class="regras-list">
+      <p><span>1.</span> O sistema sorteia duplas entre 6 jogadores.</p>
+      <p><span>2.</span> Apenas os 4 primeiros jogadores (em azul) participam da primeira partida, enquanto os 2 últimos (em cinza) ficam de fora.</p>
+      <p><span>3.</span> Após cada partida, a dupla vencedora é selecionada, e a sequência de partidas é gerada seguindo as regras combinatórias.</p>
+      <p><span>4.</span> Para a segunda partida, os vencedores da primeira jogam com os jogadores que estavam de fora (sorteio entre os dois de fora).</p>
+      <p><span>5.</span> A partir da terceira partida, jogadores que participaram de duas partidas seguidas são substituídos pelos que estavam de fora.</p>
+      <p><span>6.</span> O sistema evita repetir duplas de partidas anteriores até esgotar as combinações.</p>
+      <p><span>7.</span> Cada vitória concede 1 troféu para cada jogador da dupla vencedora, visível no ranking de troféus.</p>
+      <p><span>⚙️</span> Somente administradores podem alterar resultados ou iniciar nova rodada.</p>
+    </div>
+  </div>
+</div>
+
+<div id="sobreModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>Sobre</h2>
+    <p>Software desenvolvido por <strong>Eduardo Campelo</strong> para o <strong>Play do Bistecão</strong>.</p>
+  </div>
+</div>
+
+<div id="adminModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>Acesso do Administrador</h2>
+    <input type="password" id="senhaInput" placeholder="Digite a senha"
+      style="width:100%;padding:10px;border-radius:8px;border:1px solid #ccc;">
+    <button id="btnEntrarSenha" style="
+      margin-top:10px;
+      width:100%;
+      background:white;
+      color:#b8860b;
+      border:2px solid #b8860b;
+      padding:10px;
+      font-weight:bold;
+      border-radius:8px;
+      box-shadow:0 2px 5px rgba(0,0,0,0.08);
+      transition:background .2s, color .2s;
+    ">Entrar</button>
+    <p id="msgSenha" style="color:red;text-align:center;margin-top:10px;"></p>
+  </div>
+</div>
+<script type="module">
+/* ================= FIREBASE ================= */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+/* Ajuste se necessário: mesmo projeto já usado antes */
+const app = initializeApp({
+  apiKey: "AIzaSyCbHS1KJ_-BApLiVsXjBrqdu7_T7oOoNYQ",
+  authDomain: "bistecaoapp.firebaseapp.com",
+  projectId: "bistecaoapp"
+});
+const db = getFirestore(app);
+
+/* ================= ESTADO ================= */
+let isAdmin = false;
+let partidas = [];               // {numero, dupla1:[a,b], dupla2:[c,d], deFora:[e,f], vencedor:null|'1'|'2'}
+let usedPairs = new Set();       // pares já usados ("A|B")
+let trophyCountsDia = {};
+let trophyCountsMes = {};
+
+const salaDocRef = doc(db, "salas", "play-do-bistecao");
+
+/* ================ HELPERS GERAIS ================ */
+function getNomes(){
+  return [...Array(6)].map((_,i)=>document.getElementById("p"+(i+1)).value.trim());
+}
+function embaralhar(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function keyPair(a,b){ return [a,b].sort().join('|'); }
+function isDuplaRepetida(dupla){ return usedPairs.has(keyPair(dupla[0],dupla[1])); }
+
+function dataKeyHoje(){
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const day = String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
+function mesKey(d = new Date()){
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  return `${y}-${m}`;
+}
+function labelMes(d = new Date()){
+  return d.toLocaleDateString('pt-BR',{ month:'long', year:'numeric'}).replace(/^./,c=>c.toUpperCase());
+}
+function weekdayLabel(d){
+  return d.toLocaleDateString('pt-BR',{ weekday:'long'}).replace(/^./,c=>c.toUpperCase());
+}
+
+/* ================ MENU ================ */
+const menu = document.getElementById("menuDropdown");
+const menuIcon = document.getElementById("menuIcon");
+menuIcon.onclick = ()=> menu.style.display = (menu.style.display==="block" ? "none" : "block");
+window.onclick = e => { if(!e.target.closest('.menu-dropdown') && !e.target.closest('#menuIcon')) menu.style.display='none'; };
+
+function abrirModal(id){ menu.style.display='none'; document.getElementById(id).style.display='block'; }
+document.querySelectorAll(".modal .close").forEach(c=>c.onclick = e=> e.target.closest(".modal").style.display='none');
+
+/* Ligações com itens existentes do menu */
+menu.querySelector(".trofeus")?.addEventListener('click', (ev)=>{ ev.preventDefault(); abrirModal("rankingModal"); renderRanking(); });
+menu.querySelector(".nova")?.addEventListener('click', async (ev)=>{
+  ev.preventDefault();
+  await novaRodada();
+});
+menu.querySelector(".regras")?.addEventListener('click', (ev)=>{ ev.preventDefault(); abrirModal("regrasModal"); });
+menu.querySelector(".sobre")?.addEventListener('click', (ev)=>{ ev.preventDefault(); abrirModal("sobreModal"); });
+menu.querySelector(".admin")?.addEventListener('click', (ev)=>{ ev.preventDefault(); abrirModal("adminModal"); setTimeout(()=>document.getElementById("senhaInput")?.focus(), 50); });
+
+/* (Novos) itens opcionais do menu: histórico e encerrar mês — corrigido */
+menu.querySelector(".historicoTrofeus")?.addEventListener('click', (ev)=>{
+  ev.preventDefault();
+  abrirModal("historicoTrofeusModal");
+  prepararHistoricoTrofeus();
+});
+menu.querySelector(".encerrarMes")?.addEventListener('click', async (ev)=>{
+  ev.preventDefault();
+  if(!isAdmin){ alert("Somente administradores podem encerrar o mês."); return; }
+  await encerrarMesAtual();
+});
+menu.querySelector(".historicoPartidas")?.addEventListener('click', (ev)=>{
+  ev.preventDefault();
+  abrirModal("historicoPartidasModal");
+  prepararHistoricoPartidas();
+});
+
+
+/* ================ LOGIN ADMIN ================ */
+document.getElementById("btnEntrarSenha").onclick = async ()=>{
+  const senha = document.getElementById("senhaInput").value.trim();
+  const snap = await getDoc(doc(db,"config","senhaAdmin"));
+  if(snap.exists() && senha === snap.data().valor){
+    isAdmin = true; localStorage.setItem("bistecaAdmin","1");
+    document.getElementById("msgSenha").innerText = "✅ Acesso liberado!";
+    setTimeout(()=>document.getElementById("adminModal").style.display='none',800);
+  } else {
+    document.getElementById("msgSenha").innerText = "Senha incorreta!";
+  }
+};
+if(localStorage.getItem("bistecaAdmin")==="1") isAdmin = true;
+
+/* ================ FIRESTORE SYNC ================ */
+onSnapshot(salaDocRef, snap=>{
+  if(!snap.exists()) return;
+  const d = snap.data();
+
+  // Atualiza campos de nomes nos inputs (sincronizado)
+  if (d.nomes && Array.isArray(d.nomes)) {
+    d.nomes.forEach((nome, idx)=>{
+      const campo = document.getElementById("p"+(idx+1));
+      if(campo && campo.value.trim() !== nome) {
+        campo.value = nome;
+      }
+    });
+  }
+
+  partidas = d.partidas || [];
+  usedPairs = new Set(d.usedPairs || []);
+  trophyCountsDia = d.trophyCountsDia || {};
+  trophyCountsMes = d.trophyCountsMes || {};
+  renderPartidas();
+  renderTrofeusDia();
+  renderRanking();
+});
+
+async function salvar(){
+  await setDoc(salaDocRef, {
+    partidas,
+    usedPairs: Array.from(usedPairs),
+    trophyCountsDia,
+    trophyCountsMes,
+    nomes: getNomes()
+  });
+}
+
+/* ================ SORTEIO 1ª PARTIDA ================ */
+document.getElementById("sortear").onclick = ()=>{
+  if(!isAdmin){ alert("Somente administradores."); return; }
+  criarPrimeira();
+};
+function criarPrimeira(){
+  const n = getNomes();
+  if(n.some(x=>!x)){ alert("Preencha os 6 nomes."); return; }
+  const e = embaralhar(n.slice(0,4));
+  partidas = [{ numero:1, dupla1:[e[0],e[1]], dupla2:[e[2],e[3]], deFora:n.slice(4), vencedor:null }];
+  usedPairs.clear();
+  renderPartidas();
+  salvar();
+}
+
+/* ================ GERAÇÃO (2..9) ================ */
+function todasParticoes4([a,b,c,d]){
+  return [
+    [[a,b],[c,d]],
+    [[a,c],[b,d]],
+    [[a,d],[b,c]]
+  ];
+}
+function gerarProximaPartidaSimulada(stateUltima, statePenultima){
+  const nomes = getNomes();
+  const jogadoresUlt = [...stateUltima.dupla1, ...stateUltima.dupla2];
+  const jogadoresPen = statePenultima? [...statePenultima.dupla1, ...statePenultima.dupla2] : [];
+  const mustLeave   = jogadoresUlt.filter(p=>jogadoresPen.includes(p));
+  const permanecer  = jogadoresUlt.filter(p=>!mustLeave.includes(p));
+  const entra       = stateUltima.deFora.slice();
+
+  let candidatos = [...permanecer, ...entra].slice(0,4);
+  if(candidatos.length<4){
+    const faltam = nomes.filter(n=>!candidatos.includes(n)&&!jogadoresUlt.includes(n));
+    while(candidatos.length<4 && faltam.length) candidatos.push(faltam.shift());
+  }
+  if(candidatos.length<4) return null;
+
+  const opcoes = todasParticoes4(candidatos);
+  const ord = embaralhar(opcoes.slice());
+  let escolhida = null;
+  for(const opt of ord){
+    if(!isDuplaRepetida(opt[0]) && !isDuplaRepetida(opt[1])){ escolhida = opt; break; }
+  }
+  if(!escolhida){
+    let best = ord[0], bestR = 10;
+    ord.forEach(opt=>{
+      const r = (isDuplaRepetida(opt[0])?1:0)+(isDuplaRepetida(opt[1])?1:0);
+      if(r<bestR){ bestR=r; best=opt; }
+    });
+    escolhida = best;
+  }
+  const [dupla1,dupla2] = escolhida;
+  const novaDeFora = nomes.filter(n=>!candidatos.includes(n));
+  usedPairs.add(keyPair(dupla1[0],dupla1[1]));
+  usedPairs.add(keyPair(dupla2[0],dupla2[1]));
+  return { numero:0, dupla1, dupla2, deFora:novaDeFora, vencedor:null };
+}
+function gerarSequenciaAposPrimeira(){
+  if(partidas.length===0) return;
+  const primeira = partidas[0];
+  if(!primeira.vencedor) return;
+
+  partidas = [partidas[0]];
+  usedPairs.clear();
+  usedPairs.add(keyPair(primeira.dupla1[0], primeira.dupla1[1]));
+  usedPairs.add(keyPair(primeira.dupla2[0], primeira.dupla2[1]));
+
+  const states = [];
+  states.push({ dupla1:primeira.dupla1.slice(), dupla2:primeira.dupla2.slice(), deFora:primeira.deFora.slice() });
+
+  const vencedores = primeira.vencedor==='1'? primeira.dupla1.slice(): primeira.dupla2.slice();
+  const perdedores = primeira.vencedor==='1'? primeira.dupla2.slice(): primeira.dupla1.slice();
+  const deFora     = primeira.deFora.slice();
+  const embFor     = embaralhar(deFora.slice());
+
+  const p2_dupla1 = [vencedores[0], embFor[0]];
+  const p2_dupla2 = [vencedores[1], embFor[1]];
+  const state2 = { dupla1:p2_dupla1, dupla2:p2_dupla2, deFora:perdedores.slice() };
+  usedPairs.add(keyPair(p2_dupla1[0],p2_dupla1[1]));
+  usedPairs.add(keyPair(p2_dupla2[0],p2_dupla2[1]));
+  states.push(state2);
+
+  for(let idx=3; idx<=9; idx++){
+    const stUlt = states[states.length-1];
+    const stPen = states.length>=2? states[states.length-2] : null;
+    const nova  = gerarProximaPartidaSimulada(stUlt, stPen);
+    if(!nova) break;
+    nova.numero = idx;
+    states.push({ dupla1:nova.dupla1.slice(), dupla2:nova.dupla2.slice(), deFora:nova.deFora.slice() });
+  }
+
+  for(let i=1;i<states.length;i++){
+    const st = states[i];
+    partidas.push({ numero:partidas.length+1, dupla1:st.dupla1.slice(), dupla2:st.dupla2.slice(), deFora:st.deFora.slice(), vencedor:null });
+  }
+}
+
+/* ================ RENDER PARTIDAS (visual idêntico) ================ */
+function renderPartidas(){
+  const r = document.getElementById("resultado");
+  r.innerHTML = "";
+  partidas.forEach(p=>{
+    const d1Class = p.vencedor==='1' ? 'dupla dupla-vencedora' : 'dupla';
+    const d2Class = p.vencedor==='2' ? 'dupla dupla-vencedora' : 'dupla';
+    const perd1   = p.vencedor==='2' ? 'dupla dupla-perdedora' : 'dupla';
+    const perd2   = p.vencedor==='1' ? 'dupla dupla-perdedora' : 'dupla';
+    r.innerHTML += `
+      <h3 style="text-align:center;">Partida ${p.numero}</h3>
+      <div id="d1-${p.numero}" class="${p.vencedor==='2'?perd1:d1Class}">
+        <strong>Dupla 1:</strong> ${p.dupla1.join(' & ')} ${p.vencedor==='1'?'🏆':''}
+      </div>
+      <div id="d2-${p.numero}" class="${p.vencedor==='1'?perd2:d2Class}">
+        <strong>Dupla 2:</strong> ${p.dupla2.join(' & ')} ${p.vencedor==='2'?'🏆':''}
+      </div>
+      <div class="dupla-fora"><strong>De fora:</strong> ${p.deFora.join(' & ')}</div>
+    `;
+  });
+  if(isAdmin){
+    partidas.forEach(p=>{
+      if(p.vencedor===null){
+        const el1 = document.getElementById(`d1-${p.numero}`);
+        const el2 = document.getElementById(`d2-${p.numero}`);
+        if(el1) el1.onclick = ()=>vencedor(p.numero,1);
+        if(el2) el2.onclick = ()=>vencedor(p.numero,2);
+      }
+    });
+  }
+}
+
+/* ================ LÓGICA DE VITÓRIA ================ */
+function vencedor(n,d){
+  const p = partidas.find(x=>x.numero===n);
+  if(!p || p.vencedor) return;
+  p.vencedor = d.toString();
+
+  const ganh = d===1 ? p.dupla1 : p.dupla2;
+  ganh.forEach(g=>{
+    trophyCountsDia[g]  = (trophyCountsDia[g]||0) + 1;
+    trophyCountsMes[g]  = (trophyCountsMes[g]||0) + 1;
+  });
+
+  if(n===1){ gerarSequenciaAposPrimeira(); }
+
+  renderPartidas();
+  renderTrofeusDia();
+  renderRanking();
+  salvar();
+}
+
+/* ================ DUPLO CLIQUE (somente admin) ================ */
+document.addEventListener("dblclick",(e)=>{
+  if(!isAdmin) return;
+  const el = e.target.closest(".dupla-vencedora");
+  if(!el) return;
+  const id = el.id.match(/d(1|2)-(\d+)/);
+  if(!id) return;
+  const num = parseInt(id[2]);
+  const p = partidas.find(x=>x.numero===num);
+  if(p) p.vencedor = null;
+  renderPartidas(); salvar();
+});
+
+/* ================ TROFÉUS: DIA E MÊS (render) ================ */
+function renderTrofeusDia(){
+  const c = document.getElementById("trofeusDiaContainer");
+  const l = document.getElementById("trofeusDiaLista");
+  const e = Object.entries(trophyCountsDia||{});
+  if(e.length===0){ c.style.display="none"; return; }
+  c.style.display = "block";
+  l.innerHTML = e.sort((a,b)=>b[1]-a[1]).map(([n,v])=>`
+    <div class='trofeus-dia-item'><span>${n}</span><span>${v} 🏆</span></div>
+  `).join('');
+}
+function renderRanking(){
+  const l = document.getElementById("rankingList");
+  if(!l) return;
+  const e = Object.entries(trophyCountsMes||{});
+  l.innerHTML = e.length
+    ? e.sort((a,b)=>b[1]-a[1]).map(([n,v])=>`<div class='trofeus-dia-item'><span>${n}</span><span>${v} 🏆</span></div>`).join('')
+    : "<p style='text-align:center;color:#777;'>Nenhum troféu neste mês.</p>";
+}
+
+/* ================ NOVA RODADA (salva histórico do dia + sincroniza) ================ */
+async function novaRodada(){
+  if(!isAdmin){ alert("Somente administradores."); return; }
+  if(!confirm("Tem certeza que deseja iniciar nova rodada? Isso apagará os resultados do dia.")) return;
+
+  // Salva o snapshot do dia em "partidasDia/YYYY-MM-DD"
+  const hoje = dataKeyHoje();
+  const docDiaRef = doc(db, "partidasDia", `play-do-bistecao_${hoje}`);
+  await setDoc(docDiaRef, {
+    sala: "play-do-bistecao",
+    dataKey: hoje,
+    partidas: partidas || [],
+    nomes: getNomes(),
+    createdAt: Date.now()
+  });
+
+  // Zera somente o DIA (mantém troféus do mês)
+  partidas = [];
+  usedPairs = new Set();
+  trophyCountsDia = {};
+
+  await setDoc(salaDocRef, {
+    partidas: [],
+    usedPairs: [],
+    trophyCountsDia: {},
+    trophyCountsMes: trophyCountsMes || {},
+    nomes: getNomes()
+  });
+
+  document.getElementById("resultado").innerHTML = "";
+  renderTrofeusDia();
+  renderRanking();
+}
+
+/* ================ Nomes: padronizar e sincronizar ================ */
+[...Array(6)].forEach((_, i)=>{
+  const campo = document.getElementById("p"+(i+1));
+  campo.addEventListener("blur", async ()=>{
+    let v = campo.value.trim();
+    if(v.length>0){
+      campo.value = v.charAt(0).toUpperCase() + v.slice(1).toLowerCase();
+      const nomes = [...Array(6)].map((_, j)=> document.getElementById("p"+(j+1)).value.trim());
+      await setDoc(salaDocRef, {
+        partidas,
+        usedPairs: Array.from(usedPairs),
+        trophyCountsDia,
+        trophyCountsMes,
+        nomes
+      });
+    }
+  });
+});
+
+/* ================ HISTÓRICO DE TROFÉUS ================ */
+async function prepararHistoricoTrofeus(){
+  const sel = document.getElementById("mesSelect");
+  const list = document.getElementById("historicoTrofeusList");
+  if(!sel || !list) return;
+
+  sel.innerHTML = "";
+  const now = new Date();
+  for(let i=0;i<12;i++){
+    const d = new Date(now.getFullYear(), now.getMonth()-i, 1);
+    const mk = mesKey(d);
+    const opt = document.createElement("option");
+    opt.value = mk;
+    opt.textContent = labelMes(d);
+    sel.appendChild(opt);
+  }
+
+  async function carregar(mk){
+    const ref = doc(db, "historicoTrofeus", `play-do-bistecao_${mk}`);
+    const s = await getDoc(ref);
+    if(!s.exists()){ list.innerHTML = "<p style='text-align:center;color:#777;'>Sem dados para esse mês.</p>"; return; }
+    const data = s.data();
+    const entries = Object.entries(data || {}).filter(([k])=>!["sala","mesKey","rotulo","closedAt"].includes(k));
+    list.innerHTML = entries.length
+      ? entries.sort((a,b)=>b[1]-a[1]).map(([nome,q])=>`<div class='trofeus-dia-item'><span>${nome}</span><span>${q} 🏆</span></div>`).join('')
+      : "<p style='text-align:center;color:#777;'>Sem dados para esse mês.</p>";
+  }
+  sel.onchange = ()=>carregar(sel.value);
+  await carregar(sel.value);
+}
+
+/* Encerrar mês: move trophyCountsMes => historicoTrofeus e zera o mês (sem alert) */
+async function encerrarMesAtual(){
+  // monta chave do mês atual
+  const mk = mesKey(new Date());
+  const rotulo = labelMes(new Date());
+
+  // salva no histórico
+  await setDoc(doc(db,"historicoTrofeus", `play-do-bistecao_${mk}`), {
+    ...trophyCountsMes,
+    sala: "play-do-bistecao",
+    mesKey: mk,
+    rotulo,
+    closedAt: Date.now()
+  });
+
+  // zera o mês no doc principal
+  trophyCountsMes = {};
+  await setDoc(salaDocRef, {
+    partidas,
+    usedPairs: Array.from(usedPairs),
+    trophyCountsDia,
+    trophyCountsMes,
+    nomes: getNomes()
+  });
+}
+
+/* ================ HISTÓRICO DE PARTIDAS ================ */
+async function prepararHistoricoPartidas(){
+  const selMes = document.getElementById("mesPartidasSelect");
+  const listaDatas = document.getElementById("listaPartidasDoMes");
+  const detalhes = document.getElementById("detalhesPartida");
+  if(!selMes || !listaDatas || !detalhes) return;
+
+  selMes.innerHTML = "";
+  const now = new Date();
+  for(let i=0;i<12;i++){
+    const d = new Date(now.getFullYear(), now.getMonth()-i, 1);
+    const mk = mesKey(d);
+    const opt = document.createElement("option");
+    opt.value = mk;
+    opt.textContent = labelMes(d);
+    selMes.appendChild(opt);
+  }
+
+  async function listarDiasDoMes(mk){
+    listaDatas.innerHTML = "<p style='text-align:center;color:#777;'>Carregando…</p>";
+    detalhes.innerHTML = "";
+
+    // montar lista de possíveis dias do mês e checar quais existem
+    const [ano,mes] = mk.split("-").map(Number);
+    const lastDay = new Date(ano, mes, 0).getDate();
+    const encontrados = [];
+
+    for(let dia=1; dia<=lastDay; dia++){
+      const dd = String(dia).padStart(2,'0');
+      const key = `${ano}-${String(mes).padStart(2,'0')}-${dd}`;
+      const ref = doc(db,"partidasDia", `play-do-bistecao_${key}`);
+      const s = await getDoc(ref);
+      if(s.exists()){
+        encontrados.push({ key, data: s.data() });
+      }
+    }
+
+    if(encontrados.length===0){
+      listaDatas.innerHTML = "<p style='text-align:center;color:#777;'>Nenhuma partida salva neste mês.</p>";
+      return;
+    }
+
+    // render lista de datas clicáveis
+    listaDatas.innerHTML = encontrados.map(({key})=>{
+      const [Y,M,D] = key.split("-");
+      const d = new Date(Number(Y), Number(M)-1, Number(D));
+      const semana = weekdayLabel(d);
+      return `
+        <div class="trofeus-dia-item" data-date="${key}" style="cursor:pointer;">
+          <span>Partida ${D}/${M}/${Y} — ${semana}</span>
+          <span>🔎 Ver</span>
+        </div>
+      `;
+    }).join("");
+
+    // click handler: carrega e mostra o visual idêntico ao do dia
+    listaDatas.querySelectorAll(".trofeus-dia-item").forEach(el=>{
+      el.addEventListener("click", async ()=>{
+        const key = el.getAttribute("data-date");
+        const ref = doc(db,"partidasDia", `play-do-bistecao_${key}`);
+        const s = await getDoc(ref);
+        if(!s.exists()){ detalhes.innerHTML = "<p style='text-align:center;color:#777;'>Partida não encontrada.</p>"; return; }
+        const dataDia = s.data();
+        const pts = dataDia.partidas || [];
+
+        // render com mesmo visual das partidas
+        let html = "";
+        pts.forEach(p=>{
+          const d1Class = p.vencedor==='1' ? 'dupla dupla-vencedora' : 'dupla';
+          const d2Class = p.vencedor==='2' ? 'dupla dupla-vencedora' : 'dupla';
+          const perd1   = p.vencedor==='2' ? 'dupla dupla-perdedora' : 'dupla';
+          const perd2   = p.vencedor==='1' ? 'dupla dupla-perdedora' : 'dupla';
+          html += `
+            <h3 style="text-align:center;">Partida ${p.numero}</h3>
+            <div class="${p.vencedor==='2'?perd1:d1Class}">
+              <strong>Dupla 1:</strong> ${p.dupla1.join(' & ')} ${p.vencedor==='1'?'🏆':''}
+            </div>
+            <div class="${p.vencedor==='1'?perd2:d2Class}">
+              <strong>Dupla 2:</strong> ${p.dupla2.join(' & ')} ${p.vencedor==='2'?'🏆':''}
+            </div>
+            <div class="dupla-fora"><strong>De fora:</strong> ${p.deFora.join(' & ')}</div>
+          `;
+        });
+
+        detalhes.innerHTML = `
+          <div class="trofeus-dia-container" style="margin-top:10px;">
+            <h3 style="margin-bottom:8px;">📅 ${key.split("-").reverse().join("/")}</h3>
+            ${html || "<p style='text-align:center;color:#777;'>Sem partidas neste dia.</p>"}
+          </div>
+        `;
+      });
+    });
+  }
+
+  selMes.onchange = ()=> listarDiasDoMes(selMes.value);
+  await listarDiasDoMes(selMes.value);
+}
+
+/* Inicialização simples de render */
+renderPartidas();
+renderTrofeusDia();
+renderRanking();
+</script>
