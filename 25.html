@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>0 a 25 </title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500&family=Rock+Salt&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+            background-color: #f4f4f4;
+            margin: 0;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .header-footer-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        header {
+            background-color: #067733;
+            color: white;
+            padding: 20px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 8px 8px 0 0;
+            padding-left: 10px;
+        }
+
+        header h1 {
+            font-family: 'Quicksand', sans-serif;
+            font-size: 2.5em;
+            text-align: center;
+            flex-grow: 1;
+        }
+
+        footer {
+            background-color: #333;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            font-size: 14px;
+            border-radius: 0 0 8px 8px;
+        }
+
+        .quadrinhos-container {
+            display: grid;
+            grid-template-columns: repeat(5, 80px);
+            grid-template-rows: repeat(5, 80px);
+            gap: 5px;
+            justify-content: center;
+            margin: 20px auto;
+        }
+
+        .quadrinho {
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #067733;
+            color: white;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .quadrinho.inativo {
+            background-color: #ccc;
+            pointer-events: none;
+        }
+
+        .quadrinho.correto {
+            background-color: #45a049; /* Verde mais claro para o número correto */
+        }
+
+        button {
+            font-size: 18px;
+            padding: 10px;
+            cursor: pointer;
+            background-color: #067733;
+            color: white;
+            border: none;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #mensagem {
+            margin-top: 20px;
+            font-size: 20px;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        #input-container {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        input[type="number"] {
+            padding: 10px;
+            font-size: 18px;
+            width: 100px;
+            text-align: center;
+            margin-right: 10px;
+        }
+
+        .modo-container {
+            margin-top: 10px;
+            font-size: 18px;
+            color: #333;
+        }
+
+        #input-container, #modo-selecionado {
+            display: block;
+        }
+
+        .correto {
+            color: #4CAF50; /* Cor verde para o número correto */
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-footer-container">
+        <header>
+            <img src="https://artpoin.com/wp-content/uploads/2023/08/artpoin-heineken7.png" alt="Logo" width="90" height="90" id="logo" style="cursor: pointer; margin-left: 15px;">
+            <h1>De Zero a Vinte e Cinco!!</h1>
+        </header>
+    </div>
+
+    <div class="container">
+        <div id="input-container">
+            <input type="number" id="numero" min="0" max="25" placeholder="0 a 25">
+            <button onclick="iniciarJogo()">Iniciar</button>
+        </div>
+
+        <div class="modo-container" id="modo-selecionado">
+            Modo: <span id="modo-texto">Aguardando escolha...</span>
+        </div>
+
+        <div class="quadrinhos-container" id="quadrinhos-container"></div>
+
+        <div id="mensagem"></div>
+    </div>
+
+    <div class="header-footer-container">
+        <footer>
+            <p>NEM QUE OFENDA! © 2025</p>
+        </footer>
+    </div>
+
+    <audio id="click-sound" src="click.mp3" preload="auto"></audio>
+    <audio id="aplausos-sound" src="aplausos.mp3" preload="auto"></audio>
+
+    <script>
+        document.getElementById('logo').addEventListener('click', function() {
+            location.reload();
+        });
+
+        let numeroEscolhido = null;
+        let minimo = 0;
+        let maximo = 25;
+
+        function iniciarJogo() {
+            let numero = document.getElementById('numero').value;
+
+            if (numero === "") {
+                numeroEscolhido = Math.floor(Math.random() * 26);
+                document.getElementById('modo-texto').innerText = "Número Aleatório";
+            } else {
+                numero = parseInt(numero);
+                if (numero < 0 || numero > 25 || isNaN(numero)) {
+                    alert("O número deve estar entre 0 e 25!");
+                    return;
+                }
+                numeroEscolhido = numero;
+                document.getElementById('modo-texto').innerText = "Escolhido pelo Usuário";
+            }
+
+            document.getElementById('input-container').style.display = "none";
+            document.getElementById('modo-selecionado').style.display = "block";
+
+            document.getElementById('mensagem').innerText = "Tente adivinhar o número que foi escolhido!";
+            criarQuadrinhos();
+        }
+
+        function criarQuadrinhos() {
+            let container = document.getElementById('quadrinhos-container');
+            container.innerHTML = '';
+
+            for (let i = 0; i <= 25; i++) {
+                let quadrinho = document.createElement('div');
+                quadrinho.classList.add('quadrinho');
+                quadrinho.id = 'quadrinho-' + i;
+                quadrinho.innerText = i;
+                quadrinho.onclick = function() { selecionarNumero(i) };
+                container.appendChild(quadrinho);
+            }
+
+            atualizarQuadrinhos();
+        }
+
+        function atualizarQuadrinhos() {
+            for (let i = 0; i <= 25; i++) {
+                let quadrinho = document.getElementById('quadrinho-' + i);
+                if (i < minimo || i > maximo) {
+                    quadrinho.classList.add('inativo');
+                } else {
+                    quadrinho.classList.remove('inativo');
+                }
+            }
+        }
+
+        function selecionarNumero(numero) {
+            let clickSound = document.getElementById('click-sound');
+            clickSound.load();
+            clickSound.play();
+
+            if (numero < minimo || numero > maximo) {
+                document.getElementById('mensagem').innerText = `Escolha um número de ${minimo} a ${maximo}`;
+                return;
+            }
+
+            if (numero === numeroEscolhido) {
+                let aplausosSound = document.getElementById('aplausos-sound');
+                aplausosSound.load();
+                aplausosSound.play();
+
+                // Agora o número correto é inserido dentro de um <span> com a classe "correto"
+                document.getElementById('mensagem').innerHTML = `Parabéns! Você encontrou o número <span class="correto">${numeroEscolhido}</span>! Pode beber! 🍻`;
+            } else {
+                if (numero < numeroEscolhido) {
+                    minimo = numero + 1;
+                } else {
+                    maximo = numero - 1;
+                }
+                document.getElementById('mensagem').innerText = `Escolha um número de ${minimo} a ${maximo}. Tente novamente!`;
+            }
+
+            atualizarQuadrinhos();
+        }
+    </script>
+
+</body>
+</html>
