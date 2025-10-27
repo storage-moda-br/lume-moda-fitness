@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>De 0 a 25</title>
+<style>
+  :root{
+    --bg:#f4f6f8;
+    --card:#ffffff;
+    --text:#222;
+    --primary:#0057A3;
+    --disabled:#C7CDD3;
+    --starburst:rgba(255,210,0,.9);
+  }
+  body.dark{
+    --bg:#1f2327;
+    --card:#2a2f34;
+    --text:#e9e9e9;
+    --disabled:#575d62;
+    --starburst:rgba(255,240,110,.95);
+  }
+
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    background:var(--bg);
+    font-family:Poppins,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    display:flex;align-items:center;justify-content:center;
+    min-height:100dvh;
+    padding:clamp(8px, env(safe-area-inset-top, 0px) + 8px, 24px) 12px 12px 12px;
+    transition:background .2s ease;
+  }
+
+  .card{
+    width:100%;max-width:420px;
+    background:var(--card);
+    color:var(--text);
+    border-radius:20px;
+    padding:20px 20px 24px;
+    box-shadow:0 6px 20px rgba(0,0,0,.15);
+    position:relative;
+    text-align:center;
+  }
+
+  /* Mensagem fixa no topo */
+  .win-top{
+    min-height:28px;
+    margin-bottom:8px;
+    font-weight:700;
+    color:var(--primary);
+    letter-spacing:.2px;
+    opacity:0;
+    transform:translateY(6px);
+    transition:opacity .25s ease, transform .25s ease;
+  }
+  .win-top.show{
+    opacity:1;
+    transform:translateY(0);
+  }
+
+  h2{
+    margin:0 0 10px;
+    font-size:1.35rem;
+  }
+
+  /* MENU */
+  .menu-btn{
+    position:absolute;top:8px;right:8px;
+    background:transparent;border:0;
+    font-size:22px;color:var(--text);
+    cursor:pointer;padding:6px 8px;border-radius:10px;
+    z-index:10000;
+  }
+  .menu-btn:active{transform:scale(.92)}
+  .dropdown{
+    position:absolute;top:40px;right:8px;
+    width:170px;padding:10px;background:var(--card);
+    border-radius:12px;box-shadow:0 6px 16px rgba(0,0,0,.25);
+    opacity:0;pointer-events:none;transform:translateY(-6px);
+    transition:opacity .18s ease, transform .18s ease;
+    z-index:11000;
+    text-align:left;
+  }
+  .dropdown.open{opacity:1;pointer-events:auto;transform:translateY(0)}
+  .dd-item{display:flex;justify-content:space-between;align-items:center;padding:6px 0}
+  .switch{width:46px;height:26px;border-radius:20px;background:var(--disabled);position:relative;cursor:pointer;transition:.2s}
+  .switch::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.2s}
+  .switch.on{background:var(--primary)}
+  .switch.on::after{left:23px}
+
+  /* GRID */
+  .grid{display:grid;gap:8px;margin-top:8px}
+  @media(min-width:500px){.grid{grid-template-columns:repeat(5,1fr)}}
+  @media(max-width:499px) and (min-width:390px){.grid{grid-template-columns:repeat(4,1fr)}}
+  @media(max-width:389px){.grid{grid-template-columns:repeat(3,1fr)}}
+
+  .num{
+    padding:14px;border:0;border-radius:10px;
+    background:var(--primary);color:#fff;font-size:1rem;
+    cursor:pointer;transition:transform .1s;
+    position:relative;overflow:hidden;
+  }
+  .num:active:not(.disabled){transform:scale(.92)}
+  .num.disabled{background:var(--disabled)!important;cursor:not-allowed}
+
+  .btn{
+    margin-top:18px;width:100%;
+    border:0;border-radius:10px;background:#333;color:#fff;
+    padding:12px;font-size:1rem;cursor:pointer;
+  }
+
+  /* FESTA */
+  .starburst{
+    position:absolute;inset:0;border-radius:50%;
+    background:var(--starburst);filter:blur(40px);
+    animation:burst .9s ease forwards;z-index:-1;
+  }
+  @keyframes burst{
+    0%{opacity:0;transform:scale(.1)}
+    50%{opacity:.9;transform:scale(1.6)}
+    100%{opacity:0;transform:scale(2.5)}
+  }
+  .confetti{
+    width:8px;height:8px;position:absolute;border-radius:50%;
+    opacity:1;animation:confetti 1.2s ease forwards;z-index:5;
+  }
+  @keyframes confetti{
+    0%{transform:translateY(0) scale(1);opacity:1}
+    100%{transform:translateY(-60px) scale(.4);opacity:0}
+  }
+  @keyframes shake{
+    0%,100%{transform:translate(0)}
+    25%{transform:translate(4px,-4px)}
+    50%{transform:translate(-4px,4px)}
+    75%{transform:translate(4px,4px)}
+  }
+</style>
+</head>
+<body>
+
+  <div class="card">
+    <!-- Menu -->
+    <button class="menu-btn" id="menuBtn" aria-label="Menu">≡</button>
+    <div class="dropdown" id="dropdown" role="menu">
+      <div class="dd-item">Tema Escuro <div class="switch" id="themeSwitch" role="switch" aria-checked="false"></div></div>
+      <div class="dd-item">Som de Clique <div class="switch on" id="soundSwitch" role="switch" aria-checked="true"></div></div>
+    </div>
+
+    <!-- Mensagem fixa no topo -->
+    <div id="winTop" class="win-top"></div>
+
+    <h2>De 0 a 25</h2>
+
+    <div class="grid" id="grid"></div>
+
+    <button class="btn" id="restart">Reiniciar</button>
+  </div>
+
+<script>
+  /* =========================
+     ESTADO / REFERÊNCIAS
+  ========================== */
+  let secret = Math.floor(Math.random()*26);
+  const grid = document.getElementById('grid');
+  const winTop = document.getElementById('winTop');
+  const menuBtn = document.getElementById('menuBtn');
+  const dropdown = document.getElementById('dropdown');
+  const themeSwitch = document.getElementById('themeSwitch');
+  const soundSwitch = document.getElementById('soundSwitch');
+
+  // Preferências
+  const PREF_THEME = 'guess.theme';
+  const PREF_SOUND = 'guess.sound';
+
+  // Áudio
+  let audioCtx = null;
+  let clickSoundOn = true;
+
+  function ensureAudio() {
+    if (!audioCtx) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (AC) audioCtx = new AC();
+    }
+  }
+
+  /* =========================
+     SONS (WebAudio)
+  ========================== */
+
+  // Beep curtinho do clique (8-bit vibes, mas suave)
+  function playClick() {
+    if (!clickSoundOn || !audioCtx) return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(1300, audioCtx.currentTime);
+    gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.07);
+    osc.connect(gain).connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.07);
+  }
+
+  // Gera ruído branco para simular aplausos
+  function playNoiseBurst(startTime, duration, volume = 0.2) {
+    if (!audioCtx) return;
+    const bufferSize = Math.floor(audioCtx.sampleRate * duration);
+    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize); // decai no fim
+    }
+    const src = audioCtx.createBufferSource();
+    src.buffer = buffer;
+    const gain = audioCtx.createGain();
+    gain.gain.setValueAtTime(volume, startTime);
+    gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+    src.connect(gain).connect(audioCtx.destination);
+    src.start(startTime);
+    src.stop(startTime + duration);
+  }
+
+  // Várias palmas + um "grito" sintético curto (formante agudo)
+  function playVictoryCrowd() {
+    if (!audioCtx) return;
+
+    const now = audioCtx.currentTime;
+
+    // 1) Série de "aplausos" com bursts de ruído (aleatórios)
+    for (let i = 0; i < 5; i++) {
+      const t = now + i * 0.18 + Math.random() * 0.05;
+      playNoiseBurst(t, 0.18, 0.22);
+    }
+
+    // 2) Pequeno swell de torcida (ruído mais longo)
+    playNoiseBurst(now + 0.2, 0.9, 0.12);
+
+    // 3) "AÊÊÊ" sintético: três osciladores subindo rápido
+    const freqs = [420, 600, 780];
+    freqs.forEach((f, i) => {
+      const t = now + 0.25 + i * 0.08;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(f, t);
+      osc.frequency.linearRampToValueAtTime(f + 120, t + 0.18); // subida
+      gain.gain.setValueAtTime(0.08, t);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.22);
+      osc.connect(gain).connect(audioCtx.destination);
+      osc.start(t);
+      osc.stop(t + 0.22);
+    });
+
+    // Duração total ~1.2s
+  }
+
+  /* =========================
+     UI / JOGO
+  ========================== */
+  function buildGrid(){
+    grid.innerHTML = '';
+    for(let i=0;i<=25;i++){
+      const btn = document.createElement('button');
+      btn.className = 'num';
+      btn.textContent = i;
+      btn.dataset.v = i;
+      btn.addEventListener('click', () => onPick(btn));
+      grid.appendChild(btn);
+    }
+  }
+
+  function disableOutside(min, max){
+    document.querySelectorAll('.num').forEach(b=>{
+      const v = Number(b.dataset.v);
+      if (v < min || v > max) {
+        b.disabled = true;
+        b.classList.add('disabled');
+      }
+    });
+  }
+
+  async function onPick(btn){
+    ensureAudio();
+    if (audioCtx && audioCtx.state === 'suspended') {
+      try { await audioCtx.resume(); } catch {}
+    }
+    playClick();
+
+    const v = Number(btn.dataset.v);
+
+    if (v === secret){
+      // Festa visual
+      btn.innerHTML = `${v} 🍺`;
+
+      // Starburst
+      const sb = document.createElement('div');
+      sb.className = 'starburst';
+      btn.appendChild(sb);
+
+      // Confetes
+      for (let i=0;i<12;i++){
+        const c = document.createElement('div');
+        c.className = 'confetti';
+        c.style.background = i%2 ? '#FFD700' : '#FF3300';
+        c.style.left = (10 + Math.random()*25) + 'px';
+        c.style.top  = (10 + Math.random()*25) + 'px';
+        btn.appendChild(c);
+        setTimeout(()=>c.remove(), 1300);
+      }
+
+      // Shake
+      document.body.style.animation = 'shake .38s ease';
+      setTimeout(()=>document.body.style.animation = '', 380);
+
+      // Desabilita tudo fora do número
+      disableOutside(secret, secret);
+
+      // Mostra mensagem no topo (fixa até reiniciar)
+      winTop.textContent = 'VOCÊ ACERTOU! PODE VIRAR O COPO 🍻';
+      winTop.classList.add('show');
+
+      // Som de comemoração ~1.2s (sem bloqueio)
+      playVictoryCrowd();
+
+    } else if (v < secret){
+      disableOutside(v+1, 25);
+      btn.classList.add('disabled');
+      btn.disabled = true;
+    } else {
+      disableOutside(0, v-1);
+      btn.classList.add('disabled');
+      btn.disabled = true;
+    }
+  }
+
+  // Reiniciar
+  document.getElementById('restart').addEventListener('click', ()=>{
+    secret = Math.floor(Math.random()*26);
+    winTop.textContent = '';
+    winTop.classList.remove('show');
+    buildGrid();
+  });
+
+  // Menu
+  menuBtn.addEventListener('click', (e)=>{
+    e.stopPropagation();
+    dropdown.classList.toggle('open');
+  });
+  document.addEventListener('click', (e)=>{
+    if (!dropdown.contains(e.target) && e.target !== menuBtn) {
+      dropdown.classList.remove('open');
+    }
+  });
+
+  // Tema
+  function applyTheme(dark){
+    document.body.classList.toggle('dark', dark);
+    themeSwitch.classList.toggle('on', dark);
+    themeSwitch.setAttribute('aria-checked', String(dark));
+    localStorage.setItem(PREF_THEME, dark ? 'dark' : 'light');
+  }
+  themeSwitch.addEventListener('click', ()=>{
+    const dark = !document.body.classList.contains('dark');
+    applyTheme(dark);
+  });
+
+  // Som de clique
+  function applySound(on){
+    clickSoundOn = on;
+    soundSwitch.classList.toggle('on', on);
+    soundSwitch.setAttribute('aria-checked', String(on));
+    localStorage.setItem(PREF_SOUND, on ? 'on' : 'off');
+  }
+  soundSwitch.addEventListener('click', ()=>{
+    applySound(!clickSoundOn);
+  });
+
+  // Restaurar preferências
+  (function restore(){
+    applyTheme(localStorage.getItem(PREF_THEME)==='dark');
+    applySound(localStorage.getItem(PREF_SOUND)!=='off');
+  })();
+
+  // Monta UI
+  buildGrid();
+</script>
+
+</body>
+</html>
