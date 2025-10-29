@@ -72,11 +72,12 @@ function weekdayLabel(d){
 const menu=document.getElementById("menuDropdown");
 
 function atualizarMenuAdmin() {
-  const botoesAdmin = menu.querySelectorAll(".nova, .encerrarMes");
+  const botoesAdmin = menu.querySelectorAll(".nova, .encerrarMes, .selecionarSala");
   botoesAdmin.forEach(btn => {
     btn.style.display = isAdmin ? "flex" : "none";
   });
 }
+
 atualizarMenuAdmin();
 
 document.getElementById("menuIcon").onclick=()=>menu.style.display=menu.style.display==="block"?"none":"block";
