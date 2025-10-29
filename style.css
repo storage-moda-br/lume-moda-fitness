@@ -76,6 +76,12 @@ button:hover{transform:scale(1.03);}
 }
 
 #indicadorDB {
+  text-align: left;
+  padding-left: 10px;
+}
+
+
+#indicadorDB {
   transition: opacity .3s;
 }
 
