@@ -1,53 +1,216 @@
-*{box-sizing:border-box;font-family:"Poppins",sans-serif;}
-body{margin:0;background:#f4f7fb;display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:10px;}
-.container{background:white;width:100%;max-width:420px;padding:20px 15px;border-radius:20px;box-shadow:0 4px 12px rgba(0,0,0,0.1);}
-.header{display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:20px;}
-.header img{height:60px;width:60px;object-fit:contain;position:absolute;left:0;cursor:pointer;}
-.header h1{color:#0093ff;font-size:1.6rem;margin:0;text-align:center;width:100%;}
-.menu-icon{position:absolute;right:0;top:50%;transform:translateY(-50%);font-size:1.6rem;cursor:pointer;color:#333;}
-.menu-dropdown{display:none;position:absolute;right:0;top:60px;background:white;border-radius:8px;box-shadow:0 4px 8px rgba(0,0,0,0.2);z-index:1000;min-width:190px;}
-.menu-dropdown a{display:flex;align-items:center;padding:10px 15px;color:#333;text-decoration:none;font-size:.95rem;transition:background .2s;}
-.menu-dropdown a:hover{background:#e8f4ff;}
-.menu-dropdown a.trofeus::before{content:"🏆";margin-right:8px;}
-.menu-dropdown a.historicoTrofeus::before{content:"📅";margin-right:8px;}
-.menu-dropdown a.historicoPartidas::before{content:"🎾";margin-right:8px;}
-.menu-dropdown a.encerrarMes::before{content:"📦";margin-right:8px;}
-.menu-dropdown a.nova::before{content:"🔄";margin-right:8px;}
-.menu-dropdown a.regras::before{content:"📘";color:#0093ff;margin-right:8px;}
-.menu-dropdown a.sobre::before{content:"ℹ️";margin-right:8px;}
-.menu-dropdown a.admin::before{content:"🔐";margin-right:8px;}
-.menu-dropdown a.selecionarSala::before{
-  content:"📊";
-  margin-right:8px;
-}
-.menu-dropdown a.editarTrofeus::before {
-  content: "✏️";
-  margin-right: 8px;
+/* ================= BASE ================= */
+* {
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
 }
 
+body {
+  margin: 0;
+  background: #f4f7fb;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  padding: 10px;
+}
 
+.container {
+  background: white;
+  width: 100%;
+  max-width: 420px;
+  padding: 20px 15px;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
 
+/* ================= HEADER ================= */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin-bottom: 20px;
+}
 
-.inputs{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:20px;}
-input{width:100%;padding:10px;border:1px solid #ddd;border-radius:10px;font-size:.95rem;}
-.jogador-ativo{background:#e8f4ff;border:2px solid #0093ff;}
-.jogador-fora{background:#f0f0f0;border:1px solid #ccc;color:#666;}
+.header img {
+  height: 60px;
+  width: 60px;
+  object-fit: contain;
+  position: absolute;
+  left: 0;
+  cursor: pointer;
+}
 
-button{display:block;width:100%;max-width:260px;margin:0 auto;padding:12px 20px;border:none;border-radius:30px;background:linear-gradient(90deg,#0093ff,#00c8ff);color:white;font-size:1rem;cursor:pointer;transition:.3s;}
-button:hover{transform:scale(1.03);}
-.dupla{background:#e8f4ff;margin-bottom:10px;border-radius:15px;padding:10px 15px;border:1px solid #0093ff;font-weight:500;}
-.dupla-vencedora{background:#e6ffed!important;border-color:#28a745!important;}
-.dupla-perdedora{background:#ffe6e6!important;border-color:#dc3545!important;color:#444!important;}
-.dupla-fora{background:#f0f0f0;border:1px solid #ccc;color:#666;border-radius:15px;padding:10px 15px;font-weight:500;margin-bottom:10px;}
+.header h1 {
+  color: #0093ff;
+  font-size: 1.6rem;
+  margin: 0;
+  text-align: center;
+  width: 100%;
+}
 
-.trofeus-dia-container{background:#f9f9f9;border-radius:12px;padding:10px 15px;margin-top:20px;box-shadow:0 2px 5px rgba(0,0,0,0.05);}
-.trofeus-dia-container h3{text-align:center;color:#b89b00;margin-bottom:10px;}
-.trofeus-dia-item{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:#f8f9fa;border-radius:8px;margin-bottom:5px;}
+.menu-icon {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.6rem;
+  cursor: pointer;
+  color: #333;
+}
 
-.modal{display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;background-color:rgba(0,0,0,.5);}
+/* ================= MENU ================= */
+.menu-dropdown {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 60px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  z-index: 1000;
+  min-width: 190px;
+}
+
+.menu-dropdown a {
+  display: flex;
+  align-items: center;
+  padding: 10px 15px;
+  color: #333;
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: background 0.2s;
+}
+.menu-dropdown a:hover {
+  background: #e8f4ff;
+}
+
+/* ÍCONES MENU */
+.menu-dropdown a.trofeus::before { content: "🏆"; margin-right: 8px; }
+.menu-dropdown a.historicoTrofeus::before { content: "📅"; margin-right: 8px; }
+.menu-dropdown a.historicoPartidas::before { content: "🎾"; margin-right: 8px; }
+.menu-dropdown a.encerrarMes::before { content: "📦"; margin-right: 8px; }
+.menu-dropdown a.nova::before { content: "🔄"; margin-right: 8px; }
+.menu-dropdown a.regras::before { content: "📘"; margin-right: 8px; }
+.menu-dropdown a.sobre::before { content: "ℹ️"; margin-right: 8px; }
+.menu-dropdown a.admin::before { content: "🔐"; margin-right: 8px; }
+.menu-dropdown a.selecionarSala::before { content: "📊"; margin-right: 8px; }
+.menu-dropdown a.editarTrofeus::before { content: "✏️"; margin-right: 8px; }
+
+/* ================= INPUTS ================= */
+.inputs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  font-size: 0.95rem;
+}
+
+.jogador-ativo {
+  background: #e8f4ff;
+  border: 2px solid #0093ff;
+}
+
+.jogador-fora {
+  background: #f0f0f0;
+  border: 1px solid #ccc;
+  color: #666;
+}
+
+/* ================= BOTÕES ================= */
+button {
+  display: block;
+  width: 100%;
+  max-width: 260px;
+  margin: 0 auto;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 30px;
+  background: linear-gradient(90deg,#0093ff,#00c8ff);
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: .3s;
+}
+button:hover {
+  transform: scale(1.03);
+}
+
+/* ================= PARTIDAS ================= */
+.dupla {
+  background: #e8f4ff;
+  margin-bottom: 10px;
+  border-radius: 15px;
+  padding: 10px 15px;
+  border: 1px solid #0093ff;
+  font-weight: 500;
+}
+.dupla-vencedora {
+  background: #e6ffed !important;
+  border-color: #28a745 !important;
+}
+.dupla-perdedora {
+  background: #ffe6e6 !important;
+  border-color: #dc3545 !important;
+  color: #444 !important;
+}
+.dupla-fora {
+  background: #f0f0f0;
+  border: 1px solid #ccc;
+  color: #666;
+  border-radius: 15px;
+  padding: 10px 15px;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+
+/* ================= TROFÉUS ================= */
+.trofeus-dia-container {
+  background: #f9f9f9;
+  border-radius: 12px;
+  padding: 10px 15px;
+  margin-top: 20px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+.trofeus-dia-container h3 {
+  text-align: center;
+  color: #b89b00;
+  margin-bottom: 10px;
+}
+.trofeus-dia-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 10px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin-bottom: 5px;
+}
+
+/* ================= MODAIS ================= */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,.5);
+}
+
 .modal-content {
   background: white;
-  margin: 10% auto;
+  position: relative;
+  margin: auto;
+  top: 55px;
   padding: 20px;
   border-radius: 15px;
   width: 90%;
@@ -58,83 +221,86 @@ button:hover{transform:scale(1.03);}
   scrollbar-color: #ccc transparent;
 }
 
+.modal-content h2 {
+  text-align: center;
+  color: #0093ff;
+  margin-bottom: 15px;
+}
 
-.modal-content h2{text-align:center;color:#0093ff;margin-bottom:15px;}
-.close{color:#aaa;float:right;font-size:28px;font-weight:bold;cursor:pointer;}
-.close:hover{color:#000;}
-.regras-list p{margin:8px 0;font-size:.93rem;}
-.regras-list span{color:#0093ff;font-weight:bold;}
-
-#selecionarSalaModal .modal-content button.btn-sala {
-  width: 100%;
-  padding: 12px;
-  border: none;
-  border-radius: 10px;
-  font-size: 1rem;
-  color: white;
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
   cursor: pointer;
-  transition: .2s;
 }
+.close:hover { color: #000; }
 
-#selecionarSalaModal .modal-content button.btn-sala:hover {
-  filter: brightness(1.1);
-}
-
-#indicadorDB {
-  font-size: 0.65rem;
-  opacity: 0.5;
+/* ================= INDICADOR BANCO ================= */
+#indicadorDB,
+#indicadorDBModal {
+  font-size: 0.70rem;
+  opacity: 0.6;
   text-align: left;
   padding-left: 8px;
-  margin-top: 10px;
 }
-
-#indicadorDB:hover {
+#indicadorDB:hover,
+#indicadorDBModal:hover {
   opacity: 1;
 }
 
+/* ================= EDITOR TROFÉUS ================= */
+.tab-btn {
+  flex: 1;
+  border: none;
+  border-radius: 30px;
+  padding: 10px 0;
+  background: #e8edf3;
+  color: #444;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+.tab-btn.active {
+  background: linear-gradient(90deg,#0093ff,#00c8ff);
+  color: white;
+}
 
-/* Editor Trofeus - botões de aba */
-#editarTrofeusModal .tab-btn {
-  background: #f4f7fb;
-  border: 1px solid #e6eefc;
-  padding: 8px;
+.edit-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  background: #f8f9fc;
+  padding: 12px;
+  border-radius: 12px;
+  margin-bottom: 10px;
+}
+
+.edit-row input {
+  border: 1px solid #ddd;
+  padding: 8px 10px;
   border-radius: 10px;
+  font-size: 0.95rem;
+}
+
+.btn-azul {
+  background: linear-gradient(90deg,#0093ff,#00c8ff);
+  border: none;
+  padding: 10px 16px;
+  border-radius: 30px;
+  color: white;
   cursor: pointer;
 }
-#editarTrofeusModal .tab-btn.active {
-  background: #0093ff;
-  color: white;
-  border-color:#0093ff;
+
+.btn-neutro {
+  background: #f2f2f2;
+  padding: 10px 16px;
+  border-radius: 30px;
+  cursor: pointer;
+  font-size: 0.9rem;
 }
 
-/* linha item */
-.edit-item {
-  display:flex;
-  gap:8px;
-  align-items:center;
-  padding:8px 10px;
-  border-radius:8px;
-  background:#fafafa;
-  margin-bottom:8px;
-}
-.edit-item input[type="text"], .edit-item input[type="number"]{
-  padding:6px 8px;
-  border-radius:8px;
-  border:1px solid #ddd;
-  font-size:0.95rem;
-}
-
-/* botão pequeno */
-.edit-item .btn-small {
-  padding:6px 8px;
-  border-radius:8px;
-  border:none;
-  cursor:pointer;
-}
-.edit-item .btn-delete { background:#ffe6e6;color:#a00;border:1px solid #ffc9c9;}
-.edit-item .btn-save { background:#e6ffed;color:#1a6b2a;border:1px solid #c8f0d0;}
-
-/* notificação discreta (toast) */
+/* Notificação */
 #toastMsg {
   position: fixed;
   right: 18px;
@@ -146,71 +312,4 @@ button:hover{transform:scale(1.03);}
   z-index: 2000;
   display: none;
   font-size: 0.9rem;
-}
-
-#editarTrofeusModal .tab-btn {
-  flex: 1;
-  border: none;
-  border-radius: 10px;
-  background: #eaeff6;
-  font-weight: 600;
-  padding: 10px;
-  cursor: pointer;
-}
-
-#editarTrofeusModal .tab-btn.active {
-  background: #0093ff;
-  color: #fff;
-}
-
-/* Minimalista */
-.tab-btn {
-  flex:1;
-  border:none;
-  border-radius:10px;
-  padding:10px 0;
-  background:#eef5ff;
-  color:#333;
-  cursor:pointer;
-  font-size:0.9rem;
-}
-
-.tab-btn.active {
-  background:#0093ff;
-  color:white;
-}
-
-.edit-row {
-  display:flex;
-  gap:8px;
-  align-items:center;
-  background:#f8f9fc;
-  padding:10px 12px;
-  border-radius:10px;
-  margin-bottom:8px;
-}
-
-.edit-row input {
-  border:1px solid #ddd;
-  padding:8px 10px;
-  border-radius:8px;
-  font-size:0.9rem;
-}
-
-.btn-azul {
-  background:linear-gradient(90deg,#0093ff,#00c8ff);
-  border:none;
-  padding:9px 14px;
-  border-radius:10px;
-  color:white;
-  cursor:pointer;
-  font-size:0.9rem;
-}
-
-.btn-neutro {
-  border:1px solid #ccc;
-  background:white;
-  padding:9px 14px;
-  border-radius:10px;
-  cursor:pointer;
 }
