@@ -87,6 +87,17 @@ function weekdayLabel(d){
   return d.toLocaleDateString('pt-BR',{ weekday:'long'}).replace(/^./,c=>c.toUpperCase());
 }
 
+// === Normalização de nomes (remove acentos, símbolos e espaços extras)
+function normalizarNome(nome) {
+  return nome
+    .normalize("NFD")                 // separa acentos
+    .replace(/[\u0300-\u036f]/g, "")  // remove acentos
+    .replace(/[^a-zA-Z\s]/g, "")      // mantém só letras e espaços
+    .trim()                           // tira espaços nas pontas
+    .replace(/\s+/g, " ");            // colapsa espaços múltiplos
+}
+
+
 
 /* ===== MENU ===== */
 const menu=document.getElementById("menuDropdown");
@@ -424,22 +435,58 @@ async function novaRodada(){
 }
 
 
-/* ================ Nomes: padronizar e sincronizar ================= */
-[...Array(6)].forEach((_, i)=>{
-  const campo = document.getElementById("p"+(i+1));
-  campo.addEventListener("blur", async ()=>{
-    let v = campo.value.trim();
-    if(v.length > 0){
-      campo.value = v.charAt(0).toUpperCase() + v.slice(1).toLowerCase();
+/* ================ Nomes: padronização + proteção duplicada ================ */
+[...Array(6)].forEach((_, i) => {
+  const campo = document.getElementById("p" + (i + 1));
+  let ultimoValorValido = campo.value;
+
+  campo.addEventListener("focus", () => {
+    ultimoValorValido = campo.value;
+  });
+
+  campo.addEventListener("blur", async () => {
+    let v = campo.value;
+
+    v = normalizarNome(v);
+
+    if (v.length === 0) {
+      campo.value = ultimoValorValido;
+      return;
     }
 
-    const nomes = [...Array(6)].map((_, j)=>
-      document.getElementById("p"+(j+1)).value.trim()
+    v = v.charAt(0).toUpperCase() + v.slice(1).toLowerCase();
+
+    // Verifica duplicação nos 6 campos
+    const nomesAtuais = [...Array(6)].map((_, j) =>
+      j === i ? v : document.getElementById("p" + (j + 1)).value.trim()
+    );
+
+    if (nomesAtuais.filter(n => n === v).length > 1) {
+      alert("⚠️ Este nome já está sendo utilizado!");
+      campo.value = ultimoValorValido;
+      return;
+    }
+
+    // Verifica duplicação no banco de troféus
+    if ((trophyCountsDia && trophyCountsDia[v]) ||
+        (trophyCountsMes && trophyCountsMes[v])) {
+      alert("⚠️ Este nome já existe no histórico! Por favor mantenha a grafia padronizada.");
+      campo.value = ultimoValorValido;
+      return;
+    }
+
+    campo.value = v;
+    ultimoValorValido = v;
+
+    const nomes = [...Array(6)].map((_, j) =>
+      document.getElementById("p" + (j + 1)).value.trim()
     );
 
     await setDoc(salaDocRef, { nomes }, { merge: true });
   });
 });
+
+
 
 
 /* ================ HISTÓRICO DE TROFÉUS ================ */
