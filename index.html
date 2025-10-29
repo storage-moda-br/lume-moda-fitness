@@ -22,7 +22,6 @@
       <a href="#" class="regras">Regras</a>
       <a href="#" class="selecionarSala">Selecionar Banco</a>
       <a href="#" class="admin">Administrador</a>
-	  <a href="#" class="editarTrofeus">Editar Troféus</a>
 	  <a href="#" class="sobre">Sobre</a>
     </div>
   </div>
@@ -138,34 +137,6 @@
     </p>
   </div>
 </div>
-<!-- Editor de Troféus (Admin) -->
-<div id="editarTrofeusModal" class="modal">
-  <div class="modal-content">
-    <span class="close">&times;</span>
-    <h2 style="color:#0093ff;">Editar Troféus</h2>
-    <!-- Abas -->
-    <div style="display:flex;gap:8px;margin:10px 0 12px;">
-      <button id="btnTabDia" class="tab-btn active">Troféus do Dia</button>
-      <button id="btnTabMes" class="tab-btn">Troféus do Mês</button>
-    </div>
-    <!-- Lista -->
-    <div id="listaTrofeus" style="min-height:60px;margin-bottom:10px;text-align:left;"></div>
-    <!-- Adicionar novo -->
-    <div style="display:flex;gap:8px;">
-      <input id="novoNomeInput" placeholder="Nome" style="flex:1;padding:10px;border-radius:10px;border:1px solid #ddd;">
-      <input id="novoValorInput" placeholder="Qtd" type="number" min="0" style="width:80px;padding:10px;border-radius:10px;border:1px solid #ddd;">
-      <button id="btnAdicionarTrofeu" class="btn-azul">Adicionar</button>
-    </div>
-    <!-- Ações -->
-    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px;">
-      <button id="btnCancelarEditar" class="btn-neutro">Cancelar</button>
-      <button id="btnSalvarTrofeus" class="btn-azul">Salvar</button>
-    </div>
-    <!-- Indicador de Banco (no rodapé do modal) -->
-    <p id="indicadorDBModal" style="font-size:0.70rem;opacity:0.6;text-align:left;margin-top:10px;"></p>
-  </div>
-</div>
-
 <div id="indicadorDB"></div>
 </div>
 

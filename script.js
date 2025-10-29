@@ -1,14 +1,8 @@
-menu.querySelector(...).addEventListener/* ================= EFEITOS NO BOTÃO ================= */
+/* ================= EFEITOS NO BOTÃO ================= */
 document.getElementById("sortear").onmouseover=function(){
   this.style.background="rgba(0,147,255,1)";
   this.style.transform="scale(1.04)";
 };
-
-menu.querySelector(".editarTrofeus")?.addEventListener("click", (ev)=>{
-  ev.preventDefault();
-  abrirEditarTrofeus("dia");
-});
-
 document.getElementById("sortear").onmouseout=function(){
   this.style.background="rgba(0,147,255,0.85)";
   this.style.transform="scale(1)";
@@ -109,12 +103,11 @@ function normalizarNome(nome) {
 const menu=document.getElementById("menuDropdown");
 
 function atualizarMenuAdmin() {
-  const botoesAdmin = menu.querySelectorAll(".nova, .encerrarMes, .selecionarSala, .editarTrofeus");
+  const botoesAdmin = menu.querySelectorAll(".nova, .encerrarMes, .selecionarSala");
   botoesAdmin.forEach(btn => {
     btn.style.display = isAdmin ? "flex" : "none";
   });
 }
-
 
 atualizarMenuAdmin();
 
@@ -679,144 +672,3 @@ renderPartidas();
 renderTrofeusDia();
 renderRanking();
 
-/* ================= Editor de Troféus (Admin) ================= */
-const editarTrofeusModal = document.getElementById("editarTrofeusModal");
-const listaTrofeusEl = document.getElementById("listaTrofeus");
-const btnTabDia = document.getElementById("btnTabDia");
-const btnTabMes = document.getElementById("btnTabMes");
-const novoNomeInput = document.getElementById("novoNomeInput");
-const novoValorInput = document.getElementById("novoValorInput");
-const btnAdicionarTrofeu = document.getElementById("btnAdicionarTrofeu");
-const btnSalvarTrofeus = document.getElementById("btnSalvarTrofeus");
-const btnCancelarEditar = document.getElementById("btnCancelarEditar");
-
-let editorModo = "dia";      // "dia" | "mes"
-let editData = {};           // cópia local (só grava no SALVAR)
-
-/* Indicador de banco também dentro do modal */
-function atualizarIndicadorDBModal(){
-  const elModal = document.getElementById("indicadorDBModal");
-  if(!elModal) return;
-  const isReal = salaAtual === "play-do-bistecao";
-  elModal.textContent = isReal ? "✅ Banco Real" : "🧪 Banco de Teste";
-  elModal.style.color = isReal ? "#0093ff" : "#ff9800";
-}
-
-function abrirEditarTrofeus(modo = "dia"){
-  if(!isAdmin){ alert("Somente administradores podem editar troféus."); return; }
-  editorModo = modo;
-  btnTabDia?.classList.toggle("active", modo === "dia");
-  btnTabMes?.classList.toggle("active", modo === "mes");
-  // faz cópia local (não toca nos objetos originais)
-  editData = (modo === "dia") ? {...(trophyCountsDia||{})} : {...(trophyCountsMes||{})};
-  renderEditorLista();
-  atualizarIndicadorDBModal();
-  abrirModal("editarTrofeusModal");
-}
-
-function renderEditorLista(){
-  const entries = Object.entries(editData || {});
-  if(entries.length === 0){
-    listaTrofeusEl.innerHTML = `<p style="text-align:center;color:#777;">Nenhum registro.</p>`;
-    return;
-  }
-  listaTrofeusEl.innerHTML = entries.sort((a,b)=>b[1]-a[1]).map(([nome,val])=>`
-    <div class="edit-row" data-nome="${nome}">
-      <input type="text" class="edit-nome" value="${nome}" style="flex:1;">
-      <input type="number" class="edit-valor" value="${val}" min="0" style="width:70px;">
-      <button class="btn-neutro btn-save" title="Salvar linha">✔</button>
-      <button class="btn-neutro btn-delete" title="Excluir linha">✖</button>
-    </div>
-  `).join('');
-
-  listaTrofeusEl.querySelectorAll(".edit-row").forEach(el=>{
-    const nomeInput = el.querySelector(".edit-nome");
-    const valInput = el.querySelector(".edit-valor");
-    const btnSave = el.querySelector(".btn-save");
-    const btnDel  = el.querySelector(".btn-delete");
-    const originalNome = el.getAttribute("data-nome");
-
-    btnSave.onclick = ()=> salvarLinha(originalNome, nomeInput.value, valInput.value);
-    btnDel.onclick  = ()=> excluirLinha(originalNome);
-  });
-}
-
-function normalizarNomeEditor(nome){
-  return (nome||"")
-    .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
-    .replace(/[^a-zA-Z\s]/g,"")
-    .trim().replace(/\s+/g," ")
-    .split(" ").map(w=> w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(" ");
-}
-
-function salvarLinha(orig, novoNome, novoValor){
-  const nomeCap = normalizarNomeEditor(novoNome);
-  if(!nomeCap){ return showToast("Nome inválido"); }
-  const val = Math.max(0, Number(novoValor)||0);
-  if(orig !== nomeCap && editData[nomeCap] !== undefined){
-    return showToast("Já existe este nome na lista");
-  }
-  delete editData[orig];
-  editData[nomeCap] = val;
-  renderEditorLista();
-  showToast("Linha atualizada (local)");
-}
-
-function excluirLinha(nome){
-  delete editData[nome];
-  renderEditorLista();
-  showToast("Linha removida (local)");
-}
-
-btnAdicionarTrofeu.onclick = ()=>{
-  const nomeCap = normalizarNomeEditor(novoNomeInput.value||"");
-  if(!nomeCap) return showToast("Digite um nome válido");
-  const val = Math.max(0, Number(novoValorInput.value)||0);
-  editData[nomeCap] = (editData[nomeCap]||0) + val;
-  novoNomeInput.value = "";
-  novoValorInput.value = "";
-  renderEditorLista();
-  showToast("Adicionado (local)");
-};
-
-btnSalvarTrofeus.onclick = async ()=>{
-  try{
-    if(editorModo === "dia"){
-      trophyCountsDia = {...editData};
-      await setDoc(salaDocRef, { trophyCountsDia }, { merge: true });
-    } else {
-      trophyCountsMes = {...editData};
-      await setDoc(salaDocRef, { trophyCountsMes }, { merge: true });
-    }
-    renderTrofeusDia();
-    renderRanking();
-    document.getElementById("editarTrofeusModal").style.display = "none";
-    showToast("Salvo ✅");
-  }catch(e){
-    console.error(e);
-    showToast("Erro ao salvar ❌");
-  }
-};
-
-btnCancelarEditar.onclick = ()=> {
-  document.getElementById("editarTrofeusModal").style.display = "none";
-  showToast("Alterações descartadas");
-};
-
-// Troca de abas
-btnTabDia?.addEventListener("click", ()=> abrirEditarTrofeus("dia"));
-btnTabMes?.addEventListener("click", ()=> abrirEditarTrofeus("mes"));
-
-// Toast
-function showToast(msg, timeout=2000){
-  let t = document.getElementById("toastMsg");
-  if(!t){
-    t = document.createElement("div");
-    t.id = "toastMsg";
-    document.body.appendChild(t);
-  }
-  t.textContent = msg;
-  t.style.display = "block";
-  t.style.opacity = "1";
-  setTimeout(()=>{ t.style.opacity = "0"; setTimeout(()=>t.style.display="none",300); }, timeout);
-}
