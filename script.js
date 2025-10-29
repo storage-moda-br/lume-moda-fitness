@@ -33,11 +33,27 @@ let trophyCountsMes = {};
 let salaAtual = localStorage.getItem("bancoAtivo") || "play-do-bistecao";
 let salaDocRef = doc(db, "salas", salaAtual);
 
-function atualizarSala(sala) {
-  salaAtual = sala;
-  localStorage.setItem("bancoAtivo", salaAtual);
-  location.reload(); // recarrega tudo com a nova sala selecionada
+onSnapshot(doc(db, "config", "dbSelecionado"), (snap) => {
+  if (!snap.exists()) return;
+
+  const firebaseSala = snap.data().sala;
+
+  if (firebaseSala !== salaAtual) {
+    localStorage.setItem("bancoAtivo", firebaseSala);
+    location.reload();
+  }
+});
+
+
+async function atualizarSala(novaSala){
+  await setDoc(doc(db, "config", "dbSelecionado"), {
+    sala: novaSala
+  });
+
+  localStorage.setItem("bancoAtivo", novaSala);
+  location.reload();
 }
+
 
 
 /* ================ HELPERS GERAIS ================ */
