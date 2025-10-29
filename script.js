@@ -47,13 +47,16 @@ onSnapshot(doc(db, "config", "dbSelecionado"), (snap) => {
 
 
 async function atualizarSala(novaSala){
+  salaAtual = novaSala; // ✅ Atualiza ANTES do firestore
+  localStorage.setItem("bancoAtivo", novaSala);
+
   await setDoc(doc(db, "config", "dbSelecionado"), {
     sala: novaSala
   });
 
-  localStorage.setItem("bancoAtivo", novaSala);
   location.reload();
 }
+
 
 
 
