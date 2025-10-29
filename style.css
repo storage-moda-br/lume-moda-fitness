@@ -76,16 +76,11 @@ button:hover{transform:scale(1.03);}
 }
 
 #indicadorDB {
-  text-align: left;
+  text-align: left !important;
   padding-left: 10px;
+  width: 100%;
+  display: block;
+  margin: 0;
 }
 
-
-#indicadorDB {
-  transition: opacity .3s;
-}
-
-#indicadorDB:hover {
-  opacity: 1;
-}
 
