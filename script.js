@@ -583,6 +583,23 @@ document.querySelectorAll(".btn-sala").forEach(btn=>{
   });
 });
 
+function atualizarIndicadorDB(){
+  const el = document.getElementById("indicadorDB");
+  if(!el) return;
+
+  if(salaAtual === "play-do-bistecao"){
+    el.textContent = "✅ Banco Real";
+    el.style.color = "#0093ff";
+  } else {
+    el.textContent = "🧪 Banco de Teste";
+    el.style.color = "#ff9800";
+  }
+}
+
+// Atualiza assim que a página carrega
+atualizarIndicadorDB();
+
+
 
 /* Inicialização simples de render */
 renderPartidas();
