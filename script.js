@@ -84,8 +84,9 @@ function normalizarNome(nome) {
     .replace(/\s+/g, " ");
 }
 
-/* ================= MENU ================= */
-const menu=document.getElementById("menuDropdown");
+/* ================= MENU COMPLETO ================= */
+const menu = document.getElementById("menuDropdown");
+const menuIcon = document.getElementById("menuIcon");
 
 function atualizarMenuAdmin() {
   const botoesAdmin = menu.querySelectorAll(".nova, .encerrarMes, .selecionarSala, .editarTrofeus");
@@ -93,26 +94,43 @@ function atualizarMenuAdmin() {
     btn.style.display = isAdmin ? "flex" : "none";
   });
 }
-atualizarMenuAdmin();
 
-document.getElementById("menuIcon").onclick=()=>menu.style.display=menu.style.display==="block"?"none":"block";
-window.onclick=e=>{if(!e.target.closest('.menu-dropdown')&&!e.target.closest('#menuIcon'))menu.style.display='none';};
+menuIcon.onclick = () => {
+  menu.style.display = menu.style.display === "block" ? "none" : "block";
+};
 
-function abrirModal(id){
-  menu.style.display='none';
-  document.getElementById(id).style.display='block';
+window.onclick = (e) => {
+  if (!e.target.closest('.menu-dropdown') && !e.target.closest('#menuIcon')) {
+    menu.style.display = 'none';
+  }
+};
+
+function ligarMenu() {
+  menu.querySelector(".trofeus")?.addEventListener('click', (ev)=>{ ev.preventDefault(); abrirModal("rankingModal"); renderRanking(); });
+  menu.querySelector(".historicoTrofeus")?.addEventListener('click', (ev)=>{ ev.preventDefault(); abrirModal("historicoTrofeusModal"); prepararHistoricoTrofeus(); });
+  menu.querySelector(".historicoPartidas")?.addEventListener('click', (ev)=>{ ev.preventDefault(); abrirModal("historicoPartidasModal"); prepararHistoricoPartidas(); });
+
+  menu.querySelector(".encerrarMes")?.addEventListener("click", (ev)=>{
+    ev.preventDefault();
+    if(!isAdmin) { alert("Somente administradores"); return; }
+    encerrarMesAtual();
+  });
+
+  menu.querySelector(".nova")?.addEventListener("click", (ev)=>{
+    ev.preventDefault();
+    if(!isAdmin) { alert("Somente administradores"); return; }
+    novaRodada();
+  });
+
+  menu.querySelector(".regras")?.addEventListener('click', (ev)=>{ ev.preventDefault(); abrirModal("regrasModal"); });
+  menu.querySelector(".sobre")?.addEventListener('click', (ev)=>{ ev.preventDefault(); abrirModal("sobreModal"); });
+  menu.querySelector(".admin")?.addEventListener('click', (ev)=>{ ev.preventDefault(); abrirModal("adminModal"); });
+  menu.querySelector(".selecionarSala")?.addEventListener("click", (ev)=>{ ev.preventDefault(); abrirModal("selecionarSalaModal"); });
+  menu.querySelector(".editarTrofeus")?.addEventListener("click", (ev)=>{ ev.preventDefault(); abrirEditarTrofeus("dia"); });
 }
 
-document.querySelectorAll(".modal .close").forEach(c=>c.onclick=e=>e.target.closest(".modal").style.display='none');
-
-menu.querySelector(".trofeus").addEventListener('click', ev=>{ev.preventDefault(); abrirModal("rankingModal"); renderRanking();});
-menu.querySelector(".historicoTrofeus").addEventListener('click', ev=>{ev.preventDefault(); abrirModal("historicoTrofeusModal"); prepararHistoricoTrofeus();});
-menu.querySelector(".historicoPartidas").addEventListener('click', ev=>{ev.preventDefault(); abrirModal("historicoPartidasModal"); prepararHistoricoPartidas();});
-menu.querySelector(".regras").addEventListener('click', ev=>{ev.preventDefault(); abrirModal("regrasModal");});
-menu.querySelector(".sobre").addEventListener('click', ev=>{ev.preventDefault(); abrirModal("sobreModal");});
-menu.querySelector(".admin").addEventListener('click', ev=>{ev.preventDefault(); abrirModal("adminModal");setTimeout(()=>document.getElementById("senhaInput")?.focus(),50);});
-menu.querySelector(".selecionarSala").addEventListener("click", ev=>{ev.preventDefault(); abrirModal("selecionarSalaModal");});
-menu.querySelector(".editarTrofeus").addEventListener("click", ev=>{ev.preventDefault(); abrirEditarTrofeus("dia");});
+ligarMenu();
+atualizarMenuAdmin();
 
 /* ================= LOGIN ADMIN ================= */
 document.getElementById("btnEntrarSenha").onclick = async ()=>{
