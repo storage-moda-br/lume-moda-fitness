@@ -647,16 +647,23 @@ document.querySelectorAll(".btn-sala").forEach(btn=>{
 
 function atualizarIndicadorDB(){
   const el = document.getElementById("indicadorDB");
-  if(!el) return;
+  const elModal = document.getElementById("indicadorDBModal");
+  if(!el && !elModal) return;
 
-  if(salaAtual === "play-do-bistecao"){
-    el.textContent = "✅ Banco Real";
-    el.style.color = "#0093ff";
-  } else {
-    el.textContent = "🧪 Banco de Teste";
-    el.style.color = "#ff9800";
+  const isReal = salaAtual === "play-do-bistecao";
+  const txt = isReal ? "✅ Banco Real" : "🧪 Banco de Teste";
+  const cor = isReal ? "#0093ff" : "#ff9800";
+
+  if(el){
+    el.textContent = txt;
+    el.style.color = cor;
+  }
+  if(elModal){
+    elModal.textContent = txt;
+    elModal.style.color = cor;
   }
 }
+
 
 document.addEventListener("DOMContentLoaded", atualizarIndicadorDB);
 

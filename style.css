@@ -20,6 +20,11 @@ body{margin:0;background:#f4f7fb;display:flex;flex-direction:column;align-items:
   content:"📊";
   margin-right:8px;
 }
+.menu-dropdown a.editarTrofeus::before {
+  content: "✏️";
+  margin-right: 8px;
+}
+
 
 
 
