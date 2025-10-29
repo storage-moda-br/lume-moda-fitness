@@ -795,11 +795,6 @@ btnTabMes.onclick = ()=> abrirEditarTrofeus("mes");
 // cancelar fecha modal (reaproveita classe close)
 btnCancelarEditar.onclick = ()=> editarTrofeusModal.style.display = "none";
 
-// helper: abrir modal (usa sua função abrirModal já criada) - caso não exista, fallback
-function abrirModal(id){ 
-  const m = document.getElementById(id);
-  if(m) m.style.display = "block";
-}
 
 // helper: toast
 function showToast(msg, timeout=2200){
