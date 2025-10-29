@@ -142,3 +142,70 @@ button:hover{transform:scale(1.03);}
   display: none;
   font-size: 0.9rem;
 }
+
+#editarTrofeusModal .tab-btn {
+  flex: 1;
+  border: none;
+  border-radius: 10px;
+  background: #eaeff6;
+  font-weight: 600;
+  padding: 10px;
+  cursor: pointer;
+}
+
+#editarTrofeusModal .tab-btn.active {
+  background: #0093ff;
+  color: #fff;
+}
+
+/* Minimalista */
+.tab-btn {
+  flex:1;
+  border:none;
+  border-radius:10px;
+  padding:10px 0;
+  background:#eef5ff;
+  color:#333;
+  cursor:pointer;
+  font-size:0.9rem;
+}
+
+.tab-btn.active {
+  background:#0093ff;
+  color:white;
+}
+
+.edit-row {
+  display:flex;
+  gap:8px;
+  align-items:center;
+  background:#f8f9fc;
+  padding:10px 12px;
+  border-radius:10px;
+  margin-bottom:8px;
+}
+
+.edit-row input {
+  border:1px solid #ddd;
+  padding:8px 10px;
+  border-radius:8px;
+  font-size:0.9rem;
+}
+
+.btn-azul {
+  background:linear-gradient(90deg,#0093ff,#00c8ff);
+  border:none;
+  padding:9px 14px;
+  border-radius:10px;
+  color:white;
+  cursor:pointer;
+  font-size:0.9rem;
+}
+
+.btn-neutro {
+  border:1px solid #ccc;
+  background:white;
+  padding:9px 14px;
+  border-radius:10px;
+  cursor:pointer;
+}

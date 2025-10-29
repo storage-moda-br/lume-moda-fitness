@@ -698,58 +698,28 @@ function renderEditorLista(){
     listaTrofeusEl.innerHTML = `<p style="text-align:center;color:#777;">Nenhum registro.</p>`;
     return;
   }
-  listaTrofeusEl.innerHTML = entries.sort((a,b)=>b[1]-a[1]).map(([nome, val], idx) => `
-    <div class="edit-item" data-nome="${nome}">
-      <div style="flex:1;min-width:120px;">
-        <input type="text" class="edit-nome" value="${escapeHtml(nome)}" />
-      </div>
-      <div>
-        <input type="number" class="edit-valor" value="${val}" min="0" style="width:80px;" />
-      </div>
-      <div style="display:flex;gap:6px;">
-        <button class="btn-small btn-save">Salvar</button>
-        <button class="btn-small btn-delete">Excluir</button>
-      </div>
+
+  listaTrofeusEl.innerHTML = entries.sort((a,b)=>b[1]-a[1]).map(([nome,val]) => `
+    <div class="edit-row" data-nome="${nome}">
+      <input type="text" class="edit-nome" value="${escapeHtml(nome)}" style="flex:1;">
+      <input type="number" class="edit-valor" value="${val}" min="0" style="width:70px;">
+      <button class="btn-neutro btn-save">✔</button>
+      <button class="btn-neutro btn-delete">✖</button>
     </div>
   `).join('');
-  // ligar eventos
-  listaTrofeusEl.querySelectorAll(".edit-item").forEach(el=>{
+
+  listaTrofeusEl.querySelectorAll(".edit-row").forEach(el=>{
     const nomeInput = el.querySelector(".edit-nome");
     const valInput = el.querySelector(".edit-valor");
     const btnSave = el.querySelector(".btn-save");
     const btnDel = el.querySelector(".btn-delete");
     const originalNome = el.getAttribute("data-nome");
 
-    btnSave.onclick = async ()=>{
-      const novoNome = normalizarNome(nomeInput.value).split(" ").map(w=>w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()).join(" ");
-      const novoVal = Number(valInput.value) || 0;
-      if(!novoNome){ showToast("Nome inválido"); return; }
-
-      // se renomeou: remove antiga chave e adiciona nova
-      if(novoNome !== originalNome){
-        // evitar sobrescrever sem querer: se já existir chave com esse nome, confirmar
-        if(editData[novoNome] !== undefined){
-          if(!confirm(`Já existe "${novoNome}". Deseja somar os valores e remover "${originalNome}"?`)) return;
-          editData[novoNome] = (Number(editData[novoNome])||0) + novoVal;
-        } else {
-          editData[novoNome] = novoVal;
-        }
-        delete editData[originalNome];
-      } else {
-        editData[originalNome] = novoVal;
-      }
-      renderEditorLista();
-      showToast("Alteração aplicada localmente. Clique em Salvar para persistir.");
-    };
-
-    btnDel.onclick = ()=>{
-      if(!confirm(`Remover "${originalNome}" do registro?`)) return;
-      delete editData[originalNome];
-      renderEditorLista();
-      showToast("Removido localmente. Clique em Salvar para persistir.");
-    };
+    btnSave.onclick = ()=> salvarLinha(originalNome, nomeInput.value, valInput.value);
+    btnDel.onclick = ()=> excluirLinha(originalNome);
   });
 }
+
 
 // adicionar novo
 btnAdicionarTrofeu.onclick = ()=>{
