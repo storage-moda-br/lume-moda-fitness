@@ -597,7 +597,8 @@ function atualizarIndicadorDB(){
 }
 
 // Atualiza assim que a página carrega
-atualizarIndicadorDB();
+document.addEventListener("DOMContentLoaded", atualizarIndicadorDB);
+
 
 
 

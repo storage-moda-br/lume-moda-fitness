@@ -74,3 +74,12 @@ button:hover{transform:scale(1.03);}
 #selecionarSalaModal .modal-content button.btn-sala:hover {
   filter: brightness(1.1);
 }
+
+#indicadorDB {
+  transition: opacity .3s;
+}
+
+#indicadorDB:hover {
+  opacity: 1;
+}
+
