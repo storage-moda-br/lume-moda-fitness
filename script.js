@@ -472,14 +472,7 @@ async function novaRodada(){
       return;
     }
 
-    // ✅ Proteção contra duplicação no banco de troféus
-    if ((trophyCountsDia && trophyCountsDia[v]) ||
-        (trophyCountsMes && trophyCountsMes[v])) {
-      alert("⚠️ Este nome já existe no histórico! Mantenha a mesma grafia.");
-      campo.value = ultimoValorValido;
-      return;
-    }
-
+   
     campo.value = v;
     ultimoValorValido = v;
 
