@@ -667,6 +667,165 @@ document.querySelectorAll(".btn-sala").forEach(btn => {
   });
 });
 
+/* ================= Editor de Troféus (Admin) ================= */
+const editarTrofeusModal = document.getElementById("editarTrofeusModal");
+const listaTrofeusEl = document.getElementById("listaTrofeus");
+const btnTabDia = document.getElementById("btnTabDia");
+const btnTabMes = document.getElementById("btnTabMes");
+const novoNomeInput = document.getElementById("novoNomeInput");
+const novoValorInput = document.getElementById("novoValorInput");
+const btnAdicionarTrofeu = document.getElementById("btnAdicionarTrofeu");
+const btnSalvarTrofeus = document.getElementById("btnSalvarTrofeus");
+const btnCancelarEditar = document.getElementById("btnCancelarEditar");
+
+let editorModo = "dia"; // "dia" ou "mes"
+let editData = {}; // cópia local dos trophyCounts
+
+function abrirEditarTrofeus(modo = "dia"){
+  if(!isAdmin){ alert("Somente administradores podem editar troféus."); return; }
+  editorModo = modo;
+  btnTabDia.classList.toggle("active", modo === "dia");
+  btnTabMes.classList.toggle("active", modo === "mes");
+  // faz cópia local para edição (não toca em original até salvar)
+  editData = modo === "dia" ? {...(trophyCountsDia||{})} : {...(trophyCountsMes||{})};
+  renderEditorLista();
+  abrirModal("editarTrofeusModal");
+}
+
+function renderEditorLista(){
+  const entries = Object.entries(editData || {});
+  if(entries.length === 0){
+    listaTrofeusEl.innerHTML = `<p style="text-align:center;color:#777;">Nenhum registro.</p>`;
+    return;
+  }
+  listaTrofeusEl.innerHTML = entries.sort((a,b)=>b[1]-a[1]).map(([nome, val], idx) => `
+    <div class="edit-item" data-nome="${nome}">
+      <div style="flex:1;min-width:120px;">
+        <input type="text" class="edit-nome" value="${escapeHtml(nome)}" />
+      </div>
+      <div>
+        <input type="number" class="edit-valor" value="${val}" min="0" style="width:80px;" />
+      </div>
+      <div style="display:flex;gap:6px;">
+        <button class="btn-small btn-save">Salvar</button>
+        <button class="btn-small btn-delete">Excluir</button>
+      </div>
+    </div>
+  `).join('');
+  // ligar eventos
+  listaTrofeusEl.querySelectorAll(".edit-item").forEach(el=>{
+    const nomeInput = el.querySelector(".edit-nome");
+    const valInput = el.querySelector(".edit-valor");
+    const btnSave = el.querySelector(".btn-save");
+    const btnDel = el.querySelector(".btn-delete");
+    const originalNome = el.getAttribute("data-nome");
+
+    btnSave.onclick = async ()=>{
+      const novoNome = normalizarNome(nomeInput.value).split(" ").map(w=>w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()).join(" ");
+      const novoVal = Number(valInput.value) || 0;
+      if(!novoNome){ showToast("Nome inválido"); return; }
+
+      // se renomeou: remove antiga chave e adiciona nova
+      if(novoNome !== originalNome){
+        // evitar sobrescrever sem querer: se já existir chave com esse nome, confirmar
+        if(editData[novoNome] !== undefined){
+          if(!confirm(`Já existe "${novoNome}". Deseja somar os valores e remover "${originalNome}"?`)) return;
+          editData[novoNome] = (Number(editData[novoNome])||0) + novoVal;
+        } else {
+          editData[novoNome] = novoVal;
+        }
+        delete editData[originalNome];
+      } else {
+        editData[originalNome] = novoVal;
+      }
+      renderEditorLista();
+      showToast("Alteração aplicada localmente. Clique em Salvar para persistir.");
+    };
+
+    btnDel.onclick = ()=>{
+      if(!confirm(`Remover "${originalNome}" do registro?`)) return;
+      delete editData[originalNome];
+      renderEditorLista();
+      showToast("Removido localmente. Clique em Salvar para persistir.");
+    };
+  });
+}
+
+// adicionar novo
+btnAdicionarTrofeu.onclick = ()=>{
+  const n = normalizarNome(novoNomeInput.value || "");
+  if(!n){ showToast("Digite um nome válido"); return; }
+  const nome = n.split(" ").map(w=>w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()).join(" ");
+  const val = Math.max(0, Number(novoValorInput.value) || 0);
+  if(editData[nome] !== undefined){
+    editData[nome] = Number(editData[nome]) + val;
+  } else {
+    editData[nome] = val;
+  }
+  novoNomeInput.value = "";
+  novoValorInput.value = "";
+  renderEditorLista();
+  showToast("Adicionado localmente. Clique em Salvar para persistir.");
+};
+
+// salvar no firestore
+btnSalvarTrofeus.onclick = async ()=>{
+  try{
+    if(editorModo === "dia"){
+      trophyCountsDia = {...editData};
+      await setDoc(salaDocRef, { trophyCountsDia: trophyCountsDia }, { merge: true });
+    } else {
+      trophyCountsMes = {...editData};
+      await setDoc(salaDocRef, { trophyCountsMes: trophyCountsMes }, { merge: true });
+    }
+    renderTrofeusDia();
+    renderRanking();
+    showToast("Salvo com sucesso ✅");
+    editarTrofeusModal.style.display = "none";
+  }catch(err){
+    console.error(err);
+    showToast("Erro ao salvar. Veja console.");
+  }
+};
+
+// abas
+btnTabDia.onclick = ()=> abrirEditarTrofeus("dia");
+btnTabMes.onclick = ()=> abrirEditarTrofeus("mes");
+
+// cancelar fecha modal (reaproveita classe close)
+btnCancelarEditar.onclick = ()=> editarTrofeusModal.style.display = "none";
+
+// helper: abrir modal (usa sua função abrirModal já criada) - caso não exista, fallback
+function abrirModal(id){ 
+  const m = document.getElementById(id);
+  if(m) m.style.display = "block";
+}
+
+// helper: toast
+function showToast(msg, timeout=2200){
+  let t = document.getElementById("toastMsg");
+  if(!t){
+    t = document.createElement("div");
+    t.id = "toastMsg";
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.display = "block";
+  t.style.opacity = "1";
+  setTimeout(()=>{ t.style.opacity = "0"; setTimeout(()=>t.style.display="none",300); }, timeout);
+}
+
+// Expor uma entrada de menu: ligar ao menu (apenas admin)
+menu.querySelector(".trofeus")?.addEventListener('click', (ev)=>{ ev.preventDefault(); abrirModal("rankingModal"); renderRanking(); });
+/* Cria item extra — recomendamos inserir no HTML do menu com a classe .editarTrofeus
+   <a href="#" class="editarTrofeus">Editar Troféus</a>
+*/
+document.querySelector(".editarTrofeus")?.addEventListener("click", (ev)=>{
+  ev.preventDefault();
+  abrirEditarTrofeus("dia");
+});
+
+
 /* Inicialização simples de render */
 renderPartidas();
 renderTrofeusDia();

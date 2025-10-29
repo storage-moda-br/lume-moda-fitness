@@ -88,3 +88,57 @@ button:hover{transform:scale(1.03);}
 }
 
 
+/* Editor Trofeus - botões de aba */
+#editarTrofeusModal .tab-btn {
+  background: #f4f7fb;
+  border: 1px solid #e6eefc;
+  padding: 8px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+#editarTrofeusModal .tab-btn.active {
+  background: #0093ff;
+  color: white;
+  border-color:#0093ff;
+}
+
+/* linha item */
+.edit-item {
+  display:flex;
+  gap:8px;
+  align-items:center;
+  padding:8px 10px;
+  border-radius:8px;
+  background:#fafafa;
+  margin-bottom:8px;
+}
+.edit-item input[type="text"], .edit-item input[type="number"]{
+  padding:6px 8px;
+  border-radius:8px;
+  border:1px solid #ddd;
+  font-size:0.95rem;
+}
+
+/* botão pequeno */
+.edit-item .btn-small {
+  padding:6px 8px;
+  border-radius:8px;
+  border:none;
+  cursor:pointer;
+}
+.edit-item .btn-delete { background:#ffe6e6;color:#a00;border:1px solid #ffc9c9;}
+.edit-item .btn-save { background:#e6ffed;color:#1a6b2a;border:1px solid #c8f0d0;}
+
+/* notificação discreta (toast) */
+#toastMsg {
+  position: fixed;
+  right: 18px;
+  top: 18px;
+  background: rgba(0,0,0,0.8);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  z-index: 2000;
+  display: none;
+  font-size: 0.9rem;
+}

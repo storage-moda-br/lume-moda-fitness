@@ -21,6 +21,7 @@
       <a href="#" class="nova">Nova rodada</a>
       <a href="#" class="regras">Regras</a>
       <a href="#" class="selecionarSala">Selecionar Banco</a>
+	  <a href="#" class="editarTrofeus">Editar Troféus</a>
       <a href="#" class="admin">Administrador</a>
 	  <a href="#" class="sobre">Sobre</a>
     </div>
@@ -138,6 +139,40 @@
   </div>
 </div>
 <div id="indicadorDB"></div>
+
+<!-- Modal: Editor de Troféus (Admin) -->
+<div id="editarTrofeusModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>Editar Troféus</h2>
+
+    <!-- abas simples -->
+    <div style="display:flex;gap:8px;margin:10px 0 12px;">
+      <button id="btnTabDia" class="tab-btn" style="flex:1">Troféus do Dia</button>
+      <button id="btnTabMes" class="tab-btn" style="flex:1">Troféus do Mês</button>
+    </div>
+
+    <div id="editorBody" style="max-height:50vh;overflow:auto;">
+      <!-- conteúdo dinâmico: lista de itens com edit/delete -->
+      <div id="listaTrofeus"></div>
+    </div>
+
+    <!-- adicionar novo -->
+    <div style="display:flex;gap:8px;margin-top:12px;">
+      <input id="novoNomeInput" placeholder="Nome do jogador" style="flex:1;padding:8px;border-radius:8px;border:1px solid #ddd;">
+      <input id="novoValorInput" placeholder="Troféus" type="number" min="0" style="width:90px;padding:8px;border-radius:8px;border:1px solid #ddd;">
+      <button id="btnAdicionarTrofeu" style="padding:8px 12px;border-radius:8px;border:none;background:#0093ff;color:#fff;">Adicionar</button>
+    </div>
+
+    <!-- ações -->
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px;">
+      <button id="btnCancelarEditar" class="close-btn" style="background:white;border:1px solid #ddd;padding:8px 12px;border-radius:8px;">Cancelar</button>
+      <button id="btnSalvarTrofeus" style="background:#28a745;border:none;color:white;padding:8px 12px;border-radius:8px;">Salvar</button>
+    </div>
+  </div>
+</div>
+
+
 </div>
 
 <script type="module" src="script.js"></script>
