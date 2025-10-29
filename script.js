@@ -84,10 +84,24 @@ function normalizarNome(nome) {
     .replace(/\s+/g, " ");
 }
 
-/* ================= MENU COMPLETO ================= */
+/* ================= MENU COMPLETO (com abrirModal) ================= */
 const menu = document.getElementById("menuDropdown");
 const menuIcon = document.getElementById("menuIcon");
 
+/* Helper: abre modal por id, fecha o menu com segurança */
+function abrirModal(id){
+  const m = document.getElementById("menuDropdown");
+  if (m) m.style.display = "none";
+  const el = document.getElementById(id);
+  if (el) el.style.display = "block";
+}
+
+/* Fecha qualquer modal quando clicar no X */
+document.querySelectorAll(".modal .close").forEach(c=>{
+  c.onclick = e => e.target.closest(".modal").style.display='none';
+});
+
+/* Mostra/oculta itens de admin no menu */
 function atualizarMenuAdmin() {
   const botoesAdmin = menu.querySelectorAll(".nova, .encerrarMes, .selecionarSala, .editarTrofeus");
   botoesAdmin.forEach(btn => {
@@ -95,40 +109,78 @@ function atualizarMenuAdmin() {
   });
 }
 
+/* Icone ☰ abre/fecha o dropdown */
 menuIcon.onclick = () => {
-  menu.style.display = menu.style.display === "block" ? "none" : "block";
+  menu.style.display = (menu.style.display === "block") ? "none" : "block";
 };
 
+/* Clique fora fecha o menu */
 window.onclick = (e) => {
   if (!e.target.closest('.menu-dropdown') && !e.target.closest('#menuIcon')) {
     menu.style.display = 'none';
   }
 };
 
+/* Liga todos os eventos do menu */
 function ligarMenu() {
-  menu.querySelector(".trofeus")?.addEventListener('click', (ev)=>{ ev.preventDefault(); abrirModal("rankingModal"); renderRanking(); });
-  menu.querySelector(".historicoTrofeus")?.addEventListener('click', (ev)=>{ ev.preventDefault(); abrirModal("historicoTrofeusModal"); prepararHistoricoTrofeus(); });
-  menu.querySelector(".historicoPartidas")?.addEventListener('click', (ev)=>{ ev.preventDefault(); abrirModal("historicoPartidasModal"); prepararHistoricoPartidas(); });
+  menu.querySelector(".trofeus")?.addEventListener('click', (ev)=>{
+    ev.preventDefault();
+    abrirModal("rankingModal");
+    renderRanking();
+  });
+
+  menu.querySelector(".historicoTrofeus")?.addEventListener('click', (ev)=>{
+    ev.preventDefault();
+    abrirModal("historicoTrofeusModal");
+    prepararHistoricoTrofeus();
+  });
+
+  menu.querySelector(".historicoPartidas")?.addEventListener('click', (ev)=>{
+    ev.preventDefault();
+    abrirModal("historicoPartidasModal");
+    prepararHistoricoPartidas();
+  });
 
   menu.querySelector(".encerrarMes")?.addEventListener("click", (ev)=>{
     ev.preventDefault();
-    if(!isAdmin) { alert("Somente administradores"); return; }
+    if(!isAdmin){ alert("Somente administradores"); return; }
     encerrarMesAtual();
   });
 
   menu.querySelector(".nova")?.addEventListener("click", (ev)=>{
     ev.preventDefault();
-    if(!isAdmin) { alert("Somente administradores"); return; }
+    if(!isAdmin){ alert("Somente administradores"); return; }
     novaRodada();
   });
 
-  menu.querySelector(".regras")?.addEventListener('click', (ev)=>{ ev.preventDefault(); abrirModal("regrasModal"); });
-  menu.querySelector(".sobre")?.addEventListener('click', (ev)=>{ ev.preventDefault(); abrirModal("sobreModal"); });
-  menu.querySelector(".admin")?.addEventListener('click', (ev)=>{ ev.preventDefault(); abrirModal("adminModal"); });
-  menu.querySelector(".selecionarSala")?.addEventListener("click", (ev)=>{ ev.preventDefault(); abrirModal("selecionarSalaModal"); });
-  menu.querySelector(".editarTrofeus")?.addEventListener("click", (ev)=>{ ev.preventDefault(); abrirEditarTrofeus("dia"); });
+  menu.querySelector(".regras")?.addEventListener('click', (ev)=>{
+    ev.preventDefault();
+    abrirModal("regrasModal");
+  });
+
+  menu.querySelector(".sobre")?.addEventListener('click', (ev)=>{
+    ev.preventDefault();
+    abrirModal("sobreModal");
+  });
+
+  menu.querySelector(".admin")?.addEventListener('click', (ev)=>{
+    ev.preventDefault();
+    abrirModal("adminModal");
+    setTimeout(()=>document.getElementById("senhaInput")?.focus(),50);
+  });
+
+  menu.querySelector(".selecionarSala")?.addEventListener("click", (ev)=>{
+    ev.preventDefault();
+    abrirModal("selecionarSalaModal");
+  });
+
+  menu.querySelector(".editarTrofeus")?.addEventListener("click", (ev)=>{
+    ev.preventDefault();
+    abrirEditarTrofeus("dia");
+  });
 }
 
+/* Inicializa menu */
 ligarMenu();
 atualizarMenuAdmin();
 
