@@ -33,6 +33,7 @@ let trophyCountsMes = {};
 let salaAtual = localStorage.getItem("bancoAtivo") || "play-do-bistecao";
 let salaDocRef = doc(db, "salas", salaAtual);
 
+// ✅ Listener Firebase para mudar banco em todos dispositivos
 onSnapshot(doc(db, "config", "dbSelecionado"), (snap) => {
   if (!snap.exists()) return;
 
@@ -613,14 +614,17 @@ function atualizarIndicadorDB(){
   }
 }
 
-// Atualiza assim que a página carrega
 document.addEventListener("DOMContentLoaded", atualizarIndicadorDB);
 
-
-
-
+// ✅ Clique nos botões do modal Selecionar DB
+document.querySelectorAll(".btn-sala").forEach(btn => {
+  btn.addEventListener("click", () => {
+    atualizarSala(btn.getAttribute("data-sala"));
+  });
+});
 
 /* Inicialização simples de render */
 renderPartidas();
 renderTrofeusDia();
 renderRanking();
+
