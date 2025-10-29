@@ -21,6 +21,7 @@
       <a href="#" class="nova">Nova rodada</a>
       <a href="#" class="regras">Regras</a>
       <a href="#" class="sobre">Sobre</a>
+	  <a href="#" class="selecionarSala">Selecionar DB</a>
       <a href="#" class="admin">Administrador</a>
     </div>
   </div>
@@ -114,6 +115,29 @@
       <p id="msgSenha"></p>
     </div>
   </div>
+  <div id="selecionarSalaModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>Selecionar sala</h2>
+    
+    <p style="text-align:center;margin-bottom:15px;">
+      Escolha qual banco deseja utilizar:
+    </p>
+
+    <button class="btn-sala" data-sala="play-do-bistecao" style="background:#007bff">
+      ✅ Banco REAL
+    </button>
+
+    <button class="btn-sala" data-sala="play-do-bistecao-test" style="background:#ff9800;margin-top:10px;">
+      ⚠️ Banco de TESTE
+    </button>
+
+    <p style="font-size:.85rem;text-align:center;margin-top:15px;">
+      O modo TESTE não afeta estatísticas reais
+    </p>
+  </div>
+</div>
+
 
 </div>
 

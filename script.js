@@ -29,7 +29,15 @@ let usedPairs = new Set();       // pares já usados ("A|B")
 let trophyCountsDia = {};
 let trophyCountsMes = {};
 
-const salaDocRef = doc(db, "salas", "play-do-bistecao");
+/* === SELEÇÃO DE SALA (REAL / TESTE) === */
+let salaAtual = localStorage.getItem("bancoAtivo") || "play-do-bistecao";
+let salaDocRef = doc(db, "salas", salaAtual);
+
+function atualizarSala(sala) {
+  salaAtual = sala;
+  localStorage.setItem("bancoAtivo", salaAtual);
+  location.reload(); // recarrega tudo com a nova sala selecionada
+}
 
 
 /* ================ HELPERS GERAIS ================ */
