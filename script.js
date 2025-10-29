@@ -445,8 +445,9 @@ async function novaRodada(){
   });
 
   campo.addEventListener("blur", async () => {
-    let v = campo.value;
+    let v = campo.value.trim();
 
+    // Normaliza acentos e espaços
     v = normalizarNome(v);
 
     if (v.length === 0) {
@@ -454,23 +455,27 @@ async function novaRodada(){
       return;
     }
 
-    v = v.charAt(0).toUpperCase() + v.slice(1).toLowerCase();
+    // ✅ Capitaliza TODAS as palavras do nome composto
+    v = v.split(" ").map(w =>
+      w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()
+    ).join(" ");
 
-    // Verifica duplicação nos 6 campos
+    // Coleta nomes atuais já normalizados
     const nomesAtuais = [...Array(6)].map((_, j) =>
       j === i ? v : document.getElementById("p" + (j + 1)).value.trim()
     );
 
+    // ✅ Proteção contra duplicação dentro dos 6 jogadores
     if (nomesAtuais.filter(n => n === v).length > 1) {
       alert("⚠️ Este nome já está sendo utilizado!");
       campo.value = ultimoValorValido;
       return;
     }
 
-    // Verifica duplicação no banco de troféus
+    // ✅ Proteção contra duplicação no banco de troféus
     if ((trophyCountsDia && trophyCountsDia[v]) ||
         (trophyCountsMes && trophyCountsMes[v])) {
-      alert("⚠️ Este nome já existe no histórico! Por favor mantenha a grafia padronizada.");
+      alert("⚠️ Este nome já existe no histórico! Mantenha a mesma grafia.");
       campo.value = ultimoValorValido;
       return;
     }
@@ -478,14 +483,10 @@ async function novaRodada(){
     campo.value = v;
     ultimoValorValido = v;
 
-    const nomes = [...Array(6)].map((_, j) =>
-      document.getElementById("p" + (j + 1)).value.trim()
-    );
-
-    await setDoc(salaDocRef, { nomes }, { merge: true });
+    // ✅ Salva somente nomes, sem mexer em troféus
+    await setDoc(salaDocRef, { nomes: nomesAtuais }, { merge: true });
   });
 });
-
 
 
 
