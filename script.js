@@ -602,6 +602,7 @@ document.addEventListener("DOMContentLoaded", atualizarIndicadorDB);
 
 
 
+
 /* Inicialização simples de render */
 renderPartidas();
 renderTrofeusDia();
