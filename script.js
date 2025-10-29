@@ -570,6 +570,18 @@ async function prepararHistoricoPartidas(){
   selMes.onchange = ()=> listarDiasDoMes(selMes.value);
   await listarDiasDoMes(selMes.value);
 }
+/* SELEÇÃO DE SALA - ABERTURA DO MODAL */
+document.querySelector(".selecionarSala").addEventListener("click", ev => {
+  ev.preventDefault();
+  abrirModal("selecionarSalaModal");
+});
+
+/* TROCA DE SALA AO CLICAR NO BOTÃO */
+document.querySelectorAll(".btn-sala").forEach(btn=>{
+  btn.addEventListener("click", () => {
+    atualizarSala(btn.getAttribute("data-sala"));
+  });
+});
 
 
 /* Inicialização simples de render */
