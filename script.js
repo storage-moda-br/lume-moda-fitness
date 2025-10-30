@@ -683,25 +683,26 @@ if (btnEditarTrofeus) {
 }
 
 function carregarEditorTrofeus() {
-  const container = document.getElementById("listaEdicaoTrofeus");
-  container.innerHTML = "";
-  const entries = Object.entries(trophyCountsMes || {});
-  if (entries.length === 0) {
-    container.innerHTML = "<p style='text-align:center;color:#777;'>Nenhum troféu registrado neste mês.</p>";
-    return;
-  }
-  entries.sort((a,b)=>b[1]-a[1]).forEach(([nome,valor])=>{
+  const lista = document.getElementById("listaTrofeus");
+  lista.innerHTML = "";
+
+  const entries = Object.entries(trophyCountsMes || {}).sort((a, b) => b[1] - a[1]);
+
+  entries.forEach(([nome, qtd]) => {
     const row = document.createElement("div");
     row.className = "edit-row";
     row.innerHTML = `
-      <input type="text" class="edit-nome" value="${nome}">
-      <input type="number" class="edit-qtd" value="${valor}" min="0">
+      <input type="text" class="nome" value="${nome}" placeholder="Nome">
+      <input type="number" class="qtd" value="${qtd}" min="0">
       <button class="btn-del">🗑️</button>
     `;
-    row.querySelector(".btn-del").onclick = ()=> row.remove();
-    container.appendChild(row);
+    lista.appendChild(row);
+
+    // Excluir linha
+    row.querySelector(".btn-del").onclick = () => row.remove();
   });
 }
+
 
 document.getElementById("btnAddTrofeu").onclick = ()=>{
   const nome = document.getElementById("novoNomeTrofeu").value.trim();
