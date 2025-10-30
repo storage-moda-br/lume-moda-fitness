@@ -672,3 +672,70 @@ renderPartidas();
 renderTrofeusDia();
 renderRanking();
 
+/* ================ EDITOR DE TROFÉUS MENSAIS ================ */
+const btnEditarTrofeus = document.querySelector(".editarTrofeus");
+if (btnEditarTrofeus) {
+  btnEditarTrofeus.addEventListener("click", () => {
+    if (!isAdmin) { alert("Somente administradores podem editar troféus."); return; }
+    abrirModal("editarTrofeusModal");
+    carregarEditorTrofeus();
+  });
+}
+
+function carregarEditorTrofeus() {
+  const container = document.getElementById("listaEdicaoTrofeus");
+  container.innerHTML = "";
+  const entries = Object.entries(trophyCountsMes || {});
+  if (entries.length === 0) {
+    container.innerHTML = "<p style='text-align:center;color:#777;'>Nenhum troféu registrado neste mês.</p>";
+    return;
+  }
+  entries.sort((a,b)=>b[1]-a[1]).forEach(([nome,valor])=>{
+    const row = document.createElement("div");
+    row.className = "edit-row";
+    row.innerHTML = `
+      <input type="text" class="edit-nome" value="${nome}">
+      <input type="number" class="edit-qtd" value="${valor}" min="0">
+      <button class="btn-del">🗑️</button>
+    `;
+    row.querySelector(".btn-del").onclick = ()=> row.remove();
+    container.appendChild(row);
+  });
+}
+
+document.getElementById("btnAddTrofeu").onclick = ()=>{
+  const nome = document.getElementById("novoNomeTrofeu").value.trim();
+  const qtd = parseInt(document.getElementById("novoValorTrofeu").value);
+  if (!nome || isNaN(qtd)) return alert("Preencha nome e quantidade.");
+  const container = document.getElementById("listaEdicaoTrofeus");
+  const row = document.createElement("div");
+  row.className = "edit-row";
+  row.innerHTML = `
+    <input type="text" class="edit-nome" value="${nome}">
+    <input type="number" class="edit-qtd" value="${qtd}" min="0">
+    <button class="btn-del">🗑️</button>
+  `;
+  row.querySelector(".btn-del").onclick = ()=> row.remove();
+  container.appendChild(row);
+  document.getElementById("novoNomeTrofeu").value="";
+  document.getElementById("novoValorTrofeu").value="";
+};
+
+document.getElementById("btnCancelarEditar").onclick = ()=>{
+  document.getElementById("editarTrofeusModal").style.display="none";
+};
+
+document.getElementById("btnSalvarTrofeus").onclick = async ()=>{
+  const rows = document.querySelectorAll("#listaEdicaoTrofeus .edit-row");
+  const novoMapa = {};
+  rows.forEach(r=>{
+    const n = r.querySelector(".edit-nome").value.trim();
+    const v = parseInt(r.querySelector(".edit-qtd").value);
+    if(n && !isNaN(v)) novoMapa[n]=v;
+  });
+  trophyCountsMes = novoMapa;
+  await setDoc(salaDocRef, { trophyCountsMes: novoMapa }, { merge:true });
+  renderRanking();
+  document.getElementById("editarTrofeusModal").style.display="none";
+  alert("✅ Troféus salvos com sucesso!");
+};
