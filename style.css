@@ -156,42 +156,43 @@ button:hover{transform:scale(1.03);}
   background: #ffbfbf;
 }
 
-/* Linha de adicionar novo troféu */
-#editarTrofeusModal .edit-row {
+/* ===== Linha de adicionar novo troféu ===== */
+#editarTrofeusModal .add-row {
   display: flex;
-  gap: 8px;
   align-items: center;
-  background: #f8f9fc;
-  padding: 8px 10px;
-  border-radius: 10px;
-  margin-bottom: 8px;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 15px 0;
 }
 
-#editarTrofeusModal input[type="text"] {
+#editarTrofeusModal .add-row input[type="text"] {
   flex: 1;
   border: 1px solid #ddd;
-  padding: 8px 10px;
-  border-radius: 8px;
+  border-radius: 10px;
+  padding: 10px;
   font-size: 0.9rem;
 }
 
-#editarTrofeusModal input[type="number"] {
+#editarTrofeusModal .add-row input[type="number"] {
   width: 70px;
   border: 1px solid #ddd;
-  padding: 8px 6px;
-  border-radius: 8px;
+  border-radius: 10px;
+  padding: 10px;
   text-align: center;
   font-size: 0.9rem;
 }
 
-#editarTrofeusModal .btn-del {
+#editarTrofeusModal .add-row button {
   border: none;
-  background: #ffecec;
-  color: #a00;
-  padding: 6px 8px;
-  border-radius: 8px;
+  border-radius: 30px;
+  background: linear-gradient(90deg, #0093ff, #00c8ff);
+  color: #fff;
+  padding: 10px 18px;
+  font-size: 0.9rem;
   cursor: pointer;
+  transition: 0.2s;
 }
-#editarTrofeusModal .btn-del:hover {
-  background: #ffbfbf;
+
+#editarTrofeusModal .add-row button:hover {
+  transform: scale(1.03);
 }
