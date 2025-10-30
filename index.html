@@ -16,7 +16,7 @@
     <div class="menu-dropdown" id="menuDropdown">
       <a href="#" class="trofeus">Troféus do mês</a>
       <a href="#" class="editarTrofeus">Editar troféus</a>
-      <a href="#" class="historicoTrofeus">Histórico de troféus</a>
+      <a href="#" class="editarTrofeus">Editar troféus</a>
       <a href="#" class="historicoPartidas">Histórico de partidas</a>
       <a href="#" class="encerrarMes">Encerrar mês</a>
       <a href="#" class="nova">Nova rodada</a>
@@ -58,11 +58,12 @@
       <h2 style="color:#0093ff;">Editar Troféus Mensais</h2>
       <p style="font-size:.8rem;opacity:.65;margin-top:-6px;margin-bottom:10px;">✅ Atualiza somente local até clicar em SALVAR<br>❌ NÃO grava automático</p>
       <div id="listaEdicaoTrofeus"></div>
-      <div style="display:flex;gap:8px;margin-top:15px;">
-        <input id="novoNomeTrofeu" placeholder="Nome" style="flex:1;padding:10px;border-radius:10px;border:1px solid #ddd;">
-        <input id="novoValorTrofeu" type="number" min="0" placeholder="Qtd" style="width:80px;padding:10px;border-radius:10px;border:1px solid #ddd;">
-        <button id="btnAddTrofeu" class="btn-azul">Adicionar</button>
-      </div>
+      <div class="add-row">
+  <input id="novoNomeTrofeu" type="text" placeholder="Nome">
+  <input id="novoValorTrofeu" type="number" min="0" placeholder="Qtd">
+  <button id="btnAddTrofeu" class="btn-azul">Adicionar</button>
+</div>
+
       <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:18px;">
         <button id="btnCancelarEditar" class="btn-neutro">Cancelar</button>
         <button id="btnSalvarTrofeus" class="btn-azul">Salvar</button>

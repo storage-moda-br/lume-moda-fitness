@@ -20,6 +20,11 @@ body{margin:0;background:#f4f7fb;display:flex;flex-direction:column;align-items:
   content:"📊";
   margin-right:8px;
 }
+.menu-dropdown a.selecionarSala::before {
+  content:"📊";
+  margin-right:8px;
+}
+
 
 
 
@@ -88,44 +93,89 @@ button:hover{transform:scale(1.03);}
 }
 
 
-/* ======= Editor de Troféus Mensais ======= */
+/* ======= Editor de Troféus Mensais (Ajustado) ======= */
 #editarTrofeusModal .edit-row {
   display: flex;
   gap: 8px;
   align-items: center;
   background: #f8f9fc;
-  padding: 10px 12px;
+  padding: 8px 10px;
   border-radius: 10px;
   margin-bottom: 8px;
 }
+
 #editarTrofeusModal input {
   border: 1px solid #ddd;
   padding: 8px 10px;
   border-radius: 8px;
   font-size: 0.9rem;
+  flex: 1;
 }
+
+#editarTrofeusModal input[type="number"] {
+  width: 65px;
+  text-align: center;
+}
+
+/* Botões */
 .btn-azul {
-  background: linear-gradient(90deg,#0093ff,#00c8ff);
+  background: linear-gradient(90deg, #0093ff, #00c8ff);
   border: none;
-  padding: 9px 14px;
-  border-radius: 10px;
+  padding: 10px 16px;
+  border-radius: 25px;
   color: white;
   cursor: pointer;
   font-size: 0.9rem;
+  transition: 0.2s;
 }
+.btn-azul:hover {
+  transform: scale(1.04);
+}
+
 .btn-neutro {
   border: 1px solid #ccc;
-  background: white;
-  padding: 9px 14px;
-  border-radius: 10px;
+  background: #f8f9fa;
+  padding: 10px 16px;
+  border-radius: 25px;
   cursor: pointer;
+  font-size: 0.9rem;
 }
+.btn-neutro:hover {
+  background: #e9ecef;
+}
+
 .btn-del {
   border: none;
-  background: #ffe6e6;
+  background: #ffecec;
   color: #a00;
   padding: 6px 8px;
   border-radius: 8px;
   cursor: pointer;
 }
+.btn-del:hover {
+  background: #ffbfbf;
+}
 
+/* Linha de adicionar novo troféu */
+#editarTrofeusModal .add-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 15px;
+  align-items: center;
+}
+
+#editarTrofeusModal .add-row input {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 10px;
+  font-size: 0.9rem;
+}
+
+#editarTrofeusModal .add-row input[type="text"] {
+  flex: 1;
+}
+
+#editarTrofeusModal .add-row input[type="number"] {
+  width: 70px;
+  text-align: center;
+}
