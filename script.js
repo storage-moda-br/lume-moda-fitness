@@ -651,8 +651,9 @@ function prepararEditorTrofeus() {
   cont.innerHTML = "";
 
   const entries = Object.entries(trophyCountsMes || {})
-  .filter(([nome]) => nome && nome.trim() !== "")
+  .filter(([nome]) => nome && nome.trim() !== "" && nome.trim().toLowerCase() !== "null")
   .sort((a, b) => b[1] - a[1]);
+
 
   if (entries.length === 0) {
     cont.innerHTML = "<p style='text-align:center;color:#777;'>Nenhum troféu neste mês.</p>";
@@ -811,25 +812,36 @@ document.addEventListener("DOMContentLoaded", () => {
     const linhas = document.querySelectorAll("#editarTrofeusLista .edit-row");
     const novosDados = {};
 
-    linhas.forEach(linha => {
+   linhas.forEach(linha => {
   const nomeEl = linha.querySelector(".nome");
   const inputEl = linha.querySelector(".edit-input");
   const nomeCampo = linha.querySelector("#novoNome");
 
   let novoNome = "";
+
   if (nomeCampo) {
+    // Campo "Novo nome"
     novoNome = nomeCampo.value.trim();
-    // ⚠️ se o campo "novo nome" estiver vazio, nem processa esta linha
-    if (!novoNome) return;
+    if (!novoNome) return; // se estiver vazio, ignora completamente
   } else if (nomeEl) {
+    // Linhas já existentes
     novoNome = nomeEl.textContent.trim();
   }
 
   const val = parseInt(inputEl?.value) || 0;
+
   if (novoNome && novoNome.toLowerCase() !== "null") {
     novosDados[novoNome] = val;
   }
 });
+
+// 🚫 Limpeza final de segurança — remove qualquer chave vazia, nula ou “null”
+for (const nome in novosDados) {
+  if (!nome || nome.trim() === "" || nome.toLowerCase() === "null") {
+    delete novosDados[nome];
+  }
+}
+
 
 
     // Atualiza no Firestore
