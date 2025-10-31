@@ -671,10 +671,14 @@ function prepararEditorTrofeus() {
   const novaLinha = document.createElement("div");
   novaLinha.className = "trofeus-dia-item edit-row";
   novaLinha.innerHTML = `
-    <input type="text" placeholder="Novo nome" id="novoNome" style="flex:1; border:1px solid #ccc; border-radius:8px; padding:8px;">
-    <span class="icon-trofeu">🏆</span>
-    <input type="number" min="0" id="novoTrofeu" value="0" style="width:70px; border:1px solid #ccc; border-radius:8px; padding:6px; text-align:center;">
-  `;
+  <span class="nome">
+    <input type="text" id="novoNome" placeholder="Novo nome" class="input-nome">
+  </span>
+  <span class="icon-trofeu">🏆</span>
+  <input type="number" min="0" id="novoTrofeu" value="0" class="edit-input">
+  <span class="btn-excluir" style="visibility:hidden;">❌</span>
+`;
+
   cont.appendChild(novaLinha);
 
   // --- Exclusão de jogador (❌) ---

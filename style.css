@@ -153,3 +153,26 @@ button:hover{transform:scale(1.03);}
   display: inline-block;
 }
 
+/* Alinhar a linha "Novo nome" à grade das demais */
+#editarTrofeusModal .input-nome {
+  width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-size: .95rem;
+  background: #fff;
+}
+
+/* Garante a mesma largura do input de número */
+#editarTrofeusModal #novoTrofeu.edit-input {
+  width: 65px; /* igual ao .edit-input das linhas acima */
+  text-align: center;
+}
+
+/* Reserva espaço fixo pro X (inclusive quando invisível) */
+#editarTrofeusModal .btn-excluir {
+  display: inline-block;
+  width: 18px;        /* largura consistente */
+  text-align: center; /* centra o X nessa largura */
+}
+
