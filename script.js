@@ -426,18 +426,33 @@ function renderRanking(){
 /* ================ NOVA RODADA (salva histórico do dia + sincroniza) ================ */
 async function novaRodada(){
   if(!isAdmin){ alert("Somente administradores."); return; }
-  if(!confirm("Tem certeza que deseja iniciar nova rodada? Isso apagará os resultados do dia.")) return;
+  if(!confirm("Tem certeza que deseja iniciar nova rodada? Isso salvará as partidas do dia e limpará a tela.")) return;
 
-  const hoje = dataKeyHoje();
-  const docDiaRef = doc(db, "partidasDia", `play-do-bistecao_${hoje}`);
+  const hoje = dataKeyHoje(); // ex: 2025-10-31
+
+  // 🔢 Procura um ID livre: play-do-bistecao_YYYY-MM-DD, _2, _3, ...
+  let contador = 1;
+  let idFinal = `play-do-bistecao_${hoje}`;
+  while (true) {
+    const refTeste = doc(db, "partidasDia", idFinal);
+    const snap = await getDoc(refTeste);
+    if (!snap.exists()) break;
+    contador++;
+    idFinal = `play-do-bistecao_${hoje}_${contador}`;
+  }
+
+  // ✅ Salva com ID único (não sobrescreve mais)
+  const docDiaRef = doc(db, "partidasDia", idFinal);
   await setDoc(docDiaRef, {
     sala: "play-do-bistecao",
     dataKey: hoje,
+    indice: contador,         // 1 para primeira do dia, 2, 3...
     partidas: partidas || [],
     nomes: getNomes(),
     createdAt: Date.now()
   });
 
+  // Limpa tela do dia (igual já fazia)
   partidas = [];
   usedPairs = new Set();
   trophyCountsDia = {};
@@ -454,6 +469,7 @@ async function novaRodada(){
   renderTrofeusDia();
   renderRanking();
 }
+
 
 
 /* ================ Nomes: padronização + proteção duplicada ================ */
@@ -632,23 +648,24 @@ async function prepararHistoricoPartidas(){
   const lastDay = new Date(ano, mes, 0).getDate();
   const encontrados = [];
 
-  // 🔍 busca todos os documentos de partidasDia
   for(let dia=1; dia<=lastDay; dia++){
     const dd = String(dia).padStart(2,'0');
-    const keyBase = `play-do-bistecao_${ano}-${String(mes).padStart(2,'0')}-${dd}`;
+    const base = `play-do-bistecao_${ano}-${String(mes).padStart(2,'0')}-${dd}`;
 
-    // varre possíveis índices (caso existam partidas 2,3,4)
-    let contador = 1;
+    // varre possíveis índices até não encontrar mais
+    let idx = 1;
     while (true) {
-      const key = contador === 1 ? keyBase : `${keyBase}_${contador}`;
-      const ref = doc(db,"partidasDia", key);
+      const id = idx === 1 ? base : `${base}_${idx}`;
+      const ref = doc(db, "partidasDia", id);
       const s = await getDoc(ref);
-      if(!s.exists()){
-        if (contador === 1) break; // nenhuma partida no dia
-        else break; // acabou os índices
+      if (!s.exists()) {
+        // se nem a primeira existe, não há partidas nesse dia
+        if (idx === 1) break;
+        // se a primeira existiu e esta não, acabou a sequência daquele dia
+        break;
       }
-      encontrados.push({ key, data: s.data(), indice: contador });
-      contador++;
+      encontrados.push({ key: id, data: s.data(), indice: idx });
+      idx++;
     }
   }
 
@@ -657,12 +674,12 @@ async function prepararHistoricoPartidas(){
     return;
   }
 
-  // 🔢 monta a lista visual com mesmo formato, só adicionando número se houver mais de uma
+  // monta a lista preservando o formato; adiciona "2", "3"... quando necessário
   listaDatas.innerHTML = encontrados.map(({key, indice})=>{
-    const partes = key.split("_");
-    const dataBruta = partes[1]; // ex: 2025-10-23
+    const partes = key.split("_");           // ["play-do-bistecao", "YYYY-MM-DD", "N?"]
+    const dataBruta = partes[1];             // "YYYY-MM-DD"
     const [Y,M,D] = dataBruta.split("-");
-    const d = new Date(Number(Y), Number(M)-1, Number(D));
+    const d = new Date(+Y, +M-1, +D);
     const semana = weekdayLabel(d);
     const prefixo = indice > 1 ? `Partida ${indice} ` : `Partida `;
     return `
@@ -673,7 +690,7 @@ async function prepararHistoricoPartidas(){
     `;
   }).join("");
 
-  // evento de clique para abrir detalhes
+  // clique para abrir detalhes
   listaDatas.querySelectorAll(".trofeus-dia-item").forEach(el=>{
     el.addEventListener("click", async ()=>{
       const key = el.getAttribute("data-date");
@@ -713,6 +730,7 @@ async function prepararHistoricoPartidas(){
     });
   });
 }
+
 
 
   selMes.onchange = ()=> listarDiasDoMes(selMes.value);
