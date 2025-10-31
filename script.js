@@ -650,7 +650,10 @@ function prepararEditorTrofeus() {
 
   cont.innerHTML = "";
 
-  const entries = Object.entries(trophyCountsMes || {}).sort((a, b) => b[1] - a[1]);
+  const entries = Object.entries(trophyCountsMes || {})
+  .filter(([nome]) => nome && nome.trim() !== "")
+  .sort((a, b) => b[1] - a[1]);
+
   if (entries.length === 0) {
     cont.innerHTML = "<p style='text-align:center;color:#777;'>Nenhum troféu neste mês.</p>";
   } else {
