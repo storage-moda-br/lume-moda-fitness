@@ -640,15 +640,16 @@ async function encerrarMesAtual() {
 
 
 
-/* ================ HISTÓRICO DE PARTIDAS (VERSÃO ESTÁVEL) ================ */
+/* ==========================================================
+   🎾 HISTÓRICO DE PARTIDAS — VERSÃO FINAL OTIMIZADA
+   ========================================================== */
 async function prepararHistoricoPartidas() {
-  console.log("🚀 prepararHistoricoPartidas iniciada");
   const selMes = document.getElementById("mesPartidasSelect");
   const listaDatas = document.getElementById("listaPartidasDoMes");
   const detalhes = document.getElementById("detalhesPartida");
   if (!selMes || !listaDatas || !detalhes) return;
 
-  // 🗓️ Preenche o seletor de meses (últimos 12)
+  // 🗓️ Preenche os últimos 12 meses no seletor
   selMes.innerHTML = "";
   const now = new Date();
   for (let i = 0; i < 12; i++) {
@@ -660,21 +661,27 @@ async function prepararHistoricoPartidas() {
     selMes.appendChild(opt);
   }
 
-  // 🔍 Carrega as partidas do mês selecionado
+  // ==========================================================
+  // 🔍 Função interna para listar as partidas do mês
+  // ==========================================================
   async function listarDiasDoMes(mk) {
     listaDatas.innerHTML = "<p style='text-align:center;color:#777;'>Carregando partidas…</p>";
     detalhes.innerHTML = "";
 
     const [ano, mes] = mk.split("-").map(Number);
-
-    console.log("⚡ Carregando partidas com consulta única...");
-    const { collection, getDocs, query } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
-
     const prefixo = `${salaAtual}_${ano}-${String(mes).padStart(2, "0")}`;
+
+    // Importa apenas os métodos necessários do Firestore
+    const { collection, getDocs, query } = await import(
+      "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"
+    );
+
+    // Busca toda a coleção (em cache, leve)
     const q = query(collection(db, "partidasDia"));
     const snap = await getDocs(q);
-    const encontrados = [];
 
+    // Filtra pelo mês e sala atual
+    const encontrados = [];
     snap.forEach((docSnap) => {
       const id = docSnap.id;
       if (id.startsWith(prefixo)) {
@@ -684,37 +691,39 @@ async function prepararHistoricoPartidas() {
       }
     });
 
-    console.log(`✅ ${encontrados.length} partidas encontradas`);
-
     if (encontrados.length === 0) {
       listaDatas.innerHTML =
         "<p style='text-align:center;color:#777;'>Nenhuma partida salva neste mês.</p>";
       return;
     }
 
-    // 🔢 Monta a lista de partidas
+    // ==========================================================
+    // 🧾 Monta a lista de partidas do mês
+    // ==========================================================
     listaDatas.innerHTML = encontrados
       .map(({ key, indice }) => {
         const dataKey = key.match(/\d{4}-\d{2}-\d{2}/)?.[0] || "";
         const [Y, M, D] = dataKey.split("-");
         const d = new Date(Number(Y), Number(M) - 1, Number(D));
         const semana = weekdayLabel(d);
-        const labelPartida = `Partida ${indice}`;
         return `
           <div class="trofeus-dia-item" data-date="${key}" style="cursor:pointer;">
-            <span>${labelPartida} — ${D}/${M}/${Y} — ${semana}</span>
+            <span>Partida ${indice} — ${D}/${M}/${Y} — ${semana}</span>
             <span>🔎 Ver</span>
           </div>
         `;
       })
       .join("");
 
-    // 🧩 Clique => mostra detalhes da partida
+    // ==========================================================
+    // 🖱️ Clique para ver detalhes da partida
+    // ==========================================================
     listaDatas.querySelectorAll(".trofeus-dia-item").forEach((el) => {
       el.addEventListener("click", async () => {
         const key = el.getAttribute("data-date");
         const ref = doc(db, "partidasDia", key);
         const s = await getDoc(ref);
+
         if (!s.exists()) {
           detalhes.innerHTML =
             "<p style='text-align:center;color:#777;'>Partida não encontrada.</p>";
@@ -738,7 +747,9 @@ async function prepararHistoricoPartidas() {
             <div class="${p.vencedor === "1" ? perd2 : d2Class}">
               <strong>Dupla 2:</strong> ${p.dupla2.join(" & ")} ${p.vencedor === "2" ? "🏆" : ""}
             </div>
-            <div class="dupla-fora"><strong>De fora:</strong> ${p.deFora.join(" & ")}</div>
+            <div class="dupla-fora">
+              <strong>De fora:</strong> ${p.deFora.join(" & ")}
+            </div>
           `;
         });
 
@@ -754,7 +765,9 @@ async function prepararHistoricoPartidas() {
     });
   }
 
+  // ==========================================================
   // 🔄 Troca de mês e carga inicial
+  // ==========================================================
   selMes.onchange = () => listarDiasDoMes(selMes.value);
   await listarDiasDoMes(selMes.value);
 }
