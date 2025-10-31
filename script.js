@@ -812,18 +812,25 @@ document.addEventListener("DOMContentLoaded", () => {
     const novosDados = {};
 
     linhas.forEach(linha => {
-      const nomeEl = linha.querySelector(".nome");
-      const inputEl = linha.querySelector(".edit-input");
-      const nomeCampo = linha.querySelector("#novoNome");
-      const novoNome = nomeCampo
-        ? nomeCampo.value.trim()
-        : (nomeEl ? nomeEl.textContent.trim() : "");
-      const val = parseInt(inputEl?.value) || 0;
-      if (novoNome && novoNome.trim() !== "" && novoNome.toLowerCase() !== "null") {
-  novosDados[novoNome] = val;
-}
+  const nomeEl = linha.querySelector(".nome");
+  const inputEl = linha.querySelector(".edit-input");
+  const nomeCampo = linha.querySelector("#novoNome");
 
-    });
+  let novoNome = "";
+  if (nomeCampo) {
+    novoNome = nomeCampo.value.trim();
+    // ⚠️ se o campo "novo nome" estiver vazio, nem processa esta linha
+    if (!novoNome) return;
+  } else if (nomeEl) {
+    novoNome = nomeEl.textContent.trim();
+  }
+
+  const val = parseInt(inputEl?.value) || 0;
+  if (novoNome && novoNome.toLowerCase() !== "null") {
+    novosDados[novoNome] = val;
+  }
+});
+
 
     // Atualiza no Firestore
     await setDoc(salaDocRef, { trophyCountsMes: novosDados }, { merge: true });
@@ -838,29 +845,3 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-/* =======================================================
-   🔧 LIMPEZA DE REGISTRO NULO NOS TROFÉUS MENSAIS
-   (executa 1x ao carregar)
-   ======================================================= */
-document.addEventListener("DOMContentLoaded", async () => {
-  if (!isAdmin) return; // só o admin pode limpar
-  if (!trophyCountsMes) return;
-
-  let houveNull = false;
-  const limpo = {};
-
-  Object.entries(trophyCountsMes).forEach(([nome, val]) => {
-    if (nome && nome.trim() !== "null" && nome.trim() !== "") {
-      limpo[nome] = val;
-    } else {
-      houveNull = true;
-    }
-  });
-
-  if (houveNull) {
-    console.warn("🔧 Corrigindo registro nulo em trophyCountsMes...");
-    await setDoc(salaDocRef, { trophyCountsMes: limpo }, { merge: true });
-    trophyCountsMes = limpo;
-    renderRanking();
-  }
-});
