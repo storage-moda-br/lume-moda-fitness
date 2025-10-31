@@ -661,57 +661,58 @@ async function prepararHistoricoPartidas() {
   }
 
   async function listarDiasDoMes(mk) {
-    listaDatas.innerHTML = "<p style='text-align:center;color:#777;'>Carregando partidas…</p>";
-    detalhes.innerHTML = "";
+  listaDatas.innerHTML = "<p style='text-align:center;color:#777;'>Carregando partidas…</p>";
+  detalhes.innerHTML = "";
 
-    const [ano, mes] = mk.split("-").map(Number);
-    const lastDay = new Date(ano, mes, 0).getDate();
-    const encontrados = [];
+  const [ano, mes] = mk.split("-").map(Number);
+  const lastDay = new Date(ano, mes, 0).getDate();
 
-    // 🔍 Busca em blocos pequenos para evitar travar
-    for (let dia = 1; dia <= lastDay; dia++) {
-      const dd = String(dia).padStart(2, "0");
-      const keyBase = `${salaAtual}_${ano}-${String(mes).padStart(2, "0")}-${dd}`;
+  // 🔍 Busca todas as partidas do mês (modo rápido e otimizado)
+  console.log("⚡ Carregando partidas com consulta única...");
 
-      for (let i = 1; i <= 5; i++) { // 🔹 Máx 5 partidas por dia (suficiente)
-        const key = i === 1 ? keyBase : `${keyBase}_${i}`;
-	console.log("📡 Buscando:", key);
+  const { collection, getDocs, query } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
 
-        try {
-          const ref = doc(db, "partidasDia", key);
-          const s = await getDoc(ref); // 🔹 Aguarda 1 por vez — sem travar
-          if (s.exists()) encontrados.push({ key, data: s.data(), indice: i });
-        } catch (e) {
-          console.warn("Erro ao buscar partida:", key, e);
-        }
-      }
+  const prefixo = `${salaAtual}_${ano}-${String(mes).padStart(2, "0")}`;
+  const q = query(collection(db, "partidasDia"));
 
-      // Pequena pausa a cada 3 dias pra liberar thread
-      if (dia % 3 === 0) await new Promise(r => setTimeout(r, 30));
+  const snap = await getDocs(q);
+  const encontrados = [];
+
+  snap.forEach((docSnap) => {
+    const id = docSnap.id;
+    if (id.startsWith(prefixo)) {
+      const data = docSnap.data();
+      const indice = data.indice || 1;
+      encontrados.push({ key: id, data, indice });
     }
+  });
 
-    if (encontrados.length === 0) {
-      listaDatas.innerHTML =
-        "<p style='text-align:center;color:#777;'>Nenhuma partida salva neste mês.</p>";
-      return;
-    }
+  console.log(`✅ ${encontrados.length} partidas encontradas`);
 
-    // 🔢 Monta a lista
-    listaDatas.innerHTML = encontrados
-      .map(({ key, indice }) => {
-        const dataKey = key.match(/\d{4}-\d{2}-\d{2}/)?.[0] || "";
-        const [Y, M, D] = dataKey.split("-");
-        const d = new Date(Number(Y), Number(M) - 1, Number(D));
-        const semana = weekdayLabel(d);
-        const labelPartida = `Partida ${indice}`;
-        return `
-          <div class="trofeus-dia-item" data-date="${key}" style="cursor:pointer;">
-            <span>${labelPartida} — ${D}/${M}/${Y} — ${semana}</span>
-            <span>🔎 Ver</span>
-          </div>
-        `;
-      })
-      .join("");
+  if (encontrados.length === 0) {
+    listaDatas.innerHTML =
+      "<p style='text-align:center;color:#777;'>Nenhuma partida salva neste mês.</p>";
+    return;
+  }
+
+  // 🔢 Monta a lista
+  listaDatas.innerHTML = encontrados
+    .map(({ key, indice }) => {
+      const dataKey = key.match(/\d{4}-\d{2}-\d{2}/)?.[0] || "";
+      const [Y, M, D] = dataKey.split("-");
+      const d = new Date(Number(Y), Number(M) - 1, Number(D));
+      const semana = weekdayLabel(d);
+      const labelPartida = `Partida ${indice}`;
+      return `
+        <div class="trofeus-dia-item" data-date="${key}" style="cursor:pointer;">
+          <span>${labelPartida} — ${D}/${M}/${Y} — ${semana}</span>
+          <span>🔎 Ver</span>
+        </div>
+      `;
+    })
+    .join("");
+}
+
 
     // Clique => mostra detalhes
     listaDatas.querySelectorAll(".trofeus-dia-item").forEach(el => {
