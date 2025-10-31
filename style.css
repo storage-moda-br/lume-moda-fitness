@@ -210,4 +210,73 @@ button:hover{transform:scale(1.03);}
   filter: brightness(1.05);
 }
 
+/* === Editor de Troféus do Dia — herda o visual do mensal === */
+#editarTrofeusDiaModal .trofeus-dia-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
 
+#editarTrofeusDiaModal .trofeus-dia-item span.nome {
+  flex: 1;
+  font-weight: 500;
+  color: #333;
+}
+
+#editarTrofeusDiaModal .icon-trofeu {
+  color: #b89b00;
+  margin-right: 4px;
+  font-size: 1rem;
+}
+
+/* 👉 mesmo tamanho/estilo do input numérico do mensal (65px) */
+#editarTrofeusDiaModal .edit-input {
+  width: 65px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 6px 8px;
+  text-align: center;
+  font-weight: 600;
+  background: #fff;
+  margin-right: 6px;
+}
+
+/* Linha 'Novo nome' com o mesmo alinhamento */
+#editarTrofeusDiaLista .edit-row:last-child {
+  background: #f8f9fc;
+  padding: 8px 10px;
+  border-radius: 10px;
+  margin-top: 8px;
+  gap: 8px;
+}
+#editarTrofeusDiaModal .input-nome,
+#editarTrofeusDiaLista #novoNomeDia {
+  width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-size: .95rem;
+  background: #fff;
+}
+#editarTrofeusDiaLista #novoTrofeuDia {
+  width: 65px;
+  text-align: center;
+}
+#editarTrofeusDiaLista .icon-trofeu {
+  margin: 0 4px;
+  display: inline-block;
+}
+
+/* Hovers e focus iguais ao mensal */
+#editarTrofeusDiaLista .edit-row:hover {
+  background: #eef7ff;
+  transition: background 0.2s ease-in-out;
+}
+#editarTrofeusDiaLista input:focus {
+  outline: none;
+  border-color: #0093ff;
+  box-shadow: 0 0 0 2px rgba(0,147,255,0.2);
+  background: #fff;
+  transition: all 0.2s ease;
+}
