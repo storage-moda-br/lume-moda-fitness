@@ -763,14 +763,7 @@ async function prepararHistoricoPartidas() {
     });
   }
 
-  // Trocar mês
-  selMes.onchange = () => listarDiasDoMes(selMes.value);
-
-  // Carrega mês atual
-  listarDiasDoMes(selMes.value);
-}
-
-
+ 
 
   // 🔄 Evento de troca do mês + chamada inicial
   selMes.onchange = () => listarDiasDoMes(selMes.value);
