@@ -175,4 +175,39 @@ button:hover{transform:scale(1.03);}
   width: 18px;        /* largura consistente */
   text-align: center; /* centra o X nessa largura */
 }
+/* =======================================================
+   ✨ MELHORIAS VISUAIS NO EDITOR DE TROFÉUS
+   ======================================================= */
+
+/* 1️⃣ HOVER em cada linha (leve azul) */
+#editarTrofeusLista .edit-row:hover {
+  background: #eef7ff;
+  transition: background 0.2s ease-in-out;
+}
+
+/* 2️⃣ Destaque quando o campo "Novo nome" ou número está ativo */
+#editarTrofeusLista input:focus {
+  outline: none;
+  border-color: #0093ff;
+  box-shadow: 0 0 0 2px rgba(0,147,255,0.2);
+  background: #fff;
+  transition: all 0.2s ease;
+}
+
+/* 3️⃣ Animação de confirmação visual no botão Salvar */
+#editarTrofeusSalvar {
+  transition: background 0.4s ease, transform 0.2s ease;
+}
+
+/* Estado de sucesso — aplicado via JS por 1 segundo */
+#editarTrofeusSalvar.success {
+  background: linear-gradient(90deg,#00c851,#00e676);
+  transform: scale(1.05);
+}
+
+/* Pequeno retorno ao normal */
+#editarTrofeusSalvar.success:hover {
+  filter: brightness(1.05);
+}
+
 

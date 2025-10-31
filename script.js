@@ -791,3 +791,43 @@ document.querySelectorAll(".btn-sala").forEach(btn => {
 renderPartidas();
 renderTrofeusDia();
 renderRanking();
+
+/* =======================================================
+   🏆 BOTÃO SALVAR ALTERAÇÕES DO EDITOR DE TROFÉUS
+   ======================================================= */
+document.addEventListener("DOMContentLoaded", () => {
+  const btnSalvarTrofeus = document.getElementById("editarTrofeusSalvar");
+  if (!btnSalvarTrofeus) return;
+
+  btnSalvarTrofeus.addEventListener("click", async () => {
+    if (!isAdmin) {
+      alert("Somente administradores.");
+      return;
+    }
+
+    const linhas = document.querySelectorAll("#editarTrofeusLista .edit-row");
+    const novosDados = {};
+
+    linhas.forEach(linha => {
+      const nomeEl = linha.querySelector(".nome");
+      const inputEl = linha.querySelector(".edit-input");
+      const nomeCampo = linha.querySelector("#novoNome");
+      const novoNome = nomeCampo
+        ? nomeCampo.value.trim()
+        : (nomeEl ? nomeEl.textContent.trim() : "");
+      const val = parseInt(inputEl?.value) || 0;
+      if (novoNome) novosDados[novoNome] = val;
+    });
+
+    // Atualiza no Firestore
+    await setDoc(salaDocRef, { trophyCountsMes: novosDados }, { merge: true });
+    trophyCountsMes = novosDados;
+    renderRanking();
+
+    alert("Troféus atualizados com sucesso!");
+
+    // ✅ Feedback visual de confirmação
+    btnSalvarTrofeus.classList.add("success");
+    setTimeout(() => btnSalvarTrofeus.classList.remove("success"), 1000);
+  });
+});
