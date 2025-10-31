@@ -635,7 +635,7 @@ async function encerrarMesAtual() {
 
 
 
-/* ================ HISTÓRICO DE PARTIDAS (VERSÃO OTIMIZADA) ================ */
+/* ================ HISTÓRICO DE PARTIDAS (VERSÃO ESTÁVEL) ================ */
 async function prepararHistoricoPartidas() {
   const selMes = document.getElementById("mesPartidasSelect");
   const listaDatas = document.getElementById("listaPartidasDoMes");
@@ -654,33 +654,33 @@ async function prepararHistoricoPartidas() {
     selMes.appendChild(opt);
   }
 
-  // 🧩 Função que carrega os dias e partidas do mês selecionado
   async function listarDiasDoMes(mk) {
-    listaDatas.innerHTML = "<p style='text-align:center;color:#777;'>Carregando…</p>";
+    listaDatas.innerHTML = "<p style='text-align:center;color:#777;'>Carregando partidas…</p>";
     detalhes.innerHTML = "";
 
     const [ano, mes] = mk.split("-").map(Number);
     const lastDay = new Date(ano, mes, 0).getDate();
+    const encontrados = [];
 
-    // 🔍 Cria todas as promessas de busca (em paralelo)
-    const consultas = [];
+    // 🔍 Busca em blocos pequenos para evitar travar
     for (let dia = 1; dia <= lastDay; dia++) {
       const dd = String(dia).padStart(2, "0");
       const keyBase = `${salaAtual}_${ano}-${String(mes).padStart(2, "0")}-${dd}`;
-      for (let i = 1; i <= 10; i++) {
-        const key = i === 1 ? keyBase : `${keyBase}_${i}`;
-        consultas.push(
-          getDoc(doc(db, "partidasDia", key)).then((s) => {
-            if (s.exists()) return { key, data: s.data(), indice: i };
-            return null;
-          })
-        );
-      }
-    }
 
-    // ✅ Executa todas as consultas de uma vez (rápido)
-    const resultados = await Promise.all(consultas);
-    const encontrados = resultados.filter(Boolean);
+      for (let i = 1; i <= 5; i++) { // 🔹 Máx 5 partidas por dia (suficiente)
+        const key = i === 1 ? keyBase : `${keyBase}_${i}`;
+        try {
+          const ref = doc(db, "partidasDia", key);
+          const s = await getDoc(ref); // 🔹 Aguarda 1 por vez — sem travar
+          if (s.exists()) encontrados.push({ key, data: s.data(), indice: i });
+        } catch (e) {
+          console.warn("Erro ao buscar partida:", key, e);
+        }
+      }
+
+      // Pequena pausa a cada 3 dias pra liberar thread
+      if (dia % 3 === 0) await new Promise(r => setTimeout(r, 30));
+    }
 
     if (encontrados.length === 0) {
       listaDatas.innerHTML =
@@ -688,16 +688,14 @@ async function prepararHistoricoPartidas() {
       return;
     }
 
-    // 🔢 Mostra todas as partidas (1, 2, 3...) com data e dia da semana
+    // 🔢 Monta a lista
     listaDatas.innerHTML = encontrados
       .map(({ key, indice }) => {
-        const partes = key.split("_");
-        const dataKey = partes.find((p) => /^\d{4}-\d{2}-\d{2}$/.test(p)) || "";
+        const dataKey = key.match(/\d{4}-\d{2}-\d{2}/)?.[0] || "";
         const [Y, M, D] = dataKey.split("-");
         const d = new Date(Number(Y), Number(M) - 1, Number(D));
         const semana = weekdayLabel(d);
         const labelPartida = `Partida ${indice}`;
-
         return `
           <div class="trofeus-dia-item" data-date="${key}" style="cursor:pointer;">
             <span>${labelPartida} — ${D}/${M}/${Y} — ${semana}</span>
@@ -707,59 +705,63 @@ async function prepararHistoricoPartidas() {
       })
       .join("");
 
-    // 🎾 Clique em cada linha => mostra detalhes da partida
-    listaDatas.querySelectorAll(".trofeus-dia-item").forEach((el) => {
+    // Clique => mostra detalhes
+    listaDatas.querySelectorAll(".trofeus-dia-item").forEach(el => {
       el.addEventListener("click", async () => {
         const key = el.getAttribute("data-date");
-        const ref = doc(db, "partidasDia", key);
-        const s = await getDoc(ref);
-        if (!s.exists()) {
-          detalhes.innerHTML =
-            "<p style='text-align:center;color:#777;'>Partida não encontrada.</p>";
-          return;
-        }
+        detalhes.innerHTML = "<p style='text-align:center;color:#777;'>Carregando detalhes...</p>";
 
-        const dataDia = s.data();
-        const pts = dataDia.partidas || [];
+        try {
+          const ref = doc(db, "partidasDia", key);
+          const s = await getDoc(ref);
+          if (!s.exists()) {
+            detalhes.innerHTML = "<p style='text-align:center;color:#777;'>Partida não encontrada.</p>";
+            return;
+          }
 
-        let html = "";
-        pts.forEach((p) => {
-          const d1Class = p.vencedor === "1" ? "dupla dupla-vencedora" : "dupla";
-          const d2Class = p.vencedor === "2" ? "dupla dupla-vencedora" : "dupla";
-          const perd1 = p.vencedor === "2" ? "dupla dupla-perdedora" : "dupla";
-          const perd2 = p.vencedor === "1" ? "dupla dupla-perdedora" : "dupla";
+          const dataDia = s.data();
+          const pts = dataDia.partidas || [];
+          let html = "";
 
-          html += `
-            <h3 style="text-align:center;">Partida ${p.numero}</h3>
-            <div class="${p.vencedor === "2" ? perd1 : d1Class}">
-              <strong>Dupla 1:</strong> ${p.dupla1.join(" & ")} ${p.vencedor === "1" ? "🏆" : ""}
+          pts.forEach(p => {
+            const d1Class = p.vencedor === "1" ? "dupla dupla-vencedora" : "dupla";
+            const d2Class = p.vencedor === "2" ? "dupla dupla-vencedora" : "dupla";
+            const perd1 = p.vencedor === "2" ? "dupla dupla-perdedora" : "dupla";
+            const perd2 = p.vencedor === "1" ? "dupla dupla-perdedora" : "dupla";
+
+            html += `
+              <h3 style="text-align:center;">Partida ${p.numero}</h3>
+              <div class="${p.vencedor === "2" ? perd1 : d1Class}">
+                <strong>Dupla 1:</strong> ${p.dupla1.join(" & ")} ${p.vencedor === "1" ? "🏆" : ""}
+              </div>
+              <div class="${p.vencedor === "1" ? perd2 : d2Class}">
+                <strong>Dupla 2:</strong> ${p.dupla2.join(" & ")} ${p.vencedor === "2" ? "🏆" : ""}
+              </div>
+              <div class="dupla-fora"><strong>De fora:</strong> ${p.deFora.join(" & ")}</div>
+            `;
+          });
+
+          detalhes.innerHTML = `
+            <div class="trofeus-dia-container" style="margin-top:10px;">
+              <h3 style="margin-bottom:8px;">📅 ${key.split("_").pop().replaceAll("-", "/")}</h3>
+              ${html || "<p style='text-align:center;color:#777;'>Sem partidas neste dia.</p>"}
             </div>
-            <div class="${p.vencedor === "1" ? perd2 : d2Class}">
-              <strong>Dupla 2:</strong> ${p.dupla2.join(" & ")} ${p.vencedor === "2" ? "🏆" : ""}
-            </div>
-            <div class="dupla-fora"><strong>De fora:</strong> ${p.deFora.join(" & ")}</div>
           `;
-        });
-
-        detalhes.innerHTML = `
-          <div class="trofeus-dia-container" style="margin-top:10px;">
-            <h3 style="margin-bottom:8px;">📅 ${key
-              .split("_")
-              .pop()
-              .replaceAll("-", "/")}</h3>
-            ${html || "<p style='text-align:center;color:#777;'>Sem partidas neste dia.</p>"}
-          </div>
-        `;
+        } catch (e) {
+          detalhes.innerHTML = "<p style='text-align:center;color:#d33;'>Erro ao carregar partida.</p>";
+          console.error(e);
+        }
       });
     });
   }
 
-  // 🔄 Atualiza ao trocar o mês
+  // Trocar mês
   selMes.onchange = () => listarDiasDoMes(selMes.value);
 
-  // ⚡ Carrega o mês atual automaticamente ao abrir
+  // Carrega mês atual
   listarDiasDoMes(selMes.value);
 }
+
 
 
   // 🔄 Evento de troca do mês + chamada inicial
