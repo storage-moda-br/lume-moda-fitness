@@ -21,10 +21,8 @@
       <a href="#" class="nova">Nova rodada</a>
       <a href="#" class="regras">Regras</a>
       <a href="#" class="selecionarSala">Selecionar Banco</a>
-
-      <!-- === NOVO: Editor de Troféus (menu) === -->
-      <a href="#" class="editarTrofeus">Editar troféus</a>
-
+      <a href="#" class="editarTrofeus">Editar troféus do Mês</a>
+      <a href="#" class="editarTrofeusDia">🗓️ Editar troféus do dia</a>
       <a href="#" class="admin">Administrador</a>
 	  <a href="#" class="sobre">Sobre</a>
     </div>
@@ -156,6 +154,25 @@
     </div>
   </div>
   <!-- === FIM NOVO === -->
+  
+  <!-- === NOVO: Modal Editor de Troféus do Dia === -->
+<div id="editarTrofeusDiaModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>🗓️ Editar troféus do dia</h2>
+    <p style="text-align:center;color:#666;margin-top:-8px;margin-bottom:12px;">
+      Altere os valores ou exclua jogadores, e clique em <strong>Salvar alterações</strong>.  
+      Sem salvar, nada é gravado no banco.
+    </p>
+    <div id="editarTrofeusDiaLista"></div>
+    <div class="editar-actions">
+      <button id="btnSalvarEdicaoTrofeusDia">Salvar alterações</button>
+      <button id="btnCancelarEdicaoTrofeusDia" class="btn-secondary">Cancelar</button>
+    </div>
+  </div>
+</div>
+<!-- === FIM NOVO === -->
+
 
   <div id="indicadorDB"></div>
 </div>

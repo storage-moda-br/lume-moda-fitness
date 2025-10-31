@@ -753,7 +753,123 @@ function prepararEditorTrofeus() {
 }
 /* === FIM NOVO === */
 
+/* === NOVO: Editor de Troféus do Dia (sincroniza com o Mensal) === */
+function prepararEditorTrofeusDia() {
+  const cont = document.getElementById("editarTrofeusDiaLista");
+  if (!cont) return;
+
+  cont.innerHTML = "";
+
+  const entries = Object.entries(trophyCountsDia || {})
+    .filter(([nome]) => nome && nome.trim() !== "" && nome.trim().toLowerCase() !== "null")
+    .sort((a, b) => b[1] - a[1]);
+
+  if (entries.length === 0) {
+    cont.innerHTML = "<p style='text-align:center;color:#777;'>Nenhum troféu registrado hoje.</p>";
+  } else {
+    entries.forEach(([nome, qtd]) => {
+      const div = document.createElement("div");
+      div.className = "trofeus-dia-item edit-row";
+      div.innerHTML = `
+        <span class="nome">${nome}</span>
+        <span class="icon-trofeu">🏆</span>
+        <input type="number" min="0" value="${Number(qtd) || 0}" class="edit-input" data-nome="${nome}">
+        <span class="btn-excluir" title="Excluir jogador">❌</span>
+      `;
+      cont.appendChild(div);
+    });
+  }
+
+  // --- Linha para adicionar novo jogador ---
+  const novaLinha = document.createElement("div");
+  novaLinha.className = "trofeus-dia-item edit-row";
+  novaLinha.innerHTML = `
+    <span class="nome">
+      <input type="text" id="novoNomeDia" placeholder="Novo nome" class="input-nome">
+    </span>
+    <span class="icon-trofeu">🏆</span>
+    <input type="number" min="0" id="novoTrofeuDia" value="0" class="edit-input">
+    <span class="btn-excluir" style="visibility:hidden;">❌</span>
+  `;
+  cont.appendChild(novaLinha);
+
+  // --- Exclusão de jogador (❌) ---
+  cont.querySelectorAll(".btn-excluir").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const nome = btn.parentElement.querySelector(".nome").textContent.trim();
+      if (!confirm(`Deseja realmente remover ${nome}?`)) return;
+
+      delete trophyCountsDia[nome];
+      delete trophyCountsMes[nome];
+      await updateDoc(salaDocRef, { trophyCountsDia, trophyCountsMes });
+      prepararEditorTrofeusDia();
+      renderTrofeusDia();
+      renderRanking();
+    });
+  });
+
+  // --- Botão Salvar ---
+  const btnSalvar = document.getElementById("btnSalvarEdicaoTrofeusDia");
+  if (btnSalvar) {
+    btnSalvar.onclick = async () => {
+      const inputs = cont.querySelectorAll(".edit-input");
+      const novoMapa = { ...trophyCountsDia };
+
+      // Atualiza os valores existentes
+      inputs.forEach(inp => {
+        const nome = inp.getAttribute("data-nome");
+        const val = Math.max(0, parseInt(inp.value, 10) || 0);
+        if (nome) novoMapa[nome] = val;
+      });
+
+      // Novo jogador
+      const novoNome = document.getElementById("novoNomeDia").value.trim();
+      const novoTrofeu = parseInt(document.getElementById("novoTrofeuDia").value, 10) || 0;
+      if (novoNome) {
+        if (novoMapa[novoNome]) {
+          alert("⚠️ Este nome já existe nos troféus do dia!");
+        } else {
+          novoMapa[novoNome] = novoTrofeu;
+        }
+      }
+
+      // Atualiza local e sincroniza com o mensal
+      trophyCountsDia = novoMapa;
+      for (const nome in novoMapa) {
+        trophyCountsMes[nome] = (trophyCountsMes[nome] || 0) + (novoMapa[nome] - (trophyCountsDia[nome] || 0));
+      }
+
+      await updateDoc(salaDocRef, { trophyCountsDia, trophyCountsMes });
+
+      // Feedback visual
+      const originalText = btnSalvar.textContent;
+      btnSalvar.textContent = "✅ Salvo com sucesso!";
+      btnSalvar.style.background = "#28a745";
+      btnSalvar.disabled = true;
+      setTimeout(() => {
+        btnSalvar.textContent = originalText;
+        btnSalvar.style.background = "";
+        btnSalvar.disabled = false;
+      }, 2000);
+
+      renderTrofeusDia();
+      renderRanking();
+      prepararEditorTrofeusDia(); // re-render
+    };
+  }
+
+  // --- Botão Cancelar ---
+  const btnCancelar = document.getElementById("btnCancelarEdicaoTrofeusDia");
+  if (btnCancelar) {
+    btnCancelar.onclick = () => {
+      document.getElementById("editarTrofeusDiaModal").style.display = "none";
+    };
+  }
+}
 /* === FIM NOVO === */
+
+
+
 
 
 /* SELEÇÃO DE SALA - ABERTURA DO MODAL */
