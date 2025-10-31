@@ -536,28 +536,74 @@ async function prepararHistoricoTrofeus(){
 }
 
 
-/* ================ ENCERRAR MÊS ================= */
-async function encerrarMesAtual(){
+/* ================ ENCERRAR MÊS (feedback visual, sem alert) ================= */
+async function encerrarMesAtual() {
+  if (!confirm("⚠️ Tem certeza que deseja encerrar o mês atual?\n\nIsso arquivará os troféus do mês e zerará o placar.")) {
+    return;
+  }
+
   const mk = mesKey(new Date());
   const rotulo = labelMes(new Date());
 
-  await setDoc(doc(db,"historicoTrofeus", `play-do-bistecao_${mk}`), {
-    ...trophyCountsMes,
-    sala: "play-do-bistecao",
-    mesKey: mk,
-    rotulo,
-    closedAt: Date.now()
-  });
+  try {
+    // Salva histórico mensal no Firestore
+    await setDoc(doc(db, "historicoTrofeus", `play-do-bistecao_${mk}`), {
+      ...trophyCountsMes,
+      sala: "play-do-bistecao",
+      mesKey: mk,
+      rotulo,
+      closedAt: Date.now()
+    });
 
-  trophyCountsMes = {};
-  await setDoc(salaDocRef, {
-    partidas,
-    usedPairs: Array.from(usedPairs),
-    trophyCountsDia,
-    trophyCountsMes,
-    nomes: getNomes()
-  });
+    // Zera troféus mensais e diários
+    trophyCountsMes = {};
+    trophyCountsDia = {};
+
+    await setDoc(salaDocRef, {
+      partidas,
+      usedPairs: Array.from(usedPairs),
+      trophyCountsDia,
+      trophyCountsMes,
+      nomes: getNomes()
+    });
+
+    renderTrofeusDia();
+    renderRanking();
+
+    // ✅ Feedback visual no botão do menu
+    const btn = menu.querySelector(".encerrarMes");
+    if (btn) {
+      const originalText = btn.textContent;
+      btn.textContent = "✅ Mês encerrado com sucesso!";
+      btn.style.background = "#28a745";
+      btn.style.color = "white";
+      btn.style.borderRadius = "8px";
+      btn.style.transition = "0.3s ease";
+
+      setTimeout(() => {
+        btn.textContent = originalText;
+        btn.style.background = "";
+        btn.style.color = "";
+      }, 3000);
+    }
+
+  } catch (e) {
+    console.error("Erro ao encerrar mês:", e);
+    const btn = menu.querySelector(".encerrarMes");
+    if (btn) {
+      const originalText = btn.textContent;
+      btn.textContent = "❌ Erro ao encerrar!";
+      btn.style.background = "#dc3545";
+      btn.style.color = "white";
+      setTimeout(() => {
+        btn.textContent = originalText;
+        btn.style.background = "";
+        btn.style.color = "";
+      }, 3000);
+    }
+  }
 }
+
 
 
 /* ================ HISTÓRICO DE PARTIDAS ================ */
