@@ -169,6 +169,18 @@ menu.querySelector(".editarTrofeus")?.addEventListener('click', (ev)=>{
   prepararEditorTrofeus();
 });
 
+/* === NOVO: Ação do menu "Editar Troféus do Dia" === */
+menu.querySelector(".editarTrofeusDia")?.addEventListener("click", (ev) => {
+  ev.preventDefault();
+  if (!isAdmin) {
+    alert("Somente administradores.");
+    return;
+  }
+  abrirModal("editarTrofeusDiaModal");
+  prepararEditorTrofeusDia();
+});
+
+
 
 /* ================ LOGIN ADMIN ================ */
 document.getElementById("btnEntrarSenha").onclick = async ()=>{
