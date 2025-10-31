@@ -443,16 +443,27 @@ while (true) {
 
 
 
-  // ✅ Salva com ID único (não sobrescreve mais)
-  const docDiaRef = doc(db, "partidasDia", idFinal);
-  await setDoc(docDiaRef, {
-    sala: "play-do-bistecao",
-    dataKey: hoje,
-    indice: contador,         // 1 para primeira do dia, 2, 3...
-    partidas: partidas || [],
-    nomes: getNomes(),
-    createdAt: Date.now()
-  });
+  // ✅ Garante que salva no banco correto (REAL ou TESTE)
+const docDiaRef = doc(db, "partidasDia", idFinal);
+
+await setDoc(docDiaRef, {
+  sala: salaAtual,            // ← usa o banco atualmente selecionado
+  dataKey: hoje,
+  indice: contador,           // 1, 2, 3...
+  partidas: partidas || [],
+  nomes: getNomes(),
+  createdAt: Date.now()
+});
+
+// ✅ Atualiza também o documento principal da sala (mantém consistência)
+await setDoc(salaDocRef, {
+  partidas: [],
+  usedPairs: [],
+  trophyCountsDia: {},
+  trophyCountsMes: trophyCountsMes || {},
+  nomes: getNomes()
+});
+
 
   // Limpa tela do dia (igual já fazia)
   partidas = [];
