@@ -635,13 +635,14 @@ async function encerrarMesAtual() {
 
 
 
-/* ================ HISTÓRICO DE PARTIDAS ================ */
+/* ================ HISTÓRICO DE PARTIDAS (VERSÃO OTIMIZADA) ================ */
 async function prepararHistoricoPartidas() {
   const selMes = document.getElementById("mesPartidasSelect");
   const listaDatas = document.getElementById("listaPartidasDoMes");
   const detalhes = document.getElementById("detalhesPartida");
   if (!selMes || !listaDatas || !detalhes) return;
 
+  // Preenche o seletor de meses (últimos 12)
   selMes.innerHTML = "";
   const now = new Date();
   for (let i = 0; i < 12; i++) {
@@ -653,68 +654,60 @@ async function prepararHistoricoPartidas() {
     selMes.appendChild(opt);
   }
 
-  // 🔽 Função interna para listar os dias e partidas
- async function listarDiasDoMes(mk) {
-  listaDatas.innerHTML = "<p style='text-align:center;color:#777;'>Carregando…</p>";
-  detalhes.innerHTML = "";
+  // 🧩 Função que carrega os dias e partidas do mês selecionado
+  async function listarDiasDoMes(mk) {
+    listaDatas.innerHTML = "<p style='text-align:center;color:#777;'>Carregando…</p>";
+    detalhes.innerHTML = "";
 
-  const [ano, mes] = mk.split("-").map(Number);
-  const lastDay = new Date(ano, mes, 0).getDate();
+    const [ano, mes] = mk.split("-").map(Number);
+    const lastDay = new Date(ano, mes, 0).getDate();
 
-  // 🔍 Busca todas as partidas do mês (com variações _2, _3, etc)
-  const consultas = [];
-
-  for (let dia = 1; dia <= lastDay; dia++) {
-    const dd = String(dia).padStart(2, "0");
-    const keyBase = `${salaAtual}_${ano}-${String(mes).padStart(2, "0")}-${dd}`;
-
-    // Testa possíveis sufixos (_2, _3, _4...)
-    for (let i = 1; i <= 10; i++) {
-      const key = i === 1 ? keyBase : `${keyBase}_${i}`;
-      consultas.push(
-        getDoc(doc(db, "partidasDia", key)).then((s) => {
-          if (s.exists()) {
-            return { key, data: s.data(), indice: i };
-          }
-          return null;
-        })
-      );
+    // 🔍 Cria todas as promessas de busca (em paralelo)
+    const consultas = [];
+    for (let dia = 1; dia <= lastDay; dia++) {
+      const dd = String(dia).padStart(2, "0");
+      const keyBase = `${salaAtual}_${ano}-${String(mes).padStart(2, "0")}-${dd}`;
+      for (let i = 1; i <= 10; i++) {
+        const key = i === 1 ? keyBase : `${keyBase}_${i}`;
+        consultas.push(
+          getDoc(doc(db, "partidasDia", key)).then((s) => {
+            if (s.exists()) return { key, data: s.data(), indice: i };
+            return null;
+          })
+        );
+      }
     }
-  }
 
-  // ✅ Executa todas as consultas em paralelo (muito mais rápido)
-  const resultados = await Promise.all(consultas);
-  const encontrados = resultados.filter(Boolean);
+    // ✅ Executa todas as consultas de uma vez (rápido)
+    const resultados = await Promise.all(consultas);
+    const encontrados = resultados.filter(Boolean);
 
-  if (encontrados.length === 0) {
-    listaDatas.innerHTML =
-      "<p style='text-align:center;color:#777;'>Nenhuma partida salva neste mês.</p>";
-    return;
-  }
+    if (encontrados.length === 0) {
+      listaDatas.innerHTML =
+        "<p style='text-align:center;color:#777;'>Nenhuma partida salva neste mês.</p>";
+      return;
+    }
 
-  // 🔢 Agrupa por dia, exibe todas (1, 2, 3...)
-  listaDatas.innerHTML = encontrados
-    .map(({ key, indice }) => {
-      const partes = key.split("_");
-      const dataKey = partes.find(p => /^\d{4}-\d{2}-\d{2}$/.test(p)) || "";
-      const [Y, M, D] = dataKey.split("-");
-      const d = new Date(Number(Y), Number(M) - 1, Number(D));
-      const semana = weekdayLabel(d);
-      const labelPartida = indice > 1 ? `Partida ${indice}` : "Partida 1";
+    // 🔢 Mostra todas as partidas (1, 2, 3...) com data e dia da semana
+    listaDatas.innerHTML = encontrados
+      .map(({ key, indice }) => {
+        const partes = key.split("_");
+        const dataKey = partes.find((p) => /^\d{4}-\d{2}-\d{2}$/.test(p)) || "";
+        const [Y, M, D] = dataKey.split("-");
+        const d = new Date(Number(Y), Number(M) - 1, Number(D));
+        const semana = weekdayLabel(d);
+        const labelPartida = `Partida ${indice}`;
 
-      return `
-        <div class="trofeus-dia-item" data-date="${key}" style="cursor:pointer;">
-          <span>${labelPartida} — ${D}/${M}/${Y} — ${semana}</span>
-          <span>🔎 Ver</span>
-        </div>
-      `;
-    })
-    .join("");
-}
+        return `
+          <div class="trofeus-dia-item" data-date="${key}" style="cursor:pointer;">
+            <span>${labelPartida} — ${D}/${M}/${Y} — ${semana}</span>
+            <span>🔎 Ver</span>
+          </div>
+        `;
+      })
+      .join("");
 
-
-
-    // Clique em cada linha => mostra detalhes da partida
+    // 🎾 Clique em cada linha => mostra detalhes da partida
     listaDatas.querySelectorAll(".trofeus-dia-item").forEach((el) => {
       el.addEventListener("click", async () => {
         const key = el.getAttribute("data-date");
@@ -731,14 +724,11 @@ async function prepararHistoricoPartidas() {
 
         let html = "";
         pts.forEach((p) => {
-          const d1Class =
-            p.vencedor === "1" ? "dupla dupla-vencedora" : "dupla";
-          const d2Class =
-            p.vencedor === "2" ? "dupla dupla-vencedora" : "dupla";
-          const perd1 =
-            p.vencedor === "2" ? "dupla dupla-perdedora" : "dupla";
-          const perd2 =
-            p.vencedor === "1" ? "dupla dupla-perdedora" : "dupla";
+          const d1Class = p.vencedor === "1" ? "dupla dupla-vencedora" : "dupla";
+          const d2Class = p.vencedor === "2" ? "dupla dupla-vencedora" : "dupla";
+          const perd1 = p.vencedor === "2" ? "dupla dupla-perdedora" : "dupla";
+          const perd2 = p.vencedor === "1" ? "dupla dupla-perdedora" : "dupla";
+
           html += `
             <h3 style="text-align:center;">Partida ${p.numero}</h3>
             <div class="${p.vencedor === "2" ? perd1 : d1Class}">
@@ -763,6 +753,14 @@ async function prepararHistoricoPartidas() {
       });
     });
   }
+
+  // 🔄 Atualiza ao trocar o mês
+  selMes.onchange = () => listarDiasDoMes(selMes.value);
+
+  // ⚡ Carrega o mês atual automaticamente ao abrir
+  listarDiasDoMes(selMes.value);
+}
+
 
   // 🔄 Evento de troca do mês + chamada inicial
   selMes.onchange = () => listarDiasDoMes(selMes.value);
