@@ -625,76 +625,95 @@ async function prepararHistoricoPartidas(){
   }
 
   async function listarDiasDoMes(mk){
-    listaDatas.innerHTML = "<p style='text-align:center;color:#777;'>Carregando…</p>";
-    detalhes.innerHTML = "";
+  listaDatas.innerHTML = "<p style='text-align:center;color:#777;'>Carregando…</p>";
+  detalhes.innerHTML = "";
 
-    const [ano,mes] = mk.split("-").map(Number);
-    const lastDay = new Date(ano, mes, 0).getDate();
-    const encontrados = [];
+  const [ano,mes] = mk.split("-").map(Number);
+  const lastDay = new Date(ano, mes, 0).getDate();
+  const encontrados = [];
 
-    for(let dia=1; dia<=lastDay; dia++){
-      const dd = String(dia).padStart(2,'0');
-      const key = `${ano}-${String(mes).padStart(2,'0')}-${dd}`;
-      const ref = doc(db,"partidasDia", `play-do-bistecao_${key}`);
+  // 🔍 busca todos os documentos de partidasDia
+  for(let dia=1; dia<=lastDay; dia++){
+    const dd = String(dia).padStart(2,'0');
+    const keyBase = `play-do-bistecao_${ano}-${String(mes).padStart(2,'0')}-${dd}`;
+
+    // varre possíveis índices (caso existam partidas 2,3,4)
+    let contador = 1;
+    while (true) {
+      const key = contador === 1 ? keyBase : `${keyBase}_${contador}`;
+      const ref = doc(db,"partidasDia", key);
       const s = await getDoc(ref);
-      if(s.exists()){
-        encontrados.push({ key, data: s.data() });
+      if(!s.exists()){
+        if (contador === 1) break; // nenhuma partida no dia
+        else break; // acabou os índices
       }
+      encontrados.push({ key, data: s.data(), indice: contador });
+      contador++;
     }
+  }
 
-    if(encontrados.length===0){
-      listaDatas.innerHTML = "<p style='text-align:center;color:#777;'>Nenhuma partida salva neste mês.</p>";
-      return;
-    }
+  if(encontrados.length===0){
+    listaDatas.innerHTML = "<p style='text-align:center;color:#777;'>Nenhuma partida salva neste mês.</p>";
+    return;
+  }
 
-    listaDatas.innerHTML = encontrados.map(({key})=>{
-      const [Y,M,D] = key.split("-");
-      const d = new Date(Number(Y), Number(M)-1, Number(D));
-      const semana = weekdayLabel(d);
-      return `
-        <div class="trofeus-dia-item" data-date="${key}" style="cursor:pointer;">
-          <span>Partida ${D}/${M}/${Y} — ${semana}</span>
-          <span>🔎 Ver</span>
-        </div>
-      `;
-    }).join("");
+  // 🔢 monta a lista visual com mesmo formato, só adicionando número se houver mais de uma
+  listaDatas.innerHTML = encontrados.map(({key, indice})=>{
+    const partes = key.split("_");
+    const dataBruta = partes[1]; // ex: 2025-10-23
+    const [Y,M,D] = dataBruta.split("-");
+    const d = new Date(Number(Y), Number(M)-1, Number(D));
+    const semana = weekdayLabel(d);
+    const prefixo = indice > 1 ? `Partida ${indice} ` : `Partida `;
+    return `
+      <div class="trofeus-dia-item" data-date="${key}" style="cursor:pointer;">
+        <span>${prefixo}${D}/${M}/${Y} — ${semana}</span>
+        <span>🔎 Ver</span>
+      </div>
+    `;
+  }).join("");
 
-    listaDatas.querySelectorAll(".trofeus-dia-item").forEach(el=>{
-      el.addEventListener("click", async ()=>{
-        const key = el.getAttribute("data-date");
-        const ref = doc(db,"partidasDia", `play-do-bistecao_${key}`);
-        const s = await getDoc(ref);
-        if(!s.exists()){ detalhes.innerHTML = "<p style='text-align:center;color:#777;'>Partida não encontrada.</p>"; return; }
-        const dataDia = s.data();
-        const pts = dataDia.partidas || [];
+  // evento de clique para abrir detalhes
+  listaDatas.querySelectorAll(".trofeus-dia-item").forEach(el=>{
+    el.addEventListener("click", async ()=>{
+      const key = el.getAttribute("data-date");
+      const ref = doc(db,"partidasDia", key);
+      const s = await getDoc(ref);
+      if(!s.exists()){
+        detalhes.innerHTML = "<p style='text-align:center;color:#777;'>Partida não encontrada.</p>";
+        return;
+      }
+      const dataDia = s.data();
+      const pts = dataDia.partidas || [];
 
-        let html = "";
-        pts.forEach(p=>{
-          const d1Class = p.vencedor==='1' ? 'dupla dupla-vencedora' : 'dupla';
-          const d2Class = p.vencedor==='2' ? 'dupla dupla-vencedora' : 'dupla';
-          const perd1   = p.vencedor==='2' ? 'dupla dupla-perdedora' : 'dupla';
-          const perd2   = p.vencedor==='1' ? 'dupla dupla-perdedora' : 'dupla';
-          html += `
-            <h3 style="text-align:center;">Partida ${p.numero}</h3>
-            <div class="${p.vencedor==='2'?perd1:d1Class}">
-              <strong>Dupla 1:</strong> ${p.dupla1.join(' & ')} ${p.vencedor==='1'?'🏆':''}
-            </div>
-            <div class="${p.vencedor==='1'?perd2:d2Class}">
-              <strong>Dupla 2:</strong> ${p.dupla2.join(' & ')} ${p.vencedor==='2'?'🏆':''}
-            </div>
-            <div class="dupla-fora"><strong>De fora:</strong> ${p.deFora.join(' & ')}</div>
-          `;
-        });
-
-        detalhes.innerHTML = `
-          <div class="trofeus-dia-container" style="margin-top:10px;">
-            <h3 style="margin-bottom:8px;">📅 ${key.split("-").reverse().join("/")}</h3>
-            ${html || "<p style='text-align:center;color:#777;'>Sem partidas neste dia.</p>"}
+      let html = "";
+      pts.forEach(p=>{
+        const d1Class = p.vencedor==='1' ? 'dupla dupla-vencedora' : 'dupla';
+        const d2Class = p.vencedor==='2' ? 'dupla dupla-vencedora' : 'dupla';
+        const perd1   = p.vencedor==='2' ? 'dupla dupla-perdedora' : 'dupla';
+        const perd2   = p.vencedor==='1' ? 'dupla dupla-perdedora' : 'dupla';
+        html += `
+          <h3 style="text-align:center;">Partida ${p.numero}</h3>
+          <div class="${p.vencedor==='2'?perd1:d1Class}">
+            <strong>Dupla 1:</strong> ${p.dupla1.join(' & ')} ${p.vencedor==='1'?'🏆':''}
           </div>
+          <div class="${p.vencedor==='1'?perd2:d2Class}">
+            <strong>Dupla 2:</strong> ${p.dupla2.join(' & ')} ${p.vencedor==='2'?'🏆':''}
+          </div>
+          <div class="dupla-fora"><strong>De fora:</strong> ${p.deFora.join(' & ')}</div>
         `;
       });
+
+      detalhes.innerHTML = `
+        <div class="trofeus-dia-container" style="margin-top:10px;">
+          <h3 style="margin-bottom:8px;">📅 ${key.split("_")[1].split("-").reverse().join("/")}</h3>
+          ${html || "<p style='text-align:center;color:#777;'>Sem partidas neste dia.</p>"}
+        </div>
+      `;
     });
-  }
+  });
+}
+
 
   selMes.onchange = ()=> listarDiasDoMes(selMes.value);
   await listarDiasDoMes(selMes.value);
