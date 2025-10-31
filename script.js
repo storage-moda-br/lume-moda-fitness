@@ -432,14 +432,16 @@ async function novaRodada(){
 
   // 🔢 Procura um ID livre: play-do-bistecao_YYYY-MM-DD, _2, _3, ...
   let contador = 1;
-  let idFinal = `play-do-bistecao_${hoje}`;
-  while (true) {
-    const refTeste = doc(db, "partidasDia", idFinal);
-    const snap = await getDoc(refTeste);
-    if (!snap.exists()) break;
-    contador++;
-    idFinal = `play-do-bistecao_${hoje}_${contador}`;
-  }
+let idFinal = `${salaAtual}_${hoje}`;
+while (true) {
+  const refTeste = doc(db, "partidasDia", idFinal);
+  const snap = await getDoc(refTeste);
+  if (!snap.exists()) break;
+  contador++;
+  idFinal = `${salaAtual}_${hoje}_${contador}`;
+}
+
+
 
   // ✅ Salva com ID único (não sobrescreve mais)
   const docDiaRef = doc(db, "partidasDia", idFinal);
