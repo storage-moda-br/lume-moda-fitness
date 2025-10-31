@@ -16,16 +16,8 @@ body{margin:0;background:#f4f7fb;display:flex;flex-direction:column;align-items:
 .menu-dropdown a.regras::before{content:"📘";color:#0093ff;margin-right:8px;}
 .menu-dropdown a.sobre::before{content:"ℹ️";margin-right:8px;}
 .menu-dropdown a.admin::before{content:"🔐";margin-right:8px;}
-.menu-dropdown a.selecionarSala::before{
-  content:"📊";
-  margin-right:8px;
-}
-
-/* === NOVO: Ícone item Editar Troféus === */
-.menu-dropdown a.editarTrofeus::before{
-  content:"🛠️";
-  margin-right:8px;
-}
+.menu-dropdown a.selecionarSala::before{content:"📊";margin-right:8px;}
+.menu-dropdown a.editarTrofeus::before{content:"🛠️";margin-right:8px;}
 
 .inputs{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:20px;}
 input{width:100%;padding:10px;border:1px solid #ddd;border-radius:10px;font-size:.95rem;}
@@ -73,10 +65,7 @@ button:hover{transform:scale(1.03);}
   cursor: pointer;
   transition: .2s;
 }
-
-#selecionarSalaModal .modal-content button.btn-sala:hover {
-  filter: brightness(1.1);
-}
+#selecionarSalaModal .modal-content button.btn-sala:hover { filter: brightness(1.1); }
 
 #indicadorDB {
   font-size: 0.65rem;
@@ -85,23 +74,44 @@ button:hover{transform:scale(1.03);}
   padding-left: 8px;
   margin-top: 10px;
 }
-
-#indicadorDB:hover {
-  opacity: 1;
-}
+#indicadorDB:hover { opacity: 1; }
 
 /* === NOVO: Estilo do Editor de Troféus === */
 #editarTrofeusModal .trofeus-dia-item {
-  gap: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+#editarTrofeusModal .trofeus-dia-item span.nome {
+  flex: 1;
+  font-weight: 500;
+  color: #333;
+}
+#editarTrofeusModal .trofeus-dia-item .icon-trofeu {
+  color: #b89b00;
+  margin-right: 4px;
+  font-size: 1rem;
 }
 #editarTrofeusModal .edit-input {
-  width: 72px;
+  width: 65px;
   border: 1px solid #ddd;
   border-radius: 10px;
   padding: 6px 8px;
   text-align: center;
   font-weight: 600;
   background: #fff;
+  margin-right: 6px;
+}
+#editarTrofeusModal .btn-excluir {
+  cursor: pointer;
+  color: #dc3545;
+  font-size: 1.1rem;
+  margin-left: 6px;
+  transition: 0.2s;
+}
+#editarTrofeusModal .btn-excluir:hover {
+  transform: scale(1.2);
 }
 .editar-actions {
   display: flex;

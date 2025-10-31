@@ -11,7 +11,7 @@ document.getElementById("sortear").onmouseout=function(){
 
 /* ================= FIREBASE ================= */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, doc, setDoc, getDoc, onSnapshot, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 /* Ajuste se necessário: mesmo projeto já usado antes */
 const app = initializeApp({
@@ -103,8 +103,8 @@ function normalizarNome(nome) {
 const menu=document.getElementById("menuDropdown");
 
 function atualizarMenuAdmin() {
-  // Mostra/oculta itens restritos
-  const botoesAdmin = menu.querySelectorAll(".nova, .encerrarMes, .selecionarSala, .editarTrofeus"); // === NOVO inclui .editarTrofeus
+  // === NOVO: inclui .editarTrofeus nos itens restritos
+  const botoesAdmin = menu.querySelectorAll(".nova, .encerrarMes, .selecionarSala, .editarTrofeus");
   botoesAdmin.forEach(btn => {
     btn.style.display = isAdmin ? "flex" : "none";
   });
@@ -409,8 +409,6 @@ function renderRanking(){
     ? e.sort((a,b)=>b[1]-a[1]).map(([n,v])=>`<div class='trofeus-dia-item'><span>${n}</span><span>${v} 🏆</span></div>`).join('')
     : "<p style='text-align:center;color:#777;'>Nenhum troféu neste mês.</p>";
 }
-
-
 /* ================ NOVA RODADA (salva histórico do dia + sincroniza) ================ */
 async function novaRodada(){
   if(!isAdmin){ alert("Somente administradores."); return; }
@@ -641,6 +639,90 @@ async function prepararHistoricoPartidas(){
   selMes.onchange = ()=> listarDiasDoMes(selMes.value);
   await listarDiasDoMes(selMes.value);
 }
+
+
+/* === NOVO: Editor de Troféus Mensais === */
+/* Layout de cada linha: [Nome]  🏆  [input número]      ❌ */
+function prepararEditorTrofeus(){
+  const cont = document.getElementById("editarTrofeusLista");
+  if(!cont) return;
+
+  cont.innerHTML = "";
+
+  const entries = Object.entries(trophyCountsMes || {}).sort((a,b)=>b[1]-a[1]);
+  if(entries.length===0){
+    cont.innerHTML = "<p style='text-align:center;color:#777;'>Nenhum troféu neste mês.</p>";
+    return;
+  }
+
+  entries.forEach(([nome, qtd])=>{
+    const div = document.createElement("div");
+    div.className = "trofeus-dia-item edit-row";
+    div.innerHTML = `
+      <span class="nome">${nome}</span>
+      <span class="icon-trofeu">🏆</span>
+      <input type="number" min="0" value="${Number(qtd)||0}" class="edit-input" data-nome="${nome}">
+      <span class="btn-excluir" title="Excluir jogador">❌</span>
+    `;
+    cont.appendChild(div);
+  });
+
+  // Excluir jogador (❌)
+  cont.querySelectorAll(".btn-excluir").forEach(btn=>{
+    btn.addEventListener("click", async ()=>{
+      const nome = btn.parentElement.querySelector(".nome").textContent.trim();
+      if(!confirm(`Deseja realmente remover ${nome}?`)) return;
+
+      // Remove do mapa local
+      delete trophyCountsMes[nome];
+
+      // Persiste no Firestore e atualiza UI
+      await updateDoc(salaDocRef, { trophyCountsMes });
+      prepararEditorTrofeus();
+      renderRanking();
+    });
+  });
+
+  // Salvar alterações
+  const btnSalvar = document.getElementById("btnSalvarEdicaoTrofeus");
+  if(btnSalvar){
+    btnSalvar.onclick = async ()=>{
+      const inputs = cont.querySelectorAll(".edit-input");
+      const novoMapa = { ...trophyCountsMes };
+
+      inputs.forEach(inp=>{
+        const nome = inp.getAttribute("data-nome");
+        const val = Math.max(0, parseInt(inp.value,10) || 0);
+        novoMapa[nome] = val;
+      });
+
+      // Atualiza estado local
+      trophyCountsMes = novoMapa;
+
+      // Persiste imediatamente
+      await updateDoc(salaDocRef, {
+        trophyCountsMes
+      });
+
+      // Atualiza telas que dependem do ranking
+      renderRanking();
+
+      // Fecha modal
+      document.getElementById("editarTrofeusModal").style.display = "none";
+    };
+  }
+
+  // Cancelar (só fecha o modal, sem salvar)
+  const btnCancelar = document.getElementById("btnCancelarEdicaoTrofeus");
+  if(btnCancelar){
+    btnCancelar.onclick = ()=>{
+      document.getElementById("editarTrofeusModal").style.display = "none";
+    };
+  }
+}
+/* === FIM NOVO === */
+
+
 /* SELEÇÃO DE SALA - ABERTURA DO MODAL */
 document.querySelector(".selecionarSala").addEventListener("click", ev => {
   ev.preventDefault();
@@ -669,74 +751,12 @@ function atualizarIndicadorDB(){
 
 document.addEventListener("DOMContentLoaded", atualizarIndicadorDB);
 
-// ✅ Clique nos botões do modal Selecionar DB
+// ✅ Clique nos botões do modal Selecionar DB (duplicado de propósito para garantir binding após re-render)
 document.querySelectorAll(".btn-sala").forEach(btn => {
   btn.addEventListener("click", () => {
     atualizarSala(btn.getAttribute("data-sala"));
   });
 });
-
-/* === NOVO: Editor de Troféus Mensais === */
-function prepararEditorTrofeus(){
-  const lista = document.getElementById("editarTrofeusLista");
-  if(!lista) return;
-
-  // Clona o objeto atual para render (edição local até salvar)
-  const entries = Object.entries(trophyCountsMes || {});
-  if(entries.length === 0){
-    lista.innerHTML = "<p style='text-align:center;color:#777;'>Nenhum troféu registrado neste mês.</p>";
-    return;
-  }
-
-  // Ordena desc por quantidade
-  entries.sort((a,b)=>b[1]-a[1]);
-
-  // Renderiza linhas com input numérico
-  lista.innerHTML = entries.map(([nome, qtd]) => `
-    <div class="trofeus-dia-item">
-      <span>${nome}</span>
-      <input type="number" class="edit-input" data-nome="${nome}" value="${Number(qtd)||0}" min="0" step="1" />
-    </div>
-  `).join('');
-
-  // Botão cancelar apenas fecha (não salva)
-  document.getElementById("btnCancelarEdicaoTrofeus")?.addEventListener("click", ()=>{
-    document.getElementById("editarTrofeusModal").style.display = "none";
-  }, { once: true });
-
-  // Botão salvar -> atualiza trophyCountsMes e salva no Firestore
-  document.getElementById("btnSalvarEdicaoTrofeus")?.addEventListener("click", async ()=>{
-    if(!isAdmin){ alert("Somente administradores."); return; }
-
-    const inputs = lista.querySelectorAll(".edit-input");
-    const novoMapa = { ...trophyCountsMes };
-    inputs.forEach(inp=>{
-      const nome = inp.getAttribute("data-nome");
-      const val = Math.max(0, parseInt(inp.value,10) || 0);
-      novoMapa[nome] = val;
-    });
-
-    // Atualiza estado local
-    trophyCountsMes = novoMapa;
-
-    // Persiste imediatamente
-    await setDoc(salaDocRef, {
-      partidas,
-      usedPairs: Array.from(usedPairs),
-      trophyCountsDia,
-      trophyCountsMes,
-      nomes: getNomes()
-    });
-
-    // Atualiza telas que dependem do ranking
-    renderRanking();
-
-    // Fecha modal
-    document.getElementById("editarTrofeusModal").style.display = "none";
-  }, { once: true });
-}
-/* === FIM NOVO === */
-
 
 /* Inicialização simples de render */
 renderPartidas();
