@@ -642,13 +642,13 @@ async function encerrarMesAtual() {
 
 /* ================ HISTÓRICO DE PARTIDAS (VERSÃO ESTÁVEL) ================ */
 async function prepararHistoricoPartidas() {
-	console.log("🚀 prepararHistoricoPartidas iniciada");
+  console.log("🚀 prepararHistoricoPartidas iniciada");
   const selMes = document.getElementById("mesPartidasSelect");
   const listaDatas = document.getElementById("listaPartidasDoMes");
   const detalhes = document.getElementById("detalhesPartida");
   if (!selMes || !listaDatas || !detalhes) return;
 
-  // Preenche o seletor de meses (últimos 12)
+  // 🗓️ Preenche o seletor de meses (últimos 12)
   selMes.innerHTML = "";
   const now = new Date();
   for (let i = 0; i < 12; i++) {
@@ -660,116 +660,105 @@ async function prepararHistoricoPartidas() {
     selMes.appendChild(opt);
   }
 
+  // 🔍 Carrega as partidas do mês selecionado
   async function listarDiasDoMes(mk) {
-  listaDatas.innerHTML = "<p style='text-align:center;color:#777;'>Carregando partidas…</p>";
-  detalhes.innerHTML = "";
+    listaDatas.innerHTML = "<p style='text-align:center;color:#777;'>Carregando partidas…</p>";
+    detalhes.innerHTML = "";
 
-  const [ano, mes] = mk.split("-").map(Number);
-  const lastDay = new Date(ano, mes, 0).getDate();
+    const [ano, mes] = mk.split("-").map(Number);
 
-  // 🔍 Busca todas as partidas do mês (modo rápido e otimizado)
-  console.log("⚡ Carregando partidas com consulta única...");
+    console.log("⚡ Carregando partidas com consulta única...");
+    const { collection, getDocs, query } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
 
-  const { collection, getDocs, query } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+    const prefixo = `${salaAtual}_${ano}-${String(mes).padStart(2, "0")}`;
+    const q = query(collection(db, "partidasDia"));
+    const snap = await getDocs(q);
+    const encontrados = [];
 
-  const prefixo = `${salaAtual}_${ano}-${String(mes).padStart(2, "0")}`;
-  const q = query(collection(db, "partidasDia"));
+    snap.forEach((docSnap) => {
+      const id = docSnap.id;
+      if (id.startsWith(prefixo)) {
+        const data = docSnap.data();
+        const indice = data.indice || 1;
+        encontrados.push({ key: id, data, indice });
+      }
+    });
 
-  const snap = await getDocs(q);
-  const encontrados = [];
+    console.log(`✅ ${encontrados.length} partidas encontradas`);
 
-  snap.forEach((docSnap) => {
-    const id = docSnap.id;
-    if (id.startsWith(prefixo)) {
-      const data = docSnap.data();
-      const indice = data.indice || 1;
-      encontrados.push({ key: id, data, indice });
+    if (encontrados.length === 0) {
+      listaDatas.innerHTML =
+        "<p style='text-align:center;color:#777;'>Nenhuma partida salva neste mês.</p>";
+      return;
     }
-  });
 
-  console.log(`✅ ${encontrados.length} partidas encontradas`);
+    // 🔢 Monta a lista de partidas
+    listaDatas.innerHTML = encontrados
+      .map(({ key, indice }) => {
+        const dataKey = key.match(/\d{4}-\d{2}-\d{2}/)?.[0] || "";
+        const [Y, M, D] = dataKey.split("-");
+        const d = new Date(Number(Y), Number(M) - 1, Number(D));
+        const semana = weekdayLabel(d);
+        const labelPartida = `Partida ${indice}`;
+        return `
+          <div class="trofeus-dia-item" data-date="${key}" style="cursor:pointer;">
+            <span>${labelPartida} — ${D}/${M}/${Y} — ${semana}</span>
+            <span>🔎 Ver</span>
+          </div>
+        `;
+      })
+      .join("");
 
-  if (encontrados.length === 0) {
-    listaDatas.innerHTML =
-      "<p style='text-align:center;color:#777;'>Nenhuma partida salva neste mês.</p>";
-    return;
-  }
-
-  // 🔢 Monta a lista
-  listaDatas.innerHTML = encontrados
-    .map(({ key, indice }) => {
-      const dataKey = key.match(/\d{4}-\d{2}-\d{2}/)?.[0] || "";
-      const [Y, M, D] = dataKey.split("-");
-      const d = new Date(Number(Y), Number(M) - 1, Number(D));
-      const semana = weekdayLabel(d);
-      const labelPartida = `Partida ${indice}`;
-      return `
-        <div class="trofeus-dia-item" data-date="${key}" style="cursor:pointer;">
-          <span>${labelPartida} — ${D}/${M}/${Y} — ${semana}</span>
-          <span>🔎 Ver</span>
-        </div>
-      `;
-    })
-    .join("");
-}
-
-
-    // Clique => mostra detalhes
-    listaDatas.querySelectorAll(".trofeus-dia-item").forEach(el => {
+    // 🧩 Clique => mostra detalhes da partida
+    listaDatas.querySelectorAll(".trofeus-dia-item").forEach((el) => {
       el.addEventListener("click", async () => {
         const key = el.getAttribute("data-date");
-        detalhes.innerHTML = "<p style='text-align:center;color:#777;'>Carregando detalhes...</p>";
-
-        try {
-          const ref = doc(db, "partidasDia", key);
-          const s = await getDoc(ref);
-          if (!s.exists()) {
-            detalhes.innerHTML = "<p style='text-align:center;color:#777;'>Partida não encontrada.</p>";
-            return;
-          }
-
-          const dataDia = s.data();
-          const pts = dataDia.partidas || [];
-          let html = "";
-
-          pts.forEach(p => {
-            const d1Class = p.vencedor === "1" ? "dupla dupla-vencedora" : "dupla";
-            const d2Class = p.vencedor === "2" ? "dupla dupla-vencedora" : "dupla";
-            const perd1 = p.vencedor === "2" ? "dupla dupla-perdedora" : "dupla";
-            const perd2 = p.vencedor === "1" ? "dupla dupla-perdedora" : "dupla";
-
-            html += `
-              <h3 style="text-align:center;">Partida ${p.numero}</h3>
-              <div class="${p.vencedor === "2" ? perd1 : d1Class}">
-                <strong>Dupla 1:</strong> ${p.dupla1.join(" & ")} ${p.vencedor === "1" ? "🏆" : ""}
-              </div>
-              <div class="${p.vencedor === "1" ? perd2 : d2Class}">
-                <strong>Dupla 2:</strong> ${p.dupla2.join(" & ")} ${p.vencedor === "2" ? "🏆" : ""}
-              </div>
-              <div class="dupla-fora"><strong>De fora:</strong> ${p.deFora.join(" & ")}</div>
-            `;
-          });
-
-          detalhes.innerHTML = `
-            <div class="trofeus-dia-container" style="margin-top:10px;">
-              <h3 style="margin-bottom:8px;">📅 ${key.split("_").pop().replaceAll("-", "/")}</h3>
-              ${html || "<p style='text-align:center;color:#777;'>Sem partidas neste dia.</p>"}
-            </div>
-          `;
-        } catch (e) {
-          detalhes.innerHTML = "<p style='text-align:center;color:#d33;'>Erro ao carregar partida.</p>";
-          console.error(e);
+        const ref = doc(db, "partidasDia", key);
+        const s = await getDoc(ref);
+        if (!s.exists()) {
+          detalhes.innerHTML =
+            "<p style='text-align:center;color:#777;'>Partida não encontrada.</p>";
+          return;
         }
+
+        const dataDia = s.data();
+        const pts = dataDia.partidas || [];
+        let html = "";
+
+        pts.forEach((p) => {
+          const d1Class = p.vencedor === "1" ? "dupla dupla-vencedora" : "dupla";
+          const d2Class = p.vencedor === "2" ? "dupla dupla-vencedora" : "dupla";
+          const perd1 = p.vencedor === "2" ? "dupla dupla-perdedora" : "dupla";
+          const perd2 = p.vencedor === "1" ? "dupla dupla-perdedora" : "dupla";
+          html += `
+            <h3 style="text-align:center;">Partida ${p.numero}</h3>
+            <div class="${p.vencedor === "2" ? perd1 : d1Class}">
+              <strong>Dupla 1:</strong> ${p.dupla1.join(" & ")} ${p.vencedor === "1" ? "🏆" : ""}
+            </div>
+            <div class="${p.vencedor === "1" ? perd2 : d2Class}">
+              <strong>Dupla 2:</strong> ${p.dupla2.join(" & ")} ${p.vencedor === "2" ? "🏆" : ""}
+            </div>
+            <div class="dupla-fora"><strong>De fora:</strong> ${p.deFora.join(" & ")}</div>
+          `;
+        });
+
+        detalhes.innerHTML = `
+          <div class="trofeus-dia-container" style="margin-top:10px;">
+            <h3 style="margin-bottom:8px;">📅 ${key
+              .match(/\d{4}-\d{2}-\d{2}/)?.[0]
+              ?.replaceAll("-", "/")}</h3>
+            ${html || "<p style='text-align:center;color:#777;'>Sem partidas neste dia.</p>"}
+          </div>
+        `;
       });
     });
   }
 
- 
-
-  // 🔄 Evento de troca do mês + chamada inicial
+  // 🔄 Troca de mês e carga inicial
   selMes.onchange = () => listarDiasDoMes(selMes.value);
   await listarDiasDoMes(selMes.value);
 }
+
 
 
 
