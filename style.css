@@ -20,13 +20,12 @@ body{margin:0;background:#f4f7fb;display:flex;flex-direction:column;align-items:
   content:"📊";
   margin-right:8px;
 }
-.menu-dropdown a.selecionarSala::before {
-  content:"📊";
+
+/* === NOVO: Ícone item Editar Troféus === */
+.menu-dropdown a.editarTrofeus::before{
+  content:"🛠️";
   margin-right:8px;
 }
-
-
-
 
 .inputs{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:20px;}
 input{width:100%;padding:10px;border:1px solid #ddd;border-radius:10px;font-size:.95rem;}
@@ -57,7 +56,6 @@ button:hover{transform:scale(1.03);}
   scrollbar-width: thin;
   scrollbar-color: #ccc transparent;
 }
-
 
 .modal-content h2{text-align:center;color:#0093ff;margin-bottom:15px;}
 .close{color:#aaa;float:right;font-size:28px;font-weight:bold;cursor:pointer;}
@@ -92,107 +90,26 @@ button:hover{transform:scale(1.03);}
   opacity: 1;
 }
 
-
-/* ======= Editor de Troféus Mensais (Ajustado) ======= */
-#editarTrofeusModal .edit-row {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  background: #f8f9fc;
-  padding: 8px 10px;
-  border-radius: 10px;
-  margin-bottom: 8px;
+/* === NOVO: Estilo do Editor de Troféus === */
+#editarTrofeusModal .trofeus-dia-item {
+  gap: 10px;
 }
-
-#editarTrofeusModal input {
+#editarTrofeusModal .edit-input {
+  width: 72px;
   border: 1px solid #ddd;
-  padding: 8px 10px;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  flex: 1;
-}
-
-#editarTrofeusModal input[type="number"] {
-  width: 65px;
-  text-align: center;
-}
-
-/* Botões */
-.btn-azul {
-  background: linear-gradient(90deg, #0093ff, #00c8ff);
-  border: none;
-  padding: 10px 16px;
-  border-radius: 25px;
-  color: white;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: 0.2s;
-}
-.btn-azul:hover {
-  transform: scale(1.04);
-}
-
-.btn-neutro {
-  border: 1px solid #ccc;
-  background: #f8f9fa;
-  padding: 10px 16px;
-  border-radius: 25px;
-  cursor: pointer;
-  font-size: 0.9rem;
-}
-.btn-neutro:hover {
-  background: #e9ecef;
-}
-
-.btn-del {
-  border: none;
-  background: #ffecec;
-  color: #a00;
+  border-radius: 10px;
   padding: 6px 8px;
-  border-radius: 8px;
-  cursor: pointer;
-}
-.btn-del:hover {
-  background: #ffbfbf;
-}
-
-/* ===== Linha de adicionar novo troféu ===== */
-#editarTrofeusModal .add-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  margin: 15px 0;
-}
-
-#editarTrofeusModal .add-row input[type="text"] {
-  flex: 1;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  padding: 10px;
-  font-size: 0.9rem;
-}
-
-#editarTrofeusModal .add-row input[type="number"] {
-  width: 70px;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  padding: 10px;
   text-align: center;
-  font-size: 0.9rem;
+  font-weight: 600;
+  background: #fff;
 }
-
-#editarTrofeusModal .add-row button {
-  border: none;
-  border-radius: 30px;
-  background: linear-gradient(90deg, #0093ff, #00c8ff);
-  color: #fff;
-  padding: 10px 18px;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: 0.2s;
+.editar-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
 }
-
-#editarTrofeusModal .add-row button:hover {
-  transform: scale(1.03);
+.btn-secondary{
+  background:#e9ecef!important;
+  color:#333!important;
+  box-shadow:none!important;
 }

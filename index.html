@@ -12,17 +12,21 @@
   <div class="header">
     <img src="https://i.imgur.com/rDZCHiH.png" alt="Logo">
     <h1>PLAY DO BISTECÃO</h1>
-    <span class="menu-icon" id="menuIcon">☰</span>
+	<span class="menu-icon" id="menuIcon">☰</span>
     <div class="menu-dropdown" id="menuDropdown">
       <a href="#" class="trofeus">Troféus do mês</a>
-      <a href="#" class="editarTrofeus">✏️ Editar troféus</a>
+      <a href="#" class="historicoTrofeus">Histórico de troféus</a>
       <a href="#" class="historicoPartidas">Histórico de partidas</a>
       <a href="#" class="encerrarMes">Encerrar mês</a>
       <a href="#" class="nova">Nova rodada</a>
       <a href="#" class="regras">Regras</a>
       <a href="#" class="selecionarSala">Selecionar Banco</a>
+
+      <!-- === NOVO: Editor de Troféus (menu) === -->
+      <a href="#" class="editarTrofeus">Editar troféus</a>
+
       <a href="#" class="admin">Administrador</a>
-      <a href="#" class="sobre">Sobre</a>
+	  <a href="#" class="sobre">Sobre</a>
     </div>
   </div>
 
@@ -35,7 +39,10 @@
     <input type="text" id="p6" value="Artur" class="jogador-fora">
   </div>
 
-  <button id="sortear">Sortear Primeira Partida</button>
+  <button id="sortear">
+    Sortear Primeira Partida
+  </button>
+
   <div id="resultado"></div>
   <div id="trofeusDiaContainer" class="trofeus-dia-container" style="display:none;">
     <h3>🏅 Troféus do dia</h3>
@@ -43,6 +50,7 @@
   </div>
 
   <!-- ========================= MODAIS ========================= -->
+  <!-- Ranking Modal -->
   <div id="rankingModal" class="modal">
     <div class="modal-content">
       <span class="close">&times;</span>
@@ -51,36 +59,22 @@
     </div>
   </div>
 
-  <div id="editarTrofeusModal" class="modal">
+  <!-- Histórico Troféus Modal -->
+  <div id="historicoTrofeusModal" class="modal">
     <div class="modal-content">
       <span class="close">&times;</span>
-      <h2 style="color:#0093ff;">Editar Troféus Mensais</h2>
-      <p style="font-size:.8rem;opacity:.65;margin-top:-6px;margin-bottom:10px;">✅ Atualiza somente local até clicar em SALVAR<br>❌ NÃO grava automático</p>
-      <div id="listaEdicaoTrofeus"></div>
-      <div class="add-row">
-  <input id="novoNomeTrofeu" type="text" placeholder="Nome">
-  <input id="novoValorTrofeu" type="number" min="0" placeholder="Qtd">
-  <button id="btnAddTrofeu">Adicionar</button>
-</div>
-
-
-      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:18px;">
-        <button id="btnCancelarEditar" class="btn-neutro">Cancelar</button>
-        <button id="btnSalvarTrofeus" class="btn-azul">Salvar</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="historicoTrofeusModal" class="modal">
-    <div class="modal-content"><span class="close">&times;</span><h2>📅 Histórico de Troféus</h2>
+      <h2>📅 Histórico de Troféus</h2>
       <label for="mesSelect">Selecione o mês:</label>
       <select id="mesSelect"></select>
       <div id="historicoTrofeusList"></div>
     </div>
   </div>
 
+  <!-- Histórico Partidas Modal -->
   <div id="historicoPartidasModal" class="modal">
-    <div class="modal-content"><span class="close">&times;</span><h2>🎾 Histórico de Partidas</h2>
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>🎾 Histórico de Partidas</h2>
       <label for="mesPartidasSelect">Selecione o mês:</label>
       <select id="mesPartidasSelect"></select>
       <div id="listaPartidasDoMes"></div>
@@ -88,40 +82,84 @@
     </div>
   </div>
 
+  <!-- Regras Modal -->
   <div id="regrasModal" class="modal">
-    <div class="modal-content"><span class="close">&times;</span><h2>📘 Regras do Aplicativo</h2>
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>📘 Regras do Aplicativo</h2>
       <div class="regras-list">
         <p><span>1.</span> O sistema sorteia duplas entre 6 jogadores.</p>
         <p><span>2.</span> Apenas os 4 primeiros jogam a primeira partida.</p>
-        <p><span>3.</span> Evita repetição de duplas.</p>
+        <p><span>3.</span> Sequência gerada seguindo regras combinatórias.</p>
+        <p><span>4.</span> Vencedores continuam jogando.</p>
+        <p><span>5.</span> Jogadores repetidos saem no jogo seguinte.</p>
+        <p><span>6.</span> Evita repetição de duplas.</p>
+        <p><span>7.</span> Vitória = 1 troféu por jogador.</p>
         <p><span>⚙️</span> Apenas admin altera resultados.</p>
       </div>
     </div>
   </div>
 
+  <!-- Sobre Modal -->
   <div id="sobreModal" class="modal">
-    <div class="modal-content"><span class="close">&times;</span><h2>Sobre</h2><p>Software desenvolvido por <strong>Eduardo Campelo</strong>.</p></div>
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Sobre</h2>
+      <p>Software desenvolvido por <strong>Eduardo Campelo</strong>.</p>
+    </div>
   </div>
 
+  <!-- Admin Modal -->
   <div id="adminModal" class="modal">
-    <div class="modal-content"><span class="close">&times;</span><h2>Acesso do Administrador</h2>
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Acesso do Administrador</h2>
       <input type="password" id="senhaInput" placeholder="Digite a senha">
-      <button id="btnEntrarSenha">Entrar</button><p id="msgSenha"></p>
+      <button id="btnEntrarSenha">Entrar</button>
+      <p id="msgSenha"></p>
     </div>
   </div>
 
   <div id="selecionarSalaModal" class="modal">
-    <div class="modal-content"><span class="close">&times;</span><h2>Selecionar sala</h2>
-      <p style="text-align:center;margin-bottom:15px;">Escolha qual banco deseja utilizar:</p>
-      <button class="btn-sala" data-sala="play-do-bistecao" style="background:#007bff">✅ Banco REAL</button>
-      <button class="btn-sala" data-sala="play-do-bistecao-test" style="background:#ff9800;margin-top:10px;">⚠️ Banco de TESTE</button>
-      <p style="font-size:.85rem;text-align:center;margin-top:15px;">O modo TESTE não afeta estatísticas reais</p>
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Selecionar sala</h2>
+      <p style="text-align:center;margin-bottom:15px;">
+        Escolha qual banco deseja utilizar:
+      </p>
+      <button class="btn-sala" data-sala="play-do-bistecao" style="background:#007bff">
+        ✅ Banco REAL
+      </button>
+      <button class="btn-sala" data-sala="play-do-bistecao-test" style="background:#ff9800;margin-top:10px;">
+        ⚠️ Banco de TESTE
+      </button>
+      <p style="font-size:.85rem;text-align:center;margin-top:15px;">
+        O modo TESTE não afeta estatísticas reais
+      </p>
     </div>
   </div>
+
+  <!-- === NOVO: Modal Editor de Troféus Mensais === -->
+  <div id="editarTrofeusModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>🛠️ Editar troféus mensais</h2>
+      <p style="text-align:center;color:#666;margin-top:-8px;margin-bottom:12px;">
+        Altere os valores e clique em <strong>Salvar alterações</strong>. Sem salvar, nada é gravado.
+      </p>
+      <div id="editarTrofeusLista"></div>
+      <div class="editar-actions">
+        <button id="btnSalvarEdicaoTrofeus">Salvar alterações</button>
+        <button id="btnCancelarEdicaoTrofeus" class="btn-secondary">Cancelar</button>
+      </div>
+    </div>
+  </div>
+  <!-- === FIM NOVO === -->
 
   <div id="indicadorDB"></div>
 </div>
 
 <script type="module" src="script.js"></script>
+
 </body>
 </html>

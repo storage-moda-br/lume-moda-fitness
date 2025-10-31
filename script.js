@@ -103,7 +103,8 @@ function normalizarNome(nome) {
 const menu=document.getElementById("menuDropdown");
 
 function atualizarMenuAdmin() {
-  const botoesAdmin = menu.querySelectorAll(".nova, .encerrarMes, .selecionarSala");
+  // Mostra/oculta itens restritos
+  const botoesAdmin = menu.querySelectorAll(".nova, .encerrarMes, .selecionarSala, .editarTrofeus"); // === NOVO inclui .editarTrofeus
   botoesAdmin.forEach(btn => {
     btn.style.display = isAdmin ? "flex" : "none";
   });
@@ -158,6 +159,14 @@ menu.querySelector(".historicoPartidas")?.addEventListener('click', (ev)=>{
   ev.preventDefault();
   abrirModal("historicoPartidasModal");
   prepararHistoricoPartidas();
+});
+
+/* === NOVO: Ação do menu "Editar Troféus" === */
+menu.querySelector(".editarTrofeus")?.addEventListener('click', (ev)=>{
+  ev.preventDefault();
+  if(!isAdmin){ alert("Somente administradores."); return; }
+  abrirModal("editarTrofeusModal");
+  prepararEditorTrofeus();
 });
 
 
@@ -667,76 +676,69 @@ document.querySelectorAll(".btn-sala").forEach(btn => {
   });
 });
 
+/* === NOVO: Editor de Troféus Mensais === */
+function prepararEditorTrofeus(){
+  const lista = document.getElementById("editarTrofeusLista");
+  if(!lista) return;
+
+  // Clona o objeto atual para render (edição local até salvar)
+  const entries = Object.entries(trophyCountsMes || {});
+  if(entries.length === 0){
+    lista.innerHTML = "<p style='text-align:center;color:#777;'>Nenhum troféu registrado neste mês.</p>";
+    return;
+  }
+
+  // Ordena desc por quantidade
+  entries.sort((a,b)=>b[1]-a[1]);
+
+  // Renderiza linhas com input numérico
+  lista.innerHTML = entries.map(([nome, qtd]) => `
+    <div class="trofeus-dia-item">
+      <span>${nome}</span>
+      <input type="number" class="edit-input" data-nome="${nome}" value="${Number(qtd)||0}" min="0" step="1" />
+    </div>
+  `).join('');
+
+  // Botão cancelar apenas fecha (não salva)
+  document.getElementById("btnCancelarEdicaoTrofeus")?.addEventListener("click", ()=>{
+    document.getElementById("editarTrofeusModal").style.display = "none";
+  }, { once: true });
+
+  // Botão salvar -> atualiza trophyCountsMes e salva no Firestore
+  document.getElementById("btnSalvarEdicaoTrofeus")?.addEventListener("click", async ()=>{
+    if(!isAdmin){ alert("Somente administradores."); return; }
+
+    const inputs = lista.querySelectorAll(".edit-input");
+    const novoMapa = { ...trophyCountsMes };
+    inputs.forEach(inp=>{
+      const nome = inp.getAttribute("data-nome");
+      const val = Math.max(0, parseInt(inp.value,10) || 0);
+      novoMapa[nome] = val;
+    });
+
+    // Atualiza estado local
+    trophyCountsMes = novoMapa;
+
+    // Persiste imediatamente
+    await setDoc(salaDocRef, {
+      partidas,
+      usedPairs: Array.from(usedPairs),
+      trophyCountsDia,
+      trophyCountsMes,
+      nomes: getNomes()
+    });
+
+    // Atualiza telas que dependem do ranking
+    renderRanking();
+
+    // Fecha modal
+    document.getElementById("editarTrofeusModal").style.display = "none";
+  }, { once: true });
+}
+/* === FIM NOVO === */
+
+
 /* Inicialização simples de render */
 renderPartidas();
 renderTrofeusDia();
 renderRanking();
-
-/* ================ EDITOR DE TROFÉUS MENSAIS ================ */
-const btnEditarTrofeus = document.querySelector(".editarTrofeus");
-if (btnEditarTrofeus) {
-  btnEditarTrofeus.addEventListener("click", () => {
-    if (!isAdmin) { alert("Somente administradores podem editar troféus."); return; }
-    abrirModal("editarTrofeusModal");
-    carregarEditorTrofeus();
-  });
-}
-
-function carregarEditorTrofeus() {
-  const lista = document.getElementById("listaTrofeus");
-  lista.innerHTML = "";
-
-  const entries = Object.entries(trophyCountsMes || {}).sort((a, b) => b[1] - a[1]);
-
-  entries.forEach(([nome, qtd]) => {
-    const row = document.createElement("div");
-    row.className = "edit-row";
-    row.innerHTML = `
-      <input type="text" class="nome" value="${nome}" placeholder="Nome">
-      <input type="number" class="qtd" value="${qtd}" min="0">
-      <button class="btn-del">🗑️</button>
-    `;
-    lista.appendChild(row);
-
-    // Excluir linha
-    row.querySelector(".btn-del").onclick = () => row.remove();
-  });
-}
-
-
-document.getElementById("btnAddTrofeu").onclick = ()=>{
-  const nome = document.getElementById("novoNomeTrofeu").value.trim();
-  const qtd = parseInt(document.getElementById("novoValorTrofeu").value);
-  if (!nome || isNaN(qtd)) return alert("Preencha nome e quantidade.");
-  const container = document.getElementById("listaEdicaoTrofeus");
-  const row = document.createElement("div");
-  row.className = "edit-row";
-  row.innerHTML = `
-    <input type="text" class="edit-nome" value="${nome}">
-    <input type="number" class="edit-qtd" value="${qtd}" min="0">
-    <button class="btn-del">🗑️</button>
-  `;
-  row.querySelector(".btn-del").onclick = ()=> row.remove();
-  container.appendChild(row);
-  document.getElementById("novoNomeTrofeu").value="";
-  document.getElementById("novoValorTrofeu").value="";
-};
-
-document.getElementById("btnCancelarEditar").onclick = ()=>{
-  document.getElementById("editarTrofeusModal").style.display="none";
-};
-
-document.getElementById("btnSalvarTrofeus").onclick = async ()=>{
-  const rows = document.querySelectorAll("#listaEdicaoTrofeus .edit-row");
-  const novoMapa = {};
-  rows.forEach(r=>{
-    const n = r.querySelector(".edit-nome").value.trim();
-    const v = parseInt(r.querySelector(".edit-qtd").value);
-    if(n && !isNaN(v)) novoMapa[n]=v;
-  });
-  trophyCountsMes = novoMapa;
-  await setDoc(salaDocRef, { trophyCountsMes: novoMapa }, { merge:true });
-  renderRanking();
-  document.getElementById("editarTrofeusModal").style.display="none";
-  alert("✅ Troféus salvos com sucesso!");
-};
