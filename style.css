@@ -123,3 +123,33 @@ button:hover{transform:scale(1.03);}
   color:#333!important;
   box-shadow:none!important;
 }
+/* === Ajuste visual da linha "Novo nome" no Editor de Troféus === */
+#editarTrofeusLista .edit-row:last-child {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: #f8f9fc;
+  padding: 8px 10px;
+  border-radius: 10px;
+  margin-top: 8px;
+}
+
+/* Campo de novo nome */
+#editarTrofeusLista #novoNome {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Campo de novo troféu (número) */
+#editarTrofeusLista #novoTrofeu {
+  width: 65px;
+  text-align: center;
+}
+
+/* Ícone 🏆 alinhado */
+#editarTrofeusLista .icon-trofeu {
+  margin: 0 4px;
+  display: inline-block;
+}
+
