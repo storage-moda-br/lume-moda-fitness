@@ -807,62 +807,68 @@ function prepararEditorTrofeusDia() {
   cont.appendChild(novaLinha);
 
   // Botão Salvar
-  const btnSalvar = document.getElementById("btnSalvarEdicaoTrofeusDia");
-  if (btnSalvar) {
-    btnSalvar.onclick = async () => {
-      const inputs = cont.querySelectorAll(".edit-input");
+const btnSalvar = document.getElementById("btnSalvarEdicaoTrofeusDia");
+if (btnSalvar) {
+  btnSalvar.onclick = async () => {
+    const inputs = cont.querySelectorAll(".edit-input");
 
-      // Monta mapas novos do dia e do mês
-      const novoMapaDia = {};
-      const novoMapaMes = { ...trophyCountsMes };
+    // Novo mapa do dia (baseado no que está sendo editado)
+    const novoMapaDia = {};
 
-      inputs.forEach(inp => {
-        const nome = inp.getAttribute("data-nome");
-        const val = Math.max(0, parseInt(inp.value, 10) || 0);
-        if (nome) {
-          novoMapaDia[nome] = val;
-          novoMapaMes[nome] = val; // espelha no mês
-        }
-      });
+    // Copia os valores atuais do mês para poder ajustar depois
+    const novoMapaMes = { ...trophyCountsMes };
 
-      // Inclusão
-      const novoNome = (document.getElementById("novoNomeDia")?.value || "").trim();
-      const novoTrofeu = parseInt(document.getElementById("novoTrofeuDia")?.value, 10) || 0;
-      if (novoNome) {
-        novoMapaDia[novoNome] = novoTrofeu;
-        novoMapaMes[novoNome] = novoTrofeu;
+    // Calcula diferença (delta) entre antigo e novo
+    for (const [nome, valAntigo] of Object.entries(trophyCountsDia)) {
+      const input = [...inputs].find(i => i.getAttribute("data-nome") === nome);
+      if (input) {
+        const valNovo = Math.max(0, parseInt(input.value, 10) || 0);
+        novoMapaDia[nome] = valNovo;
+
+        const delta = valNovo - valAntigo;
+        // Aplica diferença no mês (acumulando corretamente)
+        novoMapaMes[nome] = (novoMapaMes[nome] || 0) + delta;
+        if (novoMapaMes[nome] < 0) novoMapaMes[nome] = 0;
+      } else {
+        // Se jogador não foi listado, mantém valor do dia
+        novoMapaDia[nome] = valAntigo;
       }
+    }
 
-      // Atualiza estados e banco
-      trophyCountsDia = novoMapaDia;
-      trophyCountsMes = novoMapaMes;
-      await updateDoc(salaDocRef, { trophyCountsDia, trophyCountsMes });
+    // Novo jogador
+    const novoNome = (document.getElementById("novoNomeDia")?.value || "").trim();
+    const novoTrofeu = parseInt(document.getElementById("novoTrofeuDia")?.value, 10) || 0;
+    if (novoNome) {
+      novoMapaDia[novoNome] = novoTrofeu;
+      novoMapaMes[novoNome] = (novoMapaMes[novoNome] || 0) + novoTrofeu;
+    }
 
-      // Feedback verde
-      const original = btnSalvar.textContent;
-      btnSalvar.textContent = "✅ Salvo com sucesso!";
-      btnSalvar.style.background = "#28a745";
-      btnSalvar.disabled = true;
-      setTimeout(() => {
-        btnSalvar.textContent = original;
-        btnSalvar.style.background = "";
-        btnSalvar.disabled = false;
-      }, 2000);
+    // Atualiza os estados locais e Firestore
+    trophyCountsDia = novoMapaDia;
+    trophyCountsMes = novoMapaMes;
 
-      renderTrofeusDia();
-      renderRanking();
-      prepararEditorTrofeusDia();
-    };
-  }
+    await updateDoc(salaDocRef, {
+      trophyCountsDia,
+      trophyCountsMes
+    });
 
-  // Botão Cancelar
-  const btnCancelar = document.getElementById("btnCancelarEdicaoTrofeusDia");
-  if (btnCancelar) {
-    btnCancelar.onclick = () => {
-      document.getElementById("editarTrofeusDiaModal").style.display = "none";
-    };
-  }
+    // Feedback visual verde
+    const original = btnSalvar.textContent;
+    btnSalvar.textContent = "✅ Salvo com sucesso!";
+    btnSalvar.style.background = "#28a745";
+    btnSalvar.disabled = true;
+    setTimeout(() => {
+      btnSalvar.textContent = original;
+      btnSalvar.style.background = "";
+      btnSalvar.disabled = false;
+    }, 2000);
+
+    renderTrofeusDia();
+    renderRanking();
+    prepararEditorTrofeusDia();
+  };
 }
+
 
 /* === FIM NOVO === */
 
