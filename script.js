@@ -642,6 +642,7 @@ async function encerrarMesAtual() {
 
 /* ================ HISTÓRICO DE PARTIDAS (VERSÃO ESTÁVEL) ================ */
 async function prepararHistoricoPartidas() {
+	console.log("🚀 prepararHistoricoPartidas iniciada");
   const selMes = document.getElementById("mesPartidasSelect");
   const listaDatas = document.getElementById("listaPartidasDoMes");
   const detalhes = document.getElementById("detalhesPartida");
@@ -674,6 +675,8 @@ async function prepararHistoricoPartidas() {
 
       for (let i = 1; i <= 5; i++) { // 🔹 Máx 5 partidas por dia (suficiente)
         const key = i === 1 ? keyBase : `${keyBase}_${i}`;
+	console.log("📡 Buscando:", key);
+
         try {
           const ref = doc(db, "partidasDia", key);
           const s = await getDoc(ref); // 🔹 Aguarda 1 por vez — sem travar
