@@ -157,11 +157,16 @@ menu.querySelector(".encerrarMes")?.addEventListener('click', async (ev)=>{
   if(!isAdmin){ alert("Somente administradores podem encerrar o mês."); return; }
   await encerrarMesAtual();
 });
-menu.querySelector(".historicoPartidas")?.addEventListener('click', (ev)=>{
+menu.querySelector(".historicoPartidas")?.addEventListener('click', (ev) => {
   ev.preventDefault();
   abrirModal("historicoPartidasModal");
-  prepararHistoricoPartidas();
+
+  // 🕐 Aguarda o modal abrir (evita travamento visual)
+  setTimeout(() => {
+    prepararHistoricoPartidas();
+  }, 250);
 });
+
 
 /* === NOVO: Ação do menu "Editar Troféus" === */
 menu.querySelector(".editarTrofeus")?.addEventListener('click', (ev)=>{
