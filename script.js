@@ -768,13 +768,14 @@ function prepararEditorTrofeus() {
 /* === FIM NOVO === */
 
 /* === NOVO: Editor de Troféus do Dia (sincroniza com o Mensal) === */
-/* === NOVO: Editor de Troféus do Dia (sem ❌ e com layout igual ao mensal) === */
+/* === Editor de Troféus do Dia (sem ❌) com ajuste proporcional no mensal === */
 function prepararEditorTrofeusDia() {
   const cont = document.getElementById("editarTrofeusDiaLista");
   if (!cont) return;
 
   cont.innerHTML = "";
 
+  // Lista ordenada (ignora nomes vazios/null)
   const entries = Object.entries(trophyCountsDia || {})
     .filter(([nome]) => nome && nome.trim() !== "" && nome.trim().toLowerCase() !== "null")
     .sort((a, b) => b[1] - a[1]);
@@ -806,75 +807,86 @@ function prepararEditorTrofeusDia() {
   `;
   cont.appendChild(novaLinha);
 
-  // Botão Salvar
-const btnSalvar = document.getElementById("btnSalvarEdicaoTrofeusDia");
-if (btnSalvar) {
-  btnSalvar.onclick = async () => {
-    const inputs = cont.querySelectorAll(".edit-input");
+  // Botão Salvar (aplica Δ no mensal)
+  const btnSalvar = document.getElementById("btnSalvarEdicaoTrofeusDia");
+  if (btnSalvar) {
+    btnSalvar.onclick = async () => {
+      const inputs = Array.from(cont.querySelectorAll(".edit-input"));
 
-    // Novo mapa do dia (baseado no que está sendo editado)
-    const novoMapaDia = {};
+      // Mapa novo do dia (que vamos salvar)
+      const novoMapaDia = {};
+      // Clona mensal para ir ajustando
+      const novoMapaMes = { ...trophyCountsMes };
 
-    // Copia os valores atuais do mês para poder ajustar depois
-    const novoMapaMes = { ...trophyCountsMes };
+      // Aplica diferença (Δ = novoDia - antigoDia) em cada jogador existente
+      for (const [nome, valAntigoDia] of Object.entries(trophyCountsDia || {})) {
+        const input = inputs.find(i => i.getAttribute("data-nome") === nome);
+        if (input) {
+          const valNovoDia = Math.max(0, parseInt(input.value, 10) || 0);
+          novoMapaDia[nome] = valNovoDia;
 
-    // Calcula diferença (delta) entre antigo e novo
-    for (const [nome, valAntigo] of Object.entries(trophyCountsDia)) {
-      const input = [...inputs].find(i => i.getAttribute("data-nome") === nome);
-      if (input) {
-        const valNovo = Math.max(0, parseInt(input.value, 10) || 0);
-        novoMapaDia[nome] = valNovo;
-
-        const delta = valNovo - valAntigo;
-        // Aplica diferença no mês (acumulando corretamente)
-        novoMapaMes[nome] = (novoMapaMes[nome] || 0) + delta;
-        if (novoMapaMes[nome] < 0) novoMapaMes[nome] = 0;
-      } else {
-        // Se jogador não foi listado, mantém valor do dia
-        novoMapaDia[nome] = valAntigo;
+          const delta = valNovoDia - (parseInt(valAntigoDia, 10) || 0);
+          novoMapaMes[nome] = Math.max(0, (parseInt(novoMapaMes[nome], 10) || 0) + delta);
+        } else {
+          // se, por algum motivo, não renderizou, mantém o antigo
+          novoMapaDia[nome] = parseInt(valAntigoDia, 10) || 0;
+        }
       }
-    }
 
-    // Novo jogador
-    const novoNome = (document.getElementById("novoNomeDia")?.value || "").trim();
-    const novoTrofeu = parseInt(document.getElementById("novoTrofeuDia")?.value, 10) || 0;
-    if (novoNome) {
-      novoMapaDia[novoNome] = novoTrofeu;
-      novoMapaMes[novoNome] = (novoMapaMes[novoNome] || 0) + novoTrofeu;
-    }
+      // Inclusão de novo jogador (somamos no mensal também)
+      const novoNome = (document.getElementById("novoNomeDia")?.value || "").trim();
+      const novoTrofeu = parseInt(document.getElementById("novoTrofeuDia")?.value, 10) || 0;
+      if (novoNome) {
+        // protege contra duplicata
+        if (novoMapaDia[novoNome]) {
+          alert("⚠️ Este nome já existe nos troféus do dia!");
+        } else {
+          novoMapaDia[novoNome] = novoTrofeu;
+          novoMapaMes[novoNome] = (parseInt(novoMapaMes[novoNome], 10) || 0) + novoTrofeu;
+        }
+      }
 
-    // Atualiza os estados locais e Firestore
-    trophyCountsDia = novoMapaDia;
-    trophyCountsMes = novoMapaMes;
+      // Limpeza defensiva (nada de chaves vazias/null)
+      for (const k in novoMapaDia) {
+        if (!k || k.trim() === "" || k.toLowerCase() === "null") delete novoMapaDia[k];
+      }
+      for (const k in novoMapaMes) {
+        if (!k || k.trim() === "" || k.toLowerCase() === "null") delete novoMapaMes[k];
+      }
 
-    await updateDoc(salaDocRef, {
-      trophyCountsDia,
-      trophyCountsMes
-    });
+      // Atualiza estados e Firestore
+      trophyCountsDia = novoMapaDia;
+      trophyCountsMes = novoMapaMes;
 
-    // Feedback visual verde
-    const original = btnSalvar.textContent;
-    btnSalvar.textContent = "✅ Salvo com sucesso!";
-    btnSalvar.style.background = "#28a745";
-    btnSalvar.disabled = true;
-    setTimeout(() => {
-      btnSalvar.textContent = original;
-      btnSalvar.style.background = "";
-      btnSalvar.disabled = false;
-    }, 2000);
+      await updateDoc(salaDocRef, { trophyCountsDia, trophyCountsMes });
 
-    renderTrofeusDia();
-    renderRanking();
-    prepararEditorTrofeusDia();
-  };
+      // Feedback verde
+      const original = btnSalvar.textContent;
+      btnSalvar.textContent = "✅ Salvo com sucesso!";
+      btnSalvar.style.background = "#28a745";
+      btnSalvar.disabled = true;
+      setTimeout(() => {
+        btnSalvar.textContent = original;
+        btnSalvar.style.background = "";
+        btnSalvar.disabled = false;
+      }, 2000);
+
+      renderTrofeusDia();
+      renderRanking();
+      prepararEditorTrofeusDia();
+    };
+  }
+
+  // Botão Cancelar
+  const btnCancelar = document.getElementById("btnCancelarEdicaoTrofeusDia");
+  if (btnCancelar) {
+    btnCancelar.onclick = () => {
+      document.getElementById("editarTrofeusDiaModal").style.display = "none";
+    };
+  }
 }
 
-
 /* === FIM NOVO === */
-
-
-
-
 
 /* SELEÇÃO DE SALA - ABERTURA DO MODAL */
 document.querySelector(".selecionarSala").addEventListener("click", ev => {
