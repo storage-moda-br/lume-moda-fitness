@@ -685,23 +685,25 @@ async function prepararHistoricoPartidas() {
     }
 
     // 🔢 Agrupa por dia, exibe todas (1, 2, 3...)
-    listaDatas.innerHTML = encontrados
-      .map(({ key, indice }) => {
-        const partes = key.split("_");
-        const dataKey = partes[partes.length - 1].split("_")[0];
-        const [Y, M, D] = dataKey.split("-");
-        const d = new Date(Number(Y), Number(M) - 1, Number(D));
-        const semana = weekdayLabel(d);
-        const labelPartida = indice > 1 ? `Partida ${indice}` : "Partida 1";
+listaDatas.innerHTML = encontrados
+  .map(({ key, indice }) => {
+    // ✅ Extrai corretamente a data mesmo com sufixos (_2, _3, etc)
+    const matchData = key.match(/\d{4}-\d{2}-\d{2}/);
+    const dataKey = matchData ? matchData[0] : "";
+    const [Y, M, D] = dataKey.split("-");
+    const d = new Date(Number(Y), Number(M) - 1, Number(D));
+    const semana = weekdayLabel(d);
+    const labelPartida = indice > 1 ? `Partida ${indice}` : "Partida 1";
 
-        return `
-          <div class="trofeus-dia-item" data-date="${key}" style="cursor:pointer;">
-            <span>${labelPartida} — ${D}/${M}/${Y} — ${semana}</span>
-            <span>🔎 Ver</span>
-          </div>
-        `;
-      })
-      .join("");
+    return `
+      <div class="trofeus-dia-item" data-date="${key}" style="cursor:pointer;">
+        <span>${labelPartida} — ${D}/${M}/${Y} — ${semana}</span>
+        <span>🔎 Ver</span>
+      </div>
+    `;
+  })
+  .join("");
+
 
     // Clique em cada linha => mostra detalhes da partida
     listaDatas.querySelectorAll(".trofeus-dia-item").forEach((el) => {
