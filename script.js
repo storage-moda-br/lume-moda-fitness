@@ -663,26 +663,36 @@ async function prepararHistoricoPartidas() {
     const encontrados = [];
 
     // 🔍 Busca todas as partidas do mês (com variações _2, _3, etc)
-    for (let dia = 1; dia <= lastDay; dia++) {
-      const dd = String(dia).padStart(2, "0");
-      const keyBase = `${salaAtual}_${ano}-${String(mes).padStart(2, "0")}-${dd}`;
+const consultas = [];
 
-      // Testa possíveis sufixos (_2, _3, _4...)
-      for (let i = 1; i <= 10; i++) {
-        const key = i === 1 ? keyBase : `${keyBase}_${i}`;
-        const ref = doc(db, "partidasDia", key);
-        const s = await getDoc(ref);
+for (let dia = 1; dia <= lastDay; dia++) {
+  const dd = String(dia).padStart(2, "0");
+  const keyBase = `${salaAtual}_${ano}-${String(mes).padStart(2, "0")}-${dd}`;
+
+  // Testa possíveis sufixos (_2, _3, _4...)
+  for (let i = 1; i <= 10; i++) {
+    const key = i === 1 ? keyBase : `${keyBase}_${i}`;
+    consultas.push(
+      getDoc(doc(db, "partidasDia", key)).then((s) => {
         if (s.exists()) {
-          encontrados.push({ key, data: s.data(), indice: i });
+          return { key, data: s.data(), indice: i };
         }
-      }
-    }
+        return null;
+      })
+    );
+  }
+}
 
-    if (encontrados.length === 0) {
-      listaDatas.innerHTML =
-        "<p style='text-align:center;color:#777;'>Nenhuma partida salva neste mês.</p>";
-      return;
-    }
+// ✅ Executa todas as consultas em paralelo (muito mais rápido)
+const resultados = await Promise.all(consultas);
+const encontrados = resultados.filter(Boolean);
+
+if (encontrados.length === 0) {
+  listaDatas.innerHTML =
+    "<p style='text-align:center;color:#777;'>Nenhuma partida salva neste mês.</p>";
+  return;
+}
+
 
     // 🔢 Agrupa por dia, exibe todas (1, 2, 3...)
 listaDatas.innerHTML = encontrados
