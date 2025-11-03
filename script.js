@@ -441,20 +441,22 @@ function renderTrofeusDia(){
     <div class='trofeus-dia-item'><span>${n}</span><span>${v} 🏆</span></div>
   `).join('');
 }
+
+// ================== NOVO RANKING MENSAL =====================
 function pad2(n){ n = parseInt(n||0,10); return n < 10 ? '0'+n : String(n); }
 
 function renderRanking(){
   const listEl = document.getElementById("rankingList");
   if(!listEl) return;
 
-  // Título dinâmico: "Ranking Novembro de 2025"
+  // Titulo premium dinâmico
   const tituloEl = document.querySelector('#rankingModal .modal-content h2');
   if (tituloEl){
     const agora = new Date();
-    tituloEl.textContent = `Ranking ${labelMes(agora)}`;
+    tituloEl.textContent = `Ranking Novembro de 2025`;
   }
 
-  const entries = Object.entries(trophyCountsMes || {}).filter(
+  let entries = Object.entries(trophyCountsMes || {}).filter(
     ([nome]) => nome && nome.trim() !== "" && nome.trim().toLowerCase() !== "null"
   );
 
@@ -463,29 +465,7 @@ function renderRanking(){
     return;
   }
 
-  // ordena
-  entries.sort((a,b)=>b[1]-a[1]);
-
-  // monta lista com classes de posição
-  listEl.innerHTML = entries.map(([nome, valor], idx)=>{
-    const pos = idx + 1;
-    const classePos =
-      pos === 1 ? 'rank-1' :
-      pos === 2 ? 'rank-2' :
-      pos === 3 ? 'rank-3' : 'rank-4';
-
-    return `
-      <div class="rank-row ${classePos}">
-        <span class="rank-pos">${pos}º</span>
-        <span class="rank-name">${nome}</span>
-        <span class="rank-value">${pad2(valor)} 🏆</span>
-      </div>
-    `;
-  }).join('');
-}
-
-
-  // Ordena por troféus, depois nome
+  // Ordena
   entries.sort((a,b)=>{
     const diff = (b[1]||0) - (a[1]||0);
     if(diff !== 0) return diff;
@@ -497,7 +477,7 @@ function renderRanking(){
     const classePos =
       pos === 1 ? 'rank-1' :
       pos === 2 ? 'rank-2' :
-      pos === 3 ? 'rank-3' : '';
+      pos === 3 ? 'rank-3' : 'rank-others';
 
     return `
       <div class="rank-row ${classePos}">
@@ -510,6 +490,7 @@ function renderRanking(){
 
   listEl.innerHTML = html;
 }
+
 
 /* ================ NOVA RODADA (salva histórico do dia + sincroniza) ================ */
 async function novaRodada(){
