@@ -1047,13 +1047,17 @@ function atualizarIndicadorDB(){
   if(!el) return;
 
   if(salaAtual === "play-do-bistecao"){
-    el.textContent = "✅ Banco Real";
+    el.textContent = "✅ Data base";
     el.style.color = "#0093ff";
-  } else {
-    el.textContent = "🧪 Banco de Teste";
+  } else if(salaAtual === "play-do-bistecao-test"){
+    el.textContent = "🧪 Data base";
     el.style.color = "#ff9800";
+  } else {
+    el.textContent = "";
+    el.style.color = "#333";
   }
 }
+
 
 document.addEventListener("DOMContentLoaded", atualizarIndicadorDB);
 
