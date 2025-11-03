@@ -577,7 +577,7 @@ async function prepararHistoricoTrofeus(){
   }
 
   async function carregar(mk){
-    const ref = doc(db, "historicoTrofeus", `play-do-bistecao_${mk}`);
+    const ref = doc(db, "historicoTrofeus", `${salaAtual}_${mk}`);
     const s = await getDoc(ref);
     if(!s.exists()){ list.innerHTML = "<p style='text-align:center;color:#777;'>Sem dados para esse mês.</p>"; return; }
     const data = s.data();
@@ -589,6 +589,7 @@ async function prepararHistoricoTrofeus(){
   sel.onchange = ()=>carregar(sel.value);
   await carregar(sel.value);
 }
+
 
 
 /* ================ ENCERRAR MÊS (feedback visual, sem alert) ================= */
