@@ -313,3 +313,11 @@ button:hover{transform:scale(1.03);}
   text-align:center; color:#0093ff; margin-bottom:12px;
 }
 
+
+#rankingTituloMensal {
+  text-align:center;
+  color:#b89b00; /* mesmo dourado do troféu do dia */
+  font-size:1.35rem;
+  font-weight:600;
+  margin-bottom:12px;
+}

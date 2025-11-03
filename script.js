@@ -463,6 +463,17 @@ function renderRanking(){
     return;
   }
 
+  listEl.innerHTML = entries
+    .sort((a,b)=>b[1]-a[1])
+    .map(([nome,valor])=>{
+      return `<div class="trofeus-dia-item pos" data-nome="${nome}">
+        <span>${nome}</span><span>${valor} 🏆</span>
+      </div>`;
+    })
+    .join("");
+}
+
+
   // Ordena por troféus, depois nome
   entries.sort((a,b)=>{
     const diff = (b[1]||0) - (a[1]||0);
