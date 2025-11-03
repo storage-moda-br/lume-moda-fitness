@@ -447,11 +447,11 @@ function renderRanking(){
   const listEl = document.getElementById("rankingList");
   if(!listEl) return;
 
-  // Título dinâmico: "Ranking Mensal — Novembro 2025"
+  // Título dinâmico: "Ranking Novembro de 2025"
   const tituloEl = document.querySelector('#rankingModal .modal-content h2');
   if (tituloEl){
     const agora = new Date();
-    tituloEl.textContent = `Ranking Mensal — ${labelMes(agora)}`;
+    tituloEl.textContent = `Ranking ${labelMes(agora)}`;
   }
 
   const entries = Object.entries(trophyCountsMes || {}).filter(
@@ -463,14 +463,25 @@ function renderRanking(){
     return;
   }
 
-  listEl.innerHTML = entries
-    .sort((a,b)=>b[1]-a[1])
-    .map(([nome,valor])=>{
-      return `<div class="trofeus-dia-item pos" data-nome="${nome}">
-        <span>${nome}</span><span>${valor} 🏆</span>
-      </div>`;
-    })
-    .join("");
+  // ordena
+  entries.sort((a,b)=>b[1]-a[1]);
+
+  // monta lista com classes de posição
+  listEl.innerHTML = entries.map(([nome, valor], idx)=>{
+    const pos = idx + 1;
+    const classePos =
+      pos === 1 ? 'rank-1' :
+      pos === 2 ? 'rank-2' :
+      pos === 3 ? 'rank-3' : 'rank-4';
+
+    return `
+      <div class="rank-row ${classePos}">
+        <span class="rank-pos">${pos}º</span>
+        <span class="rank-name">${nome}</span>
+        <span class="rank-value">${pad2(valor)} 🏆</span>
+      </div>
+    `;
+  }).join('');
 }
 
 
