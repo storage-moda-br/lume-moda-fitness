@@ -338,9 +338,9 @@ button:hover{transform:scale(1.03);}
   box-shadow:0 0 6px rgba(165,120,70,0.45);
 }
 
-/* ==== FORÇA o fundo cinza ESCURO para posições 4+ ==== */
-.rank-row.rank-others{
-  background:#c3c3c3 !important;
+.rank-others{
+  background:#c9c9c9; /* agora sim visivelmente mais escuro */
+  box-shadow:0 0 4px rgba(0,0,0,0.22);
 }
 
 
