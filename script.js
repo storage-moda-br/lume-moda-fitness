@@ -441,14 +441,54 @@ function renderTrofeusDia(){
     <div class='trofeus-dia-item'><span>${n}</span><span>${v} 🏆</span></div>
   `).join('');
 }
+function pad2(n){ n = parseInt(n||0,10); return n < 10 ? '0'+n : String(n); }
+
 function renderRanking(){
-  const l = document.getElementById("rankingList");
-  if(!l) return;
-  const e = Object.entries(trophyCountsMes||{});
-  l.innerHTML = e.length
-    ? e.sort((a,b)=>b[1]-a[1]).map(([n,v])=>`<div class='trofeus-dia-item'><span>${n}</span><span>${v} 🏆</span></div>`).join('')
-    : "<p style='text-align:center;color:#777;'>Nenhum troféu neste mês.</p>";
+  const listEl = document.getElementById("rankingList");
+  if(!listEl) return;
+
+  // Título dinâmico: "Ranking Mensal — Novembro 2025"
+  const tituloEl = document.querySelector('#rankingModal .modal-content h2');
+  if (tituloEl){
+    const agora = new Date();
+    tituloEl.textContent = `Ranking Mensal — ${labelMes(agora)}`;
+  }
+
+  const entries = Object.entries(trophyCountsMes || {}).filter(
+    ([nome]) => nome && nome.trim() !== "" && nome.trim().toLowerCase() !== "null"
+  );
+
+  if(entries.length === 0){
+    listEl.innerHTML = "<p style='text-align:center;color:#777;'>Nenhum troféu neste mês.</p>";
+    return;
+  }
+
+  // Ordena por troféus, depois nome
+  entries.sort((a,b)=>{
+    const diff = (b[1]||0) - (a[1]||0);
+    if(diff !== 0) return diff;
+    return a[0].localeCompare(b[0], 'pt-BR', { sensitivity:'base' });
+  });
+
+  const html = entries.map(([nome, valor], idx)=>{
+    const pos = idx + 1;
+    const classePos =
+      pos === 1 ? 'rank-1' :
+      pos === 2 ? 'rank-2' :
+      pos === 3 ? 'rank-3' : '';
+
+    return `
+      <div class="rank-row ${classePos}">
+        <span class="rank-pos">${pos}º</span>
+        <span class="rank-name">${nome}</span>
+        <span class="rank-value"><span class="rank-num">${pad2(valor)}</span> 🏆</span>
+      </div>
+    `;
+  }).join('');
+
+  listEl.innerHTML = html;
 }
+
 /* ================ NOVA RODADA (salva histórico do dia + sincroniza) ================ */
 async function novaRodada(){
   if(!isAdmin){ alert("Somente administradores."); return; }
