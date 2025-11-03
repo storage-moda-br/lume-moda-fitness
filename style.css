@@ -321,3 +321,24 @@ button:hover{transform:scale(1.03);}
   font-weight:600;
   margin-bottom:12px;
 }
+
+/* premium glow */
+.rank-1{
+  background:linear-gradient(90deg,#f8e8a4,#f4d86b);
+  box-shadow:0 0 6px rgba(184,155,0,0.45);
+}
+
+.rank-2{
+  background:linear-gradient(90deg,#e7e7e7,#d1d1d1);
+  box-shadow:0 0 6px rgba(150,150,150,0.35);
+}
+
+.rank-3{
+  background:linear-gradient(90deg,#e6c29f,#d59b6e);
+  box-shadow:0 0 6px rgba(165,120,70,0.45);
+}
+
+.rank-others{
+  background:#ececec;
+  box-shadow:0 0 4px rgba(0,0,0,0.18);
+}
