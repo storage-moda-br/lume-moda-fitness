@@ -339,9 +339,10 @@ button:hover{transform:scale(1.03);}
 }
 
 .rank-others{
-  background:#dcdcdc;
-  box-shadow:0 0 4px rgba(0,0,0,0.20);
+  background:#c9c9c9; /* agora sim visivelmente mais escuro */
+  box-shadow:0 0 4px rgba(0,0,0,0.22);
 }
+
 
 
 #rankingModal .modal-content h2 {
