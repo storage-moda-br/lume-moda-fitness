@@ -342,3 +342,19 @@ button:hover{transform:scale(1.03);}
   background:#ececec;
   box-shadow:0 0 4px rgba(0,0,0,0.18);
 }
+
+#rankingModal .modal-content h2 {
+  text-align:center;
+  color:#b89b00 !important; /* mesmo dourado premium */
+  font-size:1.35rem;
+  font-weight:600;
+  margin-bottom:12px;
+}
+
+#rankingTituloMensal {
+  text-align:center;
+  color:#b89b00; /* dourado premium */
+  font-size:1.35rem;
+  font-weight:600;
+  margin-bottom:12px;
+}
