@@ -396,16 +396,37 @@ function vencedor(n,d){
 
 
 /* ================ DUPLO CLIQUE (somente admin) ================ */
+// === ESTORNO DE RESULTADO (dblclick) ===
 document.addEventListener("dblclick",(e)=>{
   if(!isAdmin) return;
   const el = e.target.closest(".dupla-vencedora");
   if(!el) return;
+
   const id = el.id.match(/d(1|2)-(\d+)/);
   if(!id) return;
+
   const num = parseInt(id[2]);
   const p = partidas.find(x=>x.numero===num);
-  if(p) p.vencedor = null;
-  renderPartidas(); salvar();
+  if(!p || p.vencedor === null) return;
+
+  // quem tinha ganho antes?
+  const vencedoresAnteriores = p.vencedor === '1' ? p.dupla1 : p.dupla2;
+
+  // SUBTRAI da dupla que estava marcada como vencedora
+  vencedoresAnteriores.forEach(g=>{
+    if(trophyCountsDia[g])  trophyCountsDia[g]--;
+    if(trophyCountsMes[g])  trophyCountsMes[g]--;
+    if(trophyCountsDia[g] < 0) trophyCountsDia[g] = 0;
+    if(trophyCountsMes[g] < 0) trophyCountsMes[g] = 0;
+  });
+
+  // limpa o resultado
+  p.vencedor = null;
+
+  renderPartidas();
+  renderTrofeusDia();
+  renderRanking();
+  salvar();
 });
 
 
