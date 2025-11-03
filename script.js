@@ -603,13 +603,14 @@ async function encerrarMesAtual() {
 
   try {
     // Salva histórico mensal no Firestore
-    await setDoc(doc(db, "historicoTrofeus", `play-do-bistecao_${mk}`), {
-      ...trophyCountsMes,
-      sala: "play-do-bistecao",
-      mesKey: mk,
-      rotulo,
-      closedAt: Date.now()
-    });
+    await setDoc(doc(db, "historicoTrofeus", `${salaAtual}_${mk}`), {
+  ...trophyCountsMes,
+  sala: salaAtual,
+  mesKey: mk,
+  rotulo,
+  closedAt: Date.now()
+});
+
 
     // Zera troféus mensais e diários
     trophyCountsMes = {};
