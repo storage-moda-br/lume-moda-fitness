@@ -602,12 +602,13 @@ await setDoc(salaDocRef, {
 
 
 
-/* ================ HISTÓRICO DE TROFÉUS ================ */
+/* ================ HISTÓRICO DE TROFÉUS (visual premium) ================ */
 async function prepararHistoricoTrofeus(){
-  const sel = document.getElementById("mesSelect");
+  const sel  = document.getElementById("mesSelect");
   const list = document.getElementById("historicoTrofeusList");
   if(!sel || !list) return;
 
+  // Preenche últimos 12 meses
   sel.innerHTML = "";
   const now = new Date();
   for(let i=0;i<12;i++){
@@ -619,53 +620,59 @@ async function prepararHistoricoTrofeus(){
     sel.appendChild(opt);
   }
 
+  // Carrega um mês
   async function carregar(mk){
-  const ref = doc(db, "historicoTrofeus", `${salaAtual}_${mk}`);
-  const s = await getDoc(ref);
+    list.innerHTML = "<p style='text-align:center;color:#777;'>Carregando…</p>";
+    try {
+      const ref = doc(db, "historicoTrofeus", `${salaAtual}_${mk}`);
+      const s   = await getDoc(ref);
 
-  const list = document.getElementById("historicoTrofeusList");
-  if(!s.exists()){
-    list.innerHTML = "<p style='text-align:center;color:#777;'>Sem dados para esse mês.</p>";
-    return;
+      if(!s.exists()){
+        list.innerHTML = "<p style='text-align:center;color:#777;'>Sem dados para esse mês.</p>";
+        return;
+      }
+
+      const data = s.data();
+      const entries = Object.entries(data)
+        .filter(([k]) => !["sala","mesKey","rotulo","closedAt"].includes(k))
+        .sort((a,b)=>{
+          const diff = (b[1]||0) - (a[1]||0); // por quantidade (DESC)
+          if(diff !== 0) return diff;
+          return a[0].localeCompare(b[0], 'pt-BR', {sensitivity:'base'}); // empate por A-Z
+        });
+
+      if(entries.length === 0){
+        list.innerHTML = "<p style='text-align:center;color:#777;'>Sem dados para esse mês.</p>";
+        return;
+      }
+
+      // HTML premium igual ao Ranking Mensal
+      const html = entries.map(([nome, valor], idx)=>{
+        const pos = idx + 1;
+        const classePos =
+          pos === 1 ? 'rank-1' :
+          pos === 2 ? 'rank-2' :
+          pos === 3 ? 'rank-3' : 'rank-others';
+
+        return `
+          <div class="rank-row ${classePos}">
+            <span class="rank-pos">${pos}º</span>
+            <span class="rank-name">${nome}</span>
+            <span class="rank-value"><span class="rank-num">${String(valor).padStart(2,'0')}</span> 🏆</span>
+          </div>
+        `;
+      }).join('');
+
+      list.innerHTML = html;
+    } catch (err){
+      console.error("Erro ao carregar histórico de troféus:", err);
+      list.innerHTML = "<p style='text-align:center;color:#d00;'>Erro ao carregar.</p>";
+    }
   }
 
-  const data = s.data();
-
-  // remove campos extras
-  const entries = Object.entries(data)
-  .filter(([k]) => !["sala","mesKey","rotulo","closedAt"].includes(k))
-  .sort((a,b)=>{
-      const diff = (b[1]||0)-(a[1]||0);
-      if(diff!==0) return diff;
-      return a[0].localeCompare(b[0],'pt-BR',{sensitivity:'base'});
-  });
-
-  if(entries.length===0){
-    list.innerHTML = "<p style='text-align:center;color:#777;'>Sem dados para esse mês.</p>";
-    return;
-  }
-
-// === visual premium igual ranking mensal ===
-const html = entries.map(([nome, valor], idx)=>{
-  const pos = idx + 1;
-  const classePos =
-    pos === 1 ? 'rank-1' :
-    pos === 2 ? 'rank-2' :
-    pos === 3 ? 'rank-3' : 'rank-others';
-
-  return `
-    <div class="rank-row ${classePos}">
-      <span class="rank-pos">${pos}º</span>
-      <span class="rank-name">${nome}</span>
-      <span class="rank-value"><span class="rank-num">${String(valor).padStart(2,'0')}</span> 🏆</span>
-    </div>
-  `;
-}).join('');
-
-list.innerHTML = "";     // ← ESSA LINHA AQUI
-list.innerHTML = html;
-
-
+  sel.onchange = ()=>carregar(sel.value);
+  await carregar(sel.value);
+}
 
 
 /* ================ ENCERRAR MÊS (feedback visual, sem alert) ================= */
