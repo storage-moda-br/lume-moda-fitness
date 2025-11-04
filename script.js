@@ -443,12 +443,11 @@ function renderTrofeusDia(){
       <div class="rank-row rank-others">
         <span class="rank-pos">${idx+1}º</span>
         <span class="rank-name">${nome}</span>
-        <span class="rank-value">
-          <span class="rank-num">${String(valor).padStart(2,'0')}</span>
-        </span>
+        <span class="rank-value"><span class="rank-num">${String(valor).padStart(2,'0')}</span> 🏆</span>
       </div>
     `).join('');
 }
+
 
 // ================== NOVO RANKING MENSAL =====================
 function pad2(n){ n = parseInt(n||0,10); return n < 10 ? '0'+n : String(n); }
