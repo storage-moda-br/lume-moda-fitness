@@ -433,27 +433,23 @@ button:hover{transform:scale(1.03);}
   box-shadow: none !important;
 }
 
-/* HISTÓRICO: força as cores premium DEFINITIVAMENTE */
-#historicoTrofeusList .rank-row.rank-1{
-  background: linear-gradient(90deg,#f8e8a4,#f4d86b) !important;
-}
-#historicoTrofeusList .rank-row.rank-2{
-  background: linear-gradient(90deg,#e7e7e7,#d1d1d1) !important;
-}
-#historicoTrofeusList .rank-row.rank-3{
-  background: linear-gradient(90deg,#e6c29f,#d59b6e) !important;
-}
-#historicoTrofeusList .rank-row.rank-others{
-  background: #f0f0f0 !important;
+/* HISTÓRICO = MESMAS CORES DO RANKING NOVO */
+#historicoTrofeusList .rank-1{
+  background:#FFF6CF !important;
 }
 
-#historicoTrofeusList .rank-row{
-  padding:12px 14px !important;
-  border-radius:12px !important;
-  display:flex !important;
-  align-items:center !important;
-  gap:10px !important;
+#historicoTrofeusList .rank-2{
+  background:#F3F6FA !important;
 }
+
+#historicoTrofeusList .rank-3{
+  background:#FFE2C2 !important;
+}
+
+#historicoTrofeusList .rank-others{
+  background:#F0F0F0 !important;
+}
+
 
 
 
