@@ -528,3 +528,9 @@ button:hover{transform:scale(1.03);}
   display:inline-block;
   min-width:2ch; /* 03, 02, 01 alinhados */
 }
+@media(max-width:480px){
+  .header img{
+    height:38px !important;
+    width:38px !important;
+  }
+}
