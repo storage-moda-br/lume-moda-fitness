@@ -429,7 +429,6 @@ document.addEventListener("dblclick",(e)=>{
   salvar();
 });
 
-
 /* ================ TROFÉUS: DIA E MÊS (render) ================ */
 function renderTrofeusDia(){
   const c = document.getElementById("trofeusDiaContainer");
@@ -437,10 +436,18 @@ function renderTrofeusDia(){
   const e = Object.entries(trophyCountsDia||{});
   if(e.length===0){ c.style.display="none"; return; }
   c.style.display = "block";
-  l.innerHTML = e.sort((a,b)=>b[1]-a[1]).map(([n,v])=>`
-    <div class='trofeus-dia-item'><span>${n}</span><span>${v} 🏆</span></div>
-  `).join('');
+
+  l.innerHTML = e
+    .sort((a,b)=>b[1]-a[1])
+    .map(([nome,valor], idx) => `
+      <div class="rank-row rank-others">
+        <span class="rank-pos">${idx+1}º</span>
+        <span class="rank-name">${nome}</span>
+        <span class="rank-value"><span class="rank-num">${String(valor).padStart(2,'0')}</span></span>
+      </div>
+    `).join('');
 }
+
 
 // ================== NOVO RANKING MENSAL =====================
 function pad2(n){ n = parseInt(n||0,10); return n < 10 ? '0'+n : String(n); }

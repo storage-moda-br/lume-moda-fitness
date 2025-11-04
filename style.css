@@ -31,9 +31,33 @@ button:hover{transform:scale(1.03);}
 .dupla-perdedora{background:#ffe6e6!important;border-color:#dc3545!important;color:#444!important;}
 .dupla-fora{background:#f0f0f0;border:1px solid #ccc;color:#666;border-radius:15px;padding:10px 15px;font-weight:500;margin-bottom:10px;}
 
-.trofeus-dia-container{background:#f9f9f9;border-radius:12px;padding:10px 15px;margin-top:20px;box-shadow:0 2px 5px rgba(0,0,0,0.05);}
-.trofeus-dia-container h3{text-align:center;color:#b89b00;margin-bottom:10px;}
-.trofeus-dia-item{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:#f8f9fa;border-radius:8px;margin-bottom:5px;}
+/* TROFÉUS DO DIA — premium cinza igual “others” */
+.trofeus-dia-container{
+  background:#ffffff;           /* branco premium */
+  border-radius:12px;
+  padding:12px 18px;            /* padding maior */
+  margin-top:20px;
+  box-shadow:0 3px 8px rgba(0,0,0,0.08); /* sombra igual ranking */
+}
+
+.trofeus-dia-container h3{
+  text-align:center;
+  color:#b89b00;                /* dourado premium */
+  margin-bottom:12px;
+  font-size:1.35rem;
+  font-weight:600;
+}
+
+/* cada linha igual estilo “rank-others” */
+.trofeus-dia-item{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 12px;
+  border-radius:12px;
+  background:#f0f0f0;           /* cinza leve, igual “others” */
+  margin-bottom:6px;
+}
 
 .modal{display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;background-color:rgba(0,0,0,.5);}
 .modal-content {
@@ -450,7 +474,10 @@ button:hover{transform:scale(1.03);}
   background:#F0F0F0 !important;
 }
 
-
-
-
-
+#tituloTrofeusDia {
+  text-align:center;
+  color:#b89b00;
+  font-size: 1.35rem;
+  font-weight:600;
+  margin-bottom:10px;
+}
