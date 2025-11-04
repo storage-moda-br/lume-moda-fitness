@@ -1101,7 +1101,21 @@ function atualizarIndicadorDB(){
     el.textContent = "";
     el.style.color = "#333";
   }
+
+  // titulo principal dinâmico
+  const titulo = document.getElementById("tituloPrincipal");
+  if (titulo){
+    if(salaAtual === "play-do-bistecao-test"){
+      titulo.textContent = "AMBIENTE TESTE";
+      titulo.style.color = "#ff9800"; // laranja do DB Teste
+    } else {
+      titulo.textContent = "PLAY DO BISTECÃO";
+      titulo.style.color = "#0093ff"; // azul original
+    }
+  }
 }
+
+
 
 
 document.addEventListener("DOMContentLoaded", atualizarIndicadorDB);
