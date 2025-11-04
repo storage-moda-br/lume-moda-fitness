@@ -620,15 +620,51 @@ async function prepararHistoricoTrofeus(){
   }
 
   async function carregar(mk){
-    const ref = doc(db, "historicoTrofeus", `${salaAtual}_${mk}`);
-    const s = await getDoc(ref);
-    if(!s.exists()){ list.innerHTML = "<p style='text-align:center;color:#777;'>Sem dados para esse mês.</p>"; return; }
-    const data = s.data();
-    const entries = Object.entries(data || {}).filter(([k])=>!["sala","mesKey","rotulo","closedAt"].includes(k));
-    list.innerHTML = entries.length
-      ? entries.sort((a,b)=>b[1]-a[1]).map(([nome,q])=>`<div class='trofeus-dia-item'><span>${nome}</span><span>${q} 🏆</span></div>`).join('')
-      : "<p style='text-align:center;color:#777;'>Sem dados para esse mês.</p>";
+  const ref = doc(db, "historicoTrofeus", `${salaAtual}_${mk}`);
+  const s = await getDoc(ref);
+
+  const list = document.getElementById("historicoTrofeusList");
+  if(!s.exists()){
+    list.innerHTML = "<p style='text-align:center;color:#777;'>Sem dados para esse mês.</p>";
+    return;
   }
+
+  const data = s.data();
+
+  // remove campos extras
+  const entries = Object.entries(data)
+  .filter(([k]) => !["sala","mesKey","rotulo","closedAt"].includes(k))
+  .sort((a,b)=>{
+      const diff = (b[1]||0)-(a[1]||0);
+      if(diff!==0) return diff;
+      return a[0].localeCompare(b[0],'pt-BR',{sensitivity:'base'});
+  });
+
+  if(entries.length===0){
+    list.innerHTML = "<p style='text-align:center;color:#777;'>Sem dados para esse mês.</p>";
+    return;
+  }
+
+  // === visual premium igual ranking mensal ===
+  const html = entries.map(([nome, valor], idx)=>{
+    const pos = idx + 1;
+    const classePos =
+      pos === 1 ? 'rank-1' :
+      pos === 2 ? 'rank-2' :
+      pos === 3 ? 'rank-3' : 'rank-others';
+
+    return `
+      <div class="rank-row ${classePos}">
+        <span class="rank-pos">${pos}º</span>
+        <span class="rank-name">${nome}</span>
+        <span class="rank-value"><span class="rank-num">${String(valor).padStart(2,'0')}</span> 🏆</span>
+      </div>
+    `;
+  }).join('');
+
+  list.innerHTML = html;
+}
+
   sel.onchange = ()=>carregar(sel.value);
   await carregar(sel.value);
 }
