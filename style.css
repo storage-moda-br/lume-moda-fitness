@@ -402,3 +402,16 @@ button:hover{transform:scale(1.03);}
 }
 
 
+#historicoTrofeusList .rank-row{ background:none !important; }
+#historicoTrofeusList .rank-others{ background:#f0f0f0 !important; }
+
+/* HISTÓRICO: força uso das cores premium igual ranking mensal */
+#historicoTrofeusList .rank-row{ 
+  background:none !important;
+  box-shadow:none !important;
+}
+#historicoTrofeusList .rank-others{ 
+  background:#f0f0f0 !important;
+}
+
+
