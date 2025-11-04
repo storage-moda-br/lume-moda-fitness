@@ -402,8 +402,6 @@ button:hover{transform:scale(1.03);}
 }
 
 
-#historicoTrofeusList .rank-row{ background:none !important; }
-#historicoTrofeusList .rank-others{ background:#f0f0f0 !important; }
 
 /* HISTÓRICO: força uso das cores premium igual ranking mensal */
 #historicoTrofeusList .rank-row{ 
@@ -413,5 +411,27 @@ button:hover{transform:scale(1.03);}
 #historicoTrofeusList .rank-others{ 
   background:#f0f0f0 !important;
 }
+
+/* Histórico = mesmas cores do Ranking Mensal (com prioridade local) */
+#historicoTrofeusList .rank-1{
+  background: linear-gradient(90deg,#f8e8a4,#f4d86b) !important;
+  box-shadow: 0 0 6px rgba(184,155,0,0.45) !important;
+}
+
+#historicoTrofeusList .rank-2{
+  background: linear-gradient(90deg,#e7e7e7,#d1d1d1) !important;
+  box-shadow: 0 0 6px rgba(150,150,150,0.35) !important;
+}
+
+#historicoTrofeusList .rank-3{
+  background: linear-gradient(90deg,#e6c29f,#d59b6e) !important;
+  box-shadow: 0 0 6px rgba(165,120,70,0.45) !important;
+}
+
+#historicoTrofeusList .rank-row.rank-others{
+  background: #f0f0f0 !important;
+  box-shadow: none !important;
+}
+
 
 
