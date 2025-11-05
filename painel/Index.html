@@ -1244,7 +1244,8 @@ Aguardo retorno! 😊`;
 
         // Modal Functions
         function openModal(element) {
-            const productCard = element.closest('.product-card');
+            const productCard = element.parentElement;
+
             const productName = productCard.getAttribute('data-product-name');
             const productPrice = productCard.getAttribute('data-product-price');
             const productDescription = productCard.getAttribute('data-product-description');
@@ -1523,7 +1524,8 @@ Aguardo retorno! 😊`;
       </div>
       <div class="product-info">
         <h4>${data.nome}</h4>
-        <div class="product-price">R$ ${data.preco}</div>
+        <div class="product-price">R$ ${data.preco.toFixed(2).replace(".", ",")}</div>
+
         <button class="product-whatsapp" onclick="buyProduct(this)">
           <i class="fab fa-whatsapp"></i> Comprar via WhatsApp
         </button>
