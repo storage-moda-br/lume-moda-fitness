@@ -7,7 +7,9 @@
 <link rel="icon" type="image/x-icon" href="https://storage-moda-br.github.io/lume-moda-fitness/imgup/favicon.ico">
 
 <style>
-body {
+#login-page * { all: revert; }
+
+body{
     margin:0;
     background:#000;
     display:flex;
@@ -17,7 +19,8 @@ body {
     font-family:Arial, sans-serif;
     color:white;
 }
-.card {
+
+#login-page .card{
     background:#222;
     width:90%;
     max-width:380px;
@@ -26,19 +29,20 @@ body {
     border-radius:16px;
     box-shadow:0 0 20px rgba(0,0,0,.6);
 }
-.logo {
+#login-page .logo{
     width:110px;
     margin-bottom:25px;
 }
-h2 {
+#login-page h2{
     margin:0;
     margin-bottom:25px;
 }
-.password-box {
+
+#login-page .password-box{
     position:relative;
     margin-top:15px;
 }
-input {
+#login-page input{
     width:100%;
     padding:14px;
     font-size:17px;
@@ -48,7 +52,7 @@ input {
     color:white;
     padding-right:45px;
 }
-.icone {
+#login-page .icone{
     position:absolute;
     right:15px;
     top:50%;
@@ -57,7 +61,7 @@ input {
     font-size:18px;
     color:#aaa;
 }
-button {
+#login-page button{
     width:100%;
     background:#000;
     color:white;
@@ -69,13 +73,14 @@ button {
     margin-top:25px;
     cursor:pointer;
 }
-button:active {
+#login-page button:active{
     transform:scale(.97);
 }
 </style>
 
 </head>
 <body>
+<div id="login-page">
 
 <div class="card">
     <img src="https://i.imgur.com/dYmnA0X.png" class="logo">
@@ -87,6 +92,8 @@ button:active {
     </div>
 
     <button onclick="login()">Entrar</button>
+</div>
+
 </div>
 
 <script>
