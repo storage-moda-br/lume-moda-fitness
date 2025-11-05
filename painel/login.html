@@ -3,12 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lume Moda Fitness - Login Painel</title>
+<title>Painel Administrativo</title>
 <link rel="icon" type="image/x-icon" href="https://storage-moda-br.github.io/lume-moda-fitness/imgup/favicon.ico">
-
 <style>
-#login-page * { all: revert; }
-
 body{
     margin:0;
     background:#000;
@@ -17,70 +14,57 @@ body{
     align-items:center;
     height:100vh;
     font-family:Arial, sans-serif;
-    color:white;
 }
-
-#login-page .card{
+.card{
     background:#222;
+    padding:35px 25px;
+    border-radius:16px;
     width:90%;
     max-width:380px;
-    padding:35px 25px;
     text-align:center;
-    border-radius:16px;
-    box-shadow:0 0 20px rgba(0,0,0,.6);
+    color:white;
 }
-#login-page .logo{
+.logo{
     width:110px;
-    margin-bottom:25px;
+    display:block;
+    margin:0 auto 25px auto;
 }
-#login-page h2{
-    margin:0;
-    margin-bottom:25px;
-}
-
-#login-page .password-box{
+h2{margin:0 0 25px 0;}
+.password-box{
     position:relative;
-    margin-top:15px;
 }
-#login-page input{
+input{
     width:100%;
     padding:14px;
-    font-size:17px;
     border:none;
     border-radius:10px;
     background:#333;
     color:white;
     padding-right:45px;
+    font-size:16px;
 }
-#login-page .icone{
+.icone{
     position:absolute;
     right:15px;
     top:50%;
     transform:translateY(-50%);
     cursor:pointer;
-    font-size:18px;
-    color:#aaa;
 }
-#login-page button{
+button{
     width:100%;
+    padding:14px;
     background:#000;
+    border:none;
+    border-radius:10px;
     color:white;
     font-weight:bold;
-    border:none;
-    padding:15px;
-    font-size:18px;
-    border-radius:10px;
     margin-top:25px;
+    font-size:18px;
     cursor:pointer;
 }
-#login-page button:active{
-    transform:scale(.97);
-}
 </style>
-
 </head>
 <body>
-<div id="login-page">
 
 <div class="card">
     <img src="https://i.imgur.com/dYmnA0X.png" class="logo">
@@ -94,23 +78,19 @@ body{
     <button onclick="login()">Entrar</button>
 </div>
 
-</div>
-
 <script>
 const SENHA_FIXA = "marta26";
-
 function login(){
-    const s = document.getElementById("senha").value.trim();
-    if(s === SENHA_FIXA){
-        window.location.href = "./painel.html";
-    } else {
-        alert("Senha incorreta");
-    }
+  const s=document.getElementById("senha").value.trim();
+  if(s===SENHA_FIXA){
+    window.location.href="./painel.html";
+  }else{
+    alert("Senha incorreta");
+  }
 }
-
 function toggleSenha(){
-    const campo = document.getElementById("senha");
-    campo.type = campo.type === "password" ? "text" : "password";
+  const campo=document.getElementById("senha");
+  campo.type=campo.type==="password"?"text":"password";
 }
 </script>
 
