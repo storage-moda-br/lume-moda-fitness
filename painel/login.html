@@ -5,65 +5,75 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Lume Moda Fitness - Login Painel</title>
 <link rel="icon" type="image/x-icon" href="https://storage-moda-br.github.io/lume-moda-fitness/imgup/favicon.ico">
+
 <style>
-body{
-    background:#111;
-    font-family:Arial, sans-serif;
+body {
+    margin:0;
+    background:#000;
     display:flex;
     justify-content:center;
     align-items:center;
     height:100vh;
-    margin:0;
+    font-family:Arial, sans-serif;
     color:white;
 }
-.card{
+.card {
     background:#222;
-    padding:35px 25px;
-    border-radius:12px;
     width:90%;
     max-width:380px;
+    padding:35px 25px;
     text-align:center;
-    box-shadow:0 0 20px rgba(0,0,0,.5);
+    border-radius:16px;
+    box-shadow:0 0 20px rgba(0,0,0,.6);
 }
-.logo{
-    width:130px;
-    margin-bottom:15px;
+.logo {
+    width:110px;
+    margin-bottom:25px;
 }
-input{
+h2 {
+    margin:0;
+    margin-bottom:25px;
+}
+.password-box {
+    position:relative;
+    margin-top:15px;
+}
+input {
     width:100%;
     padding:14px;
-    border:none;
-    border-radius:8px;
-    margin-top:15px;
     font-size:17px;
+    border:none;
+    border-radius:10px;
     background:#333;
     color:white;
+    padding-right:45px;
 }
-button{
-    width:100%;
-    background:#000;
-    border:none;
-    padding:14px;
-    border-radius:8px;
-    color:white;
-    font-weight:bold;
-    font-size:18px;
-    margin-top:25px;
-    cursor:pointer;
-}
-.password-box{
-    position:relative;
-}
-.icone{
+.icone {
     position:absolute;
-    right:12px;
+    right:15px;
     top:50%;
     transform:translateY(-50%);
     cursor:pointer;
     font-size:18px;
     color:#aaa;
 }
+button {
+    width:100%;
+    background:#000;
+    color:white;
+    font-weight:bold;
+    border:none;
+    padding:15px;
+    font-size:18px;
+    border-radius:10px;
+    margin-top:25px;
+    cursor:pointer;
+}
+button:active {
+    transform:scale(.97);
+}
 </style>
+
 </head>
 <body>
 
