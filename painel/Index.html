@@ -1218,25 +1218,31 @@
             const productDescription = productCard.getAttribute('data-product-description');
             const productImage = productCard.getAttribute('data-product-image');
             
-            const message = `🛒 *PEDIDO LUME MODA FITNESS*
+            const message = `
+*PEDIDO LUME MODA FITNESS*
 
-📦 *Produto:* ${productName}
-💰 *Preço:* R$ ${productPrice}
+*Produto:* ${productName}
+*Preço:* R$ ${parseFloat(productPrice).toFixed(2).replace(".", ",")}
 
-📋 *Descrição:*
+*Descrição:*
 ${productDescription}
 
-🖼️ *Foto do produto:*
+*Foto do produto:*
 ${productImage}
 
----
-Olá! Tenho interesse neste produto. Poderia me enviar mais informações sobre:
-- Tamanhos disponíveis
-- Cores disponíveis  
-- Formas de pagamento
-- Prazo de entrega
+---------------------------
+Olá! Tenho interesse neste produto.
 
-Aguardo retorno! 😊`;
+Poderia me enviar mais informações sobre:
+
+• Tamanhos disponíveis
+• Cores disponíveis
+• Formas de pagamento
+• Prazo de entrega
+
+Aguardo retorno! 🙂
+`;
+
             
             const whatsappUrl = `https://wa.me/5586995332408?text=${encodeURIComponent(message)}`;
             window.open(whatsappUrl, '_blank');
@@ -1261,7 +1267,8 @@ Aguardo retorno! 😊`;
             modalImage.alt = productDescription;
             modalTitle.textContent = productName;
             modalDescription.textContent = productDescription;
-            modalPrice.textContent = `R$ ${productPrice}`;
+            modalPrice.textContent = `R$ ${parseFloat(productPrice).toFixed(2).replace(".", ",")}`;
+
             
             // Store product data in modal for WhatsApp button
             const modalWhatsapp = document.getElementById('modal-whatsapp');
