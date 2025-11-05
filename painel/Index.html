@@ -1243,6 +1243,7 @@ Poderia me enviar mais informações sobre:
 Aguardo retorno! 🙂
 `;
 
+
             
             const whatsappUrl = `https://wa.me/5586995332408?text=${encodeURIComponent(message)}`;
             window.open(whatsappUrl, '_blank');
@@ -1294,25 +1295,31 @@ Aguardo retorno! 🙂
             const productDescription = modalWhatsapp.getAttribute('data-product-description');
             const productImage = modalWhatsapp.getAttribute('data-product-image');
             
-            const message = `🛒 *PEDIDO LUME MODA FITNESS*
+            const message = `
+*PEDIDO LUME MODA FITNESS*
 
-📦 *Produto:* ${productName}
-💰 *Preço:* R$ ${productPrice}
+*Produto:* ${productName}
+*Preço:* R$ ${parseFloat(productPrice).toFixed(2).replace(".", ",")}
 
-📋 *Descrição:*
+*Descrição:*
 ${productDescription}
 
-🖼️ *Foto do produto:*
+*Foto do produto:*
 ${productImage}
 
----
-Olá! Tenho interesse neste produto. Poderia me enviar mais informações sobre:
-- Tamanhos disponíveis
-- Cores disponíveis  
-- Formas de pagamento
-- Prazo de entrega
+---------------------------
+Olá! Tenho interesse neste produto.
 
-Aguardo retorno! 😊`;
+Poderia me enviar mais informações sobre:
+
+• Tamanhos disponíveis
+• Cores disponíveis
+• Formas de pagamento
+• Prazo de entrega
+
+Aguardo retorno! 🙂
+`;
+
             
             const whatsappUrl = `https://wa.me/5586995332408?text=${encodeURIComponent(message)}`;
             window.open(whatsappUrl, '_blank');
@@ -1514,13 +1521,13 @@ Aguardo retorno! 😊`;
   console.log("FIREBASE OK", db);
 
   async function carregarProduto01(){
-    console.log("Buscando produto01 no Firestore...");
-    const ref = doc(db, "produtos", "produto01");
-    const snap = await getDoc(ref);
-    console.log("snapshot:", snap.exists(), snap.data());
-    if(!snap.exists()) return;
-    const data = snap.data();
-    document.getElementById("produto01_card").innerHTML = `
+  console.log("Buscando produto01 no Firestore...");
+  const ref = doc(db, "produtos", "produto01");
+  const snap = await getDoc(ref);
+  console.log("snapshot:", snap.exists(), snap.data());
+  if(!snap.exists()) return;
+  const data = snap.data();
+  document.getElementById("produto01_card").innerHTML = `
   <div class="product-image"
        data-product-name="${data.nome}"
        data-product-price="${data.preco}"
@@ -1538,8 +1545,8 @@ Aguardo retorno! 😊`;
     </button>
   </div>
 `;
+}
 
-  }
 
   carregarProduto01();
 </script>
