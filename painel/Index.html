@@ -1244,7 +1244,7 @@ Aguardo retorno! 😊`;
 
         // Modal Functions
         function openModal(element) {
-            const productCard = element.parentElement;
+            const productCard = element; // ← só isso muda
 
             const productName = productCard.getAttribute('data-product-name');
             const productPrice = productCard.getAttribute('data-product-price');
@@ -1514,22 +1514,24 @@ Aguardo retorno! 😊`;
     if(!snap.exists()) return;
     const data = snap.data();
     document.getElementById("produto01_card").innerHTML = `
-      <div class="product-image" 
-           onclick="openModal(this)" 
-           data-product-name="${data.nome}" 
-           data-product-price="${data.preco}" 
-           data-product-description="${data.descricao}" 
-           data-product-image="${data.imagem}">
-        <img src="${data.imagem}" alt="${data.descricao}">
-      </div>
-      <div class="product-info">
-        <h4>${data.nome}</h4>
-        <div class="product-price">R$ ${data.preco.toFixed(2).replace(".", ",")}</div>
+  <div class="product-image"
+       data-product-name="${data.nome}"
+       data-product-price="${data.preco}"
+       data-product-description="${data.descricao}"
+       data-product-image="${data.imagem}">
+    <img src="${data.imagem}" alt="${data.descricao}" onclick="openModal(this.parentElement)">
+  </div>
 
-        <button class="product-whatsapp" onclick="buyProduct(this)">
-          <i class="fab fa-whatsapp"></i> Comprar via WhatsApp
-        </button>
-      </div>`;
+  <div class="product-info">
+    <h4>${data.nome}</h4>
+    <div class="product-price">R$ ${data.preco.toFixed(2).replace(".", ",")}</div>
+
+    <button class="product-whatsapp" onclick="buyProduct(this.parentElement.parentElement.querySelector('.product-image'))">
+      <i class="fab fa-whatsapp"></i> Comprar via WhatsApp
+    </button>
+  </div>
+`;
+
   }
 
   carregarProduto01();
