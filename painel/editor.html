@@ -30,15 +30,41 @@
   .err{color:var(--err);font-weight:600}
   .progress{height:8px;background:#eee;border-radius:999px;overflow:hidden}
   .progress > div{height:100%;width:0%;background:#000;transition:width .2s ease}
+
+  /* Mobile */
   @media (max-width: 820px){
     .wrap{padding:10px}
     .form{grid-template-columns:1fr}
     .btn{width:100%;padding:14px}
     input[type="text"], textarea{font-size:16px} /* evita zoom no iOS */
   }
+
+  /* Toast estilo iPhone (topo) */
+  .toast{
+    position: fixed;
+    top: -60px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #2ecc71;
+    color: #fff;
+    padding: 12px 22px;
+    font-size: 15px;
+    border-radius: 50px;
+    box-shadow: 0 3px 10px rgba(0,0,0,.25);
+    z-index: 9999;
+    opacity: 0;
+    transition: all .5s ease;
+  }
+  .toast.show{
+    top: 20px;
+    opacity: 1;
+  }
 </style>
 </head>
 <body>
+<!-- Toast topo -->
+<div id="toast" class="toast">Produto salvo com sucesso!</div>
+
 <header>
   <a href="painel.html">← Voltar</a>
   <strong id="titulo">Editar produto</strong>
@@ -119,7 +145,7 @@ const elProg = document.getElementById('progText');
 
 let currentImageUrl = "";
 
-// carregar dados atuais
+/* Carrega dados atuais */
 (async () => {
   try{
     const refDoc = doc(db, 'produtos', pid);
@@ -140,7 +166,7 @@ let currentImageUrl = "";
   }
 })();
 
-// preview quando escolher arquivo
+/* Preview local da imagem */
 elFile.addEventListener('change', () => {
   const f = elFile.files?.[0];
   if (f){
@@ -150,7 +176,7 @@ elFile.addEventListener('change', () => {
   }
 });
 
-// util: normaliza "89,90" → 89.9 (number)
+/* Normaliza "89,90" → 89.9 (number) */
 function normalizePrecoToNumber(v){
   if (!v) return 0;
   const cleaned = v.replace(/\s/g,'').replace(/\./g,'').replace(',', '.');
@@ -158,7 +184,18 @@ function normalizePrecoToNumber(v){
   return Number.isFinite(n) ? n : 0;
 }
 
-// salvar
+/* Toast + redirecionamento */
+function showToast(){
+  const t = document.getElementById("toast");
+  t.classList.add("show");
+  // visível 1.4s, some 0.4s, redireciona
+  setTimeout(()=>{
+    t.classList.remove("show");
+    setTimeout(()=>{ window.location.href = "painel.html"; }, 400);
+  }, 1400);
+}
+
+/* Salvar */
 elSalvar.addEventListener('click', async () => {
   try{
     elSalvar.disabled = true;
@@ -204,22 +241,20 @@ elSalvar.addEventListener('click', async () => {
     await setDoc(doc(db,'produtos', pid), payload, { merge: true });
 
     currentImageUrl = imageURL;
-    elStatus.innerHTML = '<span class="ok">Salvo com sucesso!</span>';
-
-    // opcional: volta ao painel após salvar
-    // setTimeout(()=>location.href='painel.html', 600);
+    elStatus.textContent = ''; // limpa status
+    showToast(); // ✅ toast + voltar pro painel
 
   }catch(err){
     console.error(err);
     elStatus.innerHTML = '<span class="err">Erro ao salvar. Veja o console.</span>';
+    elBar.style.width = '0%';
   }finally{
     elSalvar.disabled = false;
-    // oculta texto de progresso após um tempo
     setTimeout(()=>{ elProg.textContent = ''; }, 1200);
   }
 });
 
-// copiar link atual da imagem
+/* Copiar link atual da imagem */
 elCopiar.addEventListener('click', async ()=>{
   if (!currentImageUrl){ elStatus.textContent = 'Sem imagem ainda.'; return; }
   await navigator.clipboard.writeText(currentImageUrl);
