@@ -158,6 +158,9 @@
   const prevDesc = document.getElementById('prevDesc');
   const prevPreco = document.getElementById('prevPreco');
   const toast = document.getElementById('toast');
+  
+  let isUploading = false;
+
 
   document.getElementById('btnEscolherFoto').addEventListener('click', ()=>foto.click());
 
@@ -178,23 +181,68 @@
     } else prevPreco.textContent="R$ 0,00";
   });
 
-  async function salvarProduto(){
-    if(!foto.files[0]){alert("Selecione a foto!");return;}
+  let isUploading = false; // coloque isso fora da função, lá em cima junto com as consts
 
-    let p = preco.value.trim().replace(",",".");
-    if(isNaN(p)||p==""){alert("Preço inválido.");return;}
+async function salvarProduto(){
 
-    const ref = storage.ref("produtos/"+Date.now()+"-"+foto.files[0].name);
-    await ref.put(foto.files[0]);
-    const imageURL = await ref.getDownloadURL();
+  if(isUploading) return;
+  isUploading = true;
 
-    await db.collection("produtos").add({
-      nome:nome.value,
-      descricao:desc.value,
-      preco:Number(p),
-      imagem:imageURL,
-      data:firebase.firestore.FieldValue.serverTimestamp()
-    });
+  const btn = document.getElementById('salvar');
+  btn.disabled = true;
+  btn.style.opacity = .6;
+  btn.textContent = "Salvando...";
+
+  if(!foto.files[0]){
+    alert("Selecione a foto!");
+    isUploading = false;
+    btn.disabled = false;
+    btn.style.opacity = 1;
+    btn.textContent = "Salvar Produto";
+    return;
+  }
+
+  let p = preco.value.trim().replace(",",".");
+
+  if(isNaN(p)||p==""){
+    alert("Preço inválido.");
+    isUploading = false;
+    btn.disabled = false;
+    btn.style.opacity = 1;
+    btn.textContent = "Salvar Produto";
+    return;
+  }
+
+  const ref = storage.ref("produtos/"+Date.now()+"-"+foto.files[0].name);
+  await ref.put(foto.files[0]);
+  const imageURL = await ref.getDownloadURL();
+
+  await db.collection("produtos").add({
+    nome:nome.value,
+    descricao:desc.value,
+    preco:Number(p),
+    imagem:imageURL,
+    data:firebase.firestore.FieldValue.serverTimestamp()
+  });
+
+  // reset view
+  nome.value=""; desc.value=""; preco.value=""; foto.value="";
+  prevImg.innerHTML=`<span style="color:#999">Sem imagem</span>`;
+  prevNome.textContent="Nome do produto";
+  prevDesc.textContent="Descrição do produto…";
+  prevPreco.textContent="R$ 0,00";
+
+  // alert verde
+  toast.classList.add('show');
+  setTimeout(()=>toast.classList.remove('show'),2000);
+
+  // libera novamente
+  isUploading = false;
+  btn.disabled = false;
+  btn.style.opacity = 1;
+  btn.textContent = "Salvar Produto";
+}
+
 
     nome.value="";desc.value="";preco.value="";foto.value="";
     prevImg.innerHTML=`<span style="color:#999">Sem imagem</span>`;
