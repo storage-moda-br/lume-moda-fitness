@@ -6,6 +6,7 @@
 <title>LUME – Adicionar Produto</title>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
 <style>
   :root{--ink:#121212; --muted:#6b6b6b; --ok:#2ecc71}
   *{box-sizing:border-box}
@@ -24,10 +25,12 @@
   .top h2{margin:0; font-size:1.05rem}
   .body{padding:16px}
   label{display:block; font-weight:600; margin:8px 2px 6px}
+
   .input,.textarea{
     width:100%; border:1px solid #e8e8e8; border-radius:12px; padding:12px 12px; font-size:1rem; outline:none;
   }
   .textarea{min-height:120px; resize:vertical}
+
   .row{display:grid; grid-template-columns:1fr 160px; gap:10px}
   .btn{
     background:#121212; color:#fff; border:none; border-radius:14px; padding:12px 14px;
@@ -54,11 +57,9 @@
     opacity:0; transition:all .35s ease;
     z-index:9999;
   }
-  .toast.show{
-    top:25px; opacity:1;
-  }
-
+  .toast.show{top:25px; opacity:1;}
   .back{display:inline-flex; align-items:center; gap:8px; margin-bottom:10px; text-decoration:none; color:#121212}
+  .gapFoto{height:10px;} /* espaço extra */
 </style>
 </head>
 <body>
@@ -75,7 +76,13 @@
         <a class="back" href="./painel.html"><i class="fa-solid fa-arrow-left"></i> Voltar ao painel</a>
 
         <label>Foto do produto</label>
-        <input class="input" type="file" id="foto" accept="image/*">
+
+        <button class="btn" id="btnEscolherFoto">
+          <i class="fa-solid fa-camera"></i> Selecionar foto
+        </button>
+        <input type="file" id="foto" accept="image/*" style="display:none;">
+
+        <div class="gapFoto"></div>
 
         <label>Nome do produto</label>
         <input class="input" type="text" id="nome" placeholder="Ex.: Modelo verde em poliamida.">
@@ -132,6 +139,10 @@
   const prevPreco = document.getElementById('prevPreco');
   const toast = document.getElementById('toast');
 
+  document.getElementById('btnEscolherFoto').addEventListener('click', ()=>{
+    foto.click();
+  });
+
   foto.addEventListener('change', ()=>{
     if(foto.files && foto.files[0]){
       const url = URL.createObjectURL(foto.files[0]);
@@ -144,7 +155,7 @@
 
   preco.addEventListener('input', ()=>{
     let p = preco.value.trim();
-    p = p.replace(/,/g,'.'); // troca vírgula por ponto
+    p = p.replace(/,/g,'.');
     if(!isNaN(p) && p !== ""){
       p = parseFloat(p).toFixed(2).replace('.',',');
       prevPreco.textContent = `R$ ${p}`;
@@ -154,7 +165,6 @@
   });
 
   document.getElementById('salvar').addEventListener('click', ()=>{
-    // após salvar no firebase, vamos limpar:
     nome.value = "";
     desc.value = "";
     preco.value = "";
