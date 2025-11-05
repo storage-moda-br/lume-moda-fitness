@@ -1488,57 +1488,50 @@ Aguardo retorno! 😊`;
         window.addEventListener('scroll', debouncedScrollHandler);
     </script>
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBzzYviQCkPUeRSCMZ-sxJiQlKGgUFy8xk",
-  authDomain: "lume-moda-fitness.firebaseapp.com",
-  projectId: "lume-moda-fitness",
-  storageBucket: "lume-moda-fitness.appspot.com",
-  messagingSenderId: "485446426887",
-  appId: "1:485446426887:web:93ba7f4b9d4f199af7e5a2"
-};
+  const firebaseConfig = {
+    apiKey: "AIzaSyBzzYviQCkPUeRSCMZ-sxJiQlKGgUFy8xk",
+    authDomain: "lume-moda-fitness.firebaseapp.com",
+    projectId: "lume-moda-fitness",
+    storageBucket: "lume-moda-fitness.appspot.com",
+    messagingSenderId: "485446426887",
+    appId: "1:485446426887:web:93ba7f4b9d4f199af7e5a2"
+  };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
 
-console.log("FIREBASE OK", db);
+  console.log("FIREBASE OK", db);
 
-async function carregarProduto01(){
-  console.log("Buscando produto01 no Firestore...");
-  
-  const ref = doc(db, "produtos", "produto01");
-  const snap = await getDoc(ref);
+  async function carregarProduto01(){
+    console.log("Buscando produto01 no Firestore...");
+    const ref = doc(db, "produtos", "produto01");
+    const snap = await getDoc(ref);
+    console.log("snapshot:", snap.exists(), snap.data());
+    if(!snap.exists()) return;
+    const data = snap.data();
+    document.getElementById("produto01_card").innerHTML = `
+      <div class="product-image" 
+           onclick="openModal(this)" 
+           data-product-name="${data.nome}" 
+           data-product-price="${data.preco}" 
+           data-product-description="${data.descricao}" 
+           data-product-image="${data.imagem}">
+        <img src="${data.imagem}" alt="${data.descricao}">
+      </div>
+      <div class="product-info">
+        <h4>${data.nome}</h4>
+        <div class="product-price">R$ ${data.preco}</div>
+        <button class="product-whatsapp" onclick="buyProduct(this)">
+          <i class="fab fa-whatsapp"></i> Comprar via WhatsApp
+        </button>
+      </div>`;
+  }
 
-  console.log("Resultado snap.exists():", snap.exists());
-  console.log("Resultado snap.data():", snap.data());
-
-  if(!snap.exists()) return;
-
-  const data = snap.data();
-
-  document.getElementById("produto01_card").innerHTML = `
-    <div class="product-image" 
-         onclick="openModal(this)" 
-         data-product-name="${data.nome}" 
-         data-product-price="${data.preco}" 
-         data-product-description="${data.descricao}" 
-         data-product-image="${data.imagem}">
-      <img src="${data.imagem}" alt="${data.descricao}">
-    </div>
-    <div class="product-info">
-      <h4>${data.nome}</h4>
-      <div class="product-price">R$ ${data.preco}</div>
-      <button class="product-whatsapp" onclick="buyProduct(this)">
-        <i class="fab fa-whatsapp"></i> Comprar via WhatsApp
-      </button>
-    </div>
-  `;
-}
-
-carregarProduto01();
-
+  carregarProduto01();
 </script>
+
 </body>
 </html>
