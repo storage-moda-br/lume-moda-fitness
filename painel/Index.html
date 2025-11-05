@@ -1501,7 +1501,7 @@ Aguardo retorno! 😊`;
   };
 
   const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+  const db = getFirestore(app, "firestore");
 
   console.log("FIREBASE OK", db);
 
