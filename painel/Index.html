@@ -916,95 +916,63 @@
         </div>
     </div>
 
-    <!-- Categories Section -->
-    <div class="container">
-        <section class="categories" id="categorias">
-            <h2 class="section-title">Nossas Categorias</h2>
-            <div class="category-grid">
-                <div class="category-card">
-                    <div class="category-icon">
-                        <i class="fas fa-dumbbell"></i>
-                    </div>
-                    <h3>Moda Fitness</h3>
-                    <p>Roupas confortáveis e elegantes para seus treinos</p>
-                    <a href="https://wa.me/5586995332408?text=Gostaria de ver os produtos de Moda Fitness" class="btn-primary">
-                        <i class="fab fa-whatsapp"></i> Ver no WhatsApp
-                    </a>
-                </div>
-                <div class="category-card">
-                    <div class="category-icon">
-                        <i class="fas fa-volleyball-ball"></i>
-                    </div>
-                    <h3>Beach Tennis</h3>
-                    <p>Coleção especial para suas partidas na praia</p>
-                    <a href="https://wa.me/5586995332408?text=Interesse nos produtos de Beach Tennis" class="btn-primary">
-                        <i class="fab fa-whatsapp"></i> Ver no WhatsApp
-                    </a>
-                </div>
-                <div class="category-card">
-                    <div class="category-icon">
-                        <i class="fas fa-gem"></i>
-                    </div>
-                    <h3>Acessórios</h3>
-                    <p>Complete seu visual com nossos acessórios únicos</p>
-                    <a href="https://wa.me/5586995332408?text=Quero conhecer os acessórios disponíveis" class="btn-primary">
-                        <i class="fab fa-whatsapp"></i> Ver no WhatsApp
-                    </a>
-                </div>
-            </div>
-        </section>
-    </div>
-
-    <!-- Products Section -->
-    <!-- Products Section -->
+   <!-- Products Section -->
 <div class="container">
     <section class="products" id="produtos">
         <h2 class="section-title">Produtos em Destaque</h2>
 
         <div class="product-grid">
-            <!-- produto01 virá do firebase aqui -->
+            
+            <!-- produto 01 do firebase -->
             <div class="product-card" id="produto01_card"></div>
-        </div>
 
+            <!-- produto 02 fixo -->
+            <div class="product-card" data-product-name="Calça preta,Modelo em poliamida." data-product-price="95,00" data-product-description="Calça R$ 95,00 | Top Lume R$ 45,00 |  Veste do 38 ao 42/44" data-product-image="https://i.imgur.com/HxkkCAX.jpeg">
+                <div class="product-image" onclick="openModal(this)">
+                    <img src="https://i.imgur.com/HxkkCAX.jpeg" alt="Calça preta,Modelo em poliamida ." />
+                </div>
+                <div class="product-info">
+                    <h4>Calça preta,Modelo em poliamida.</h4>
+                    <div class="product-price">R$95,00</div>
+                    <button class="product-whatsapp" onclick="buyProduct(this)">
+                        <i class="fab fa-whatsapp"></i> Comprar via WhatsApp
+                    </button>
+                </div>
+            </div>
+
+            <!-- produto 03 fixo -->
+            <div class="product-card" data-product-name="Calça azul,Modelo em poliamida." data-product-price="95,00" data-product-description="Calça R$ 95,00  Top Hiit R$ 110,00" data-product-image="https://i.imgur.com/nbba2hd.jpeg">
+                <div class="product-image" onclick="openModal(this)">
+                    <img src="https://i.imgur.com/nbba2hd.jpeg" alt="Calça R$ 95,00 /n Top Hiit R$ 110,00" />
+                </div>
+                <div class="product-info">
+                    <h4>Calça azul,Modelo em poliamida.</h4>
+                    <div class="product-price">R$ 95,00</div>
+                    <button class="product-whatsapp" onclick="buyProduct(this)">
+                        <i class="fab fa-whatsapp"></i> Comprar via WhatsApp
+                    </button>
+                </div>
+            </div>
+
+            <!-- produto 04 fixo -->
+            <div class="product-card" data-product-name="Modelo marron em poliamida." data-product-price="95,00" data-product-description="Calça R$ 95,00 | Top 45,00 | Veste do 38 ao 42/44" data-product-image="https://i.imgur.com/6QSU4nq.jpeg">
+                <div class="product-image" onclick="openModal(this)">
+                    <img src="https://i.imgur.com/6QSU4nq.jpeg" alt="Modelo marron em poliamida. Calça R$ 95,00 | Top 45,00 | Veste do 38 ao 42/44" />
+                </div>
+                <div class="product-info">
+                    <h4>Modelo marron em poliamida.</h4>
+                    <div class="product-price">R$ 95,00</div>
+                    <button class="product-whatsapp" onclick="buyProduct(this)">
+                        <i class="fab fa-whatsapp"></i> Comprar via WhatsApp
+                    </button>
+                </div>
+            </div>
+
+        </div> <!-- Fim da product-grid -->
+        
     </section>
 </div>
 
-                <div class="product-card" data-product-name="Calça preta,Modelo em poliamida." data-product-price="95,00" data-product-description="Calça R$ 95,00 | Top Lume R$ 45,00 |  Veste do 38 ao 42/44" data-product-image="https://i.imgur.com/HxkkCAX.jpeg">
-                    <div class="product-image" onclick="openModal(this)">
-                        <img src="https://i.imgur.com/HxkkCAX.jpeg" alt="Calça preta,Modelo em poliamida ." />
-                    </div>
-                    <div class="product-info">
-                        <h4>Calça preta,Modelo em poliamida.</h4>
-                        <div class="product-price">R$95,00</div>
-                        <button class="product-whatsapp" onclick="buyProduct(this)">
-                            <i class="fab fa-whatsapp"></i> Comprar via WhatsApp
-                        </button>
-                    </div>
-                </div>
-                <div class="product-card" data-product-name="Calça azul,Modelo em poliamida." data-product-price="95,00" data-product-description="Calça R$ 95,00  Top Hiit R$ 110,00" data-product-image="https://i.imgur.com/nbba2hd.jpeg">
-                    <div class="product-image" onclick="openModal(this)">
-                        <img src="https://i.imgur.com/nbba2hd.jpeg" alt="Calça R$ 95,00 /n Top Hiit R$ 110,00" />
-                    </div>
-                    <div class="product-info">
-                        <h4>Calça azul,Modelo em poliamida.</h4>
-                        <div class="product-price">R$ 95,00</div>
-                        <button class="product-whatsapp" onclick="buyProduct(this)">
-                            <i class="fab fa-whatsapp"></i> Comprar via WhatsApp
-                        </button>
-                    </div>
-                </div>
-                <div class="product-card" data-product-name="Modelo marron em poliamida." data-product-price="95,00" data-product-description="Calça R$ 95,00 | Top 45,00 | Veste do 38 ao 42/44" data-product-image="https://i.imgur.com/6QSU4nq.jpeg">
-                    <div class="product-image" onclick="openModal(this)">
-                        <img src="https://i.imgur.com/6QSU4nq.jpeg" alt="Modelo marron em poliamida. Calça R$ 95,00 | Top 45,00 | Veste do 38 ao 42/44" />
-                    </div>
-                    <div class="product-info">
-                        <h4>Modelo marron em poliamida.</h4>
-                        <div class="product-price">R$ 95,00</div>
-                        <button class="product-whatsapp" onclick="buyProduct(this)">
-                            <i class="fab fa-whatsapp"></i> Comprar via WhatsApp
-                        </button>
-                    </div>
-                </div>
                 <div class="product-card" data-product-name="Modelo verde em poliamida." data-product-price="95,00" data-product-description="Calça R$ 95,00 | Top Hiit R$ 110,00| Veste do 38 ao 42/44" data-product-image="https://i.imgur.com/gBYl4ri.jpeg">
                     <div class="product-image" onclick="openModal(this)">
                         <img src="https://i.imgur.com/gBYl4ri.jpeg" alt="Modelo verde em poliamida.| Veste do 38 ao 42/44" />
