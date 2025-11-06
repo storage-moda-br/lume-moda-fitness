@@ -119,7 +119,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyBzzYviQCkPUeRSCMZ-sxJiQlKGgUFy8xk",
   authDomain: "lume-moda-fitness.firebaseapp.com",
   projectId: "lume-moda-fitness",
-  storageBucket: "lume-moda-fitness.appspot.com",
+  storageBucket: "lume-moda-fitness.firebasestorage.app",
   messagingSenderId: "485446426887",
   appId: "1:485446426887:web:93ba7f4b9d4f199af7e5a2"
 };
@@ -220,7 +220,8 @@ elSalvar.addEventListener('click', async () => {
       const storagePath = `produtos/${pid}-${Date.now()}.${ext}`;
       const storageRef = ref(st, storagePath);
 	  console.log("enviando para:", storagePath);
-      const task = uploadBytesResumable(storageRef, file);
+      const task = uploadBytesResumable(storageRef, file, { contentType: file.type });
+
 
       task.on('state_changed', (snap)=>{
         const pct = Math.round((snap.bytesTransferred / snap.totalBytes) * 100);
