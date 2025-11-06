@@ -1,0 +1,1537 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lume Moda Fitness - Estilo e Performance</title>
+	<link rel="icon" type="image/x-icon" href="https://storage-moda-br.github.io/lume-moda-fitness/imgup/favicon.ico">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #f8f8f8 0%, #e8e8e8 50%, #d8d8d8 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        /* Header */
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            position: relative;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo-img {
+            width: 100px;
+            height: 100px;
+            object-fit: contain;
+        }
+
+        .logo {
+            font-size: clamp(1.5rem, 4vw, 2rem);
+            font-weight: bold;
+            color: #000;
+            text-decoration: none;
+            background: linear-gradient(45deg, #000, #333);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            z-index: 1001;
+        }
+
+        nav {
+            display: flex;
+            transition: all 0.3s ease;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+            font-size: 1rem;
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(45deg, #000, #666);
+            transition: width 0.3s ease;
+        }
+
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        nav a:hover {
+            color: #000;
+        }
+
+        /* Mobile Menu */
+        .mobile-menu {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        .mobile-menu span {
+            width: 25px;
+            height: 3px;
+            background: #000;
+            margin: 3px 0;
+            transition: 0.3s;
+            border-radius: 2px;
+        }
+
+        .mobile-menu.active span:nth-child(1) {
+            transform: rotate(-45deg) translate(-5px, 6px);
+        }
+
+        .mobile-menu.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .mobile-menu.active span:nth-child(3) {
+            transform: rotate(45deg) translate(-5px, -6px);
+        }
+
+        .mobile-nav {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            border-radius: 0 0 15px 15px;
+        }
+
+        .mobile-nav ul {
+            flex-direction: column;
+            padding: 1rem 0;
+            gap: 0;
+        }
+
+        .mobile-nav li {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .mobile-nav a {
+            display: block;
+            padding: 1rem 1.5rem;
+            font-size: 1.1rem;
+        }
+
+        /* Banner Slider */
+        .banner-slider {
+            position: relative;
+            height: clamp(300px, 50vh, 500px);
+            overflow: hidden;
+            border-radius: 15px;
+            margin: 1rem 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .slide.active {
+            opacity: 1;
+        }
+
+        .slide1 {
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(51, 51, 51, 0.7));
+        }
+
+        .slide2 {
+            background: linear-gradient(rgba(51, 51, 51, 0.7), rgba(102, 102, 102, 0.7));
+        }
+
+        .slide3 {
+            background: linear-gradient(rgba(102, 102, 102, 0.7), rgba(0, 0, 0, 0.7));
+        }
+
+        .slide-content h2 {
+            font-size: clamp(1.8rem, 5vw, 3rem);
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            color: #fff;
+        }
+
+        .slide-content p {
+            font-size: clamp(1rem, 3vw, 1.2rem);
+            margin-bottom: 2rem;
+            max-width: 600px;
+            color: #f8f8f8;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #000, #333);
+            color: white;
+            padding: clamp(0.8rem, 2vw, 1rem) clamp(1.5rem, 4vw, 2rem);
+            border: none;
+            border-radius: 25px;
+            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+            background: linear-gradient(45deg, #333, #666);
+        }
+
+        /* Slider Navigation */
+        .slider-nav {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-dot.active {
+            background: #fff;
+            transform: scale(1.2);
+        }
+
+        /* Categories Section */
+        .categories {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: clamp(2rem, 5vw, 3rem) clamp(1rem, 3vw, 2rem);
+            margin: 2rem 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: clamp(2rem, 5vw, 2.5rem);
+            margin-bottom: clamp(2rem, 5vw, 3rem);
+            background: linear-gradient(45deg, #000, #333);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: clamp(1rem, 3vw, 2rem);
+        }
+
+        .category-card {
+            background: linear-gradient(135deg, #fff 0%, #f8f8f8 100%);
+            border-radius: 15px;
+            padding: clamp(1.5rem, 4vw, 2rem);
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            border-color: #666;
+        }
+
+        .category-icon {
+            font-size: clamp(2.5rem, 6vw, 3rem);
+            background: linear-gradient(45deg, #000, #333);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        .category-card h3 {
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
+            margin-bottom: 1rem;
+            color: #000;
+        }
+
+        .category-card p {
+            color: #666;
+            margin-bottom: 1.5rem;
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
+        }
+
+        /* Products Section */
+        .products {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: clamp(2rem, 5vw, 3rem) clamp(1rem, 3vw, 2rem);
+            margin: 2rem 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: clamp(1rem, 3vw, 2rem);
+        }
+
+        .product-card {
+            background: #fff;
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .product-image {
+            height: clamp(250px, 40vw, 300px);
+            background: linear-gradient(135deg, #f8f8f8, #e8e8e8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 1.2rem;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .product-info {
+            padding: clamp(1rem, 3vw, 1.5rem);
+        }
+
+        .product-info h4 {
+            font-size: clamp(1.1rem, 3vw, 1.3rem);
+            margin-bottom: 0.5rem;
+            color: #000;
+        }
+
+        .product-price {
+            font-size: clamp(1.2rem, 3.5vw, 1.5rem);
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .product-whatsapp {
+            background: linear-gradient(45deg, #000, #333);
+            color: white;
+            border: none;
+            padding: clamp(0.6rem, 2vw, 0.8rem) clamp(1rem, 3vw, 1.5rem);
+            border-radius: 25px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            font-size: clamp(0.8rem, 2.5vw, 1rem);
+        }
+
+        .product-whatsapp:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(45deg, #333, #666);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .modal-content {
+            background: #fff;
+            border-radius: 15px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.3s ease;
+        }
+
+        .modal-image {
+            width: 100%;
+            max-height: 500px;
+            object-fit: contain;
+            border-radius: 15px 15px 0 0;
+        }
+
+        .modal-info {
+            padding: clamp(1rem, 3vw, 1.5rem);
+            text-align: center;
+        }
+
+        .modal-info h3 {
+            font-size: clamp(1.4rem, 4vw, 1.8rem);
+            margin-bottom: 0.5rem;
+            color: #000;
+        }
+
+        .modal-info p {
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        .modal-info .product-price {
+            font-size: clamp(1.2rem, 3.5vw, 1.5rem);
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: linear-gradient(45deg, #000, #333);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .close-modal:hover {
+            background: linear-gradient(45deg, #333, #666);
+            transform: rotate(90deg);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Footer */
+        footer {
+            background: linear-gradient(135deg, #000, #333);
+            color: #fff;
+            text-align: center;
+            padding: clamp(2rem, 5vw, 3rem) clamp(1rem, 3vw, 2rem);
+            margin-top: 2rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: clamp(1.5rem, 4vw, 2rem);
+            margin-bottom: 2rem;
+            text-align: left;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 1rem;
+            color: #fff;
+            font-size: clamp(1.1rem, 3vw, 1.3rem);
+        }
+
+        .footer-section p, .footer-section a {
+            color: #ccc;
+            text-decoration: none;
+            margin-bottom: 0.5rem;
+            display: block;
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
+        }
+
+        .footer-section a:hover {
+            color: #fff;
+        }
+
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .social-icon {
+            width: clamp(35px, 8vw, 40px);
+            height: clamp(35px, 8vw, 40px);
+            background: linear-gradient(45deg, #333, #666);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: clamp(1rem, 3vw, 1.2rem);
+        }
+
+        .social-icon:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+            background: linear-gradient(45deg, #666, #999);
+        }
+
+        /* WhatsApp Float Button */
+        .whatsapp-float {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(45deg, #25D366, #1DA55B);
+            color: white;
+            width: clamp(50px, 12vw, 60px);
+            height: clamp(50px, 12vw, 60px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            animation: pulse 2s infinite;
+        }
+
+        .whatsapp-float:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.6);
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(37, 211, 102, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(37, 211, 102, 0);
+            }
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 1024px) {
+            .container {
+                padding: 0 20px;
+            }
+            
+            .category-grid {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            }
+            
+            .product-grid {
+                grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-wrap: wrap;
+                justify-content: space-between;
+            }
+
+            nav {
+                display: none;
+            }
+
+            .mobile-menu {
+                display: flex;
+            }
+
+            .mobile-nav.active {
+                display: block;
+            }
+
+            .banner-slider {
+                margin: 0.5rem 0 1rem 0;
+                border-radius: 10px;
+            }
+
+            .slide-content {
+                padding: 1rem;
+            }
+
+            .category-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .product-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 1.5rem;
+            }
+
+            .modal-content {
+                max-width: 90%;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 2rem;
+            }
+
+            .social-icons {
+                gap: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 15px;
+            }
+
+            .header-content {
+                padding: 0.8rem 0;
+            }
+
+            .logo {
+                font-size: 1.4rem;
+            }
+
+            .logo-img {
+                width: 70px;
+                height: 70px;
+            }
+
+            .banner-slider {
+                height: 280px;
+                margin: 0.5rem 0;
+            }
+
+            .slide-content h2 {
+                font-size: 1.6rem;
+            }
+
+            .slide-content p {
+                font-size: 0.95rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .btn-primary {
+                padding: 0.7rem 1.3rem;
+                font-size: 0.9rem;
+            }
+
+            .categories, .products {
+                padding: 1.5rem 1rem;
+                margin: 1.5rem 0;
+            }
+
+            .section-title {
+                font-size: 1.8rem;
+                margin-bottom: 2rem;
+            }
+
+            .category-card {
+                padding: 1.5rem;
+            }
+
+            .product-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 1rem;
+            }
+
+            .product-card {
+                border-radius: 10px;
+            }
+
+            .product-image {
+                height: 200px;
+            }
+
+            .product-info {
+                padding: 1rem;
+            }
+
+            .product-info h4 {
+                font-size: 1rem;
+            }
+
+            .product-price {
+                font-size: 1.1rem;
+            }
+
+            .product-whatsapp {
+                padding: 0.6rem 1rem;
+                font-size: 0.8rem;
+                border-radius: 20px;
+            }
+
+            .modal-content {
+                max-width: 95%;
+            }
+
+            .modal-image {
+                max-height: 350px;
+            }
+
+            .modal-info h3 {
+                font-size: 1.4rem;
+            }
+
+            .modal-info p {
+                font-size: 0.9rem;
+            }
+
+            .modal-info .product-price {
+                font-size: 1.1rem;
+            }
+
+            .whatsapp-float {
+                bottom: 15px;
+                right: 15px;
+                width: 50px;
+                height: 50px;
+                font-size: 1.2rem;
+            }
+
+            footer {
+                padding: 2rem 1rem;
+            }
+
+            .footer-content {
+                gap: 1.5rem;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .product-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .product-image {
+                height: 180px;
+            }
+
+            .slide-content h2 {
+                font-size: 1.4rem;
+            }
+
+            .slide-content p {
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Touch-friendly interactions */
+        @media (hover: none) and (pointer: coarse) {
+            .category-card:hover,
+            .product-card:hover {
+                transform: none;
+            }
+
+            .category-card:active,
+            .product-card:active {
+                transform: translateY(-3px);
+            }
+
+            .btn-primary:hover,
+            .product-whatsapp:hover {
+                transform: none;
+            }
+
+            .btn-primary:active,
+            .product-whatsapp:active {
+                transform: translateY(-1px);
+            }
+        }
+
+        /* Smooth scrolling for all devices */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Improved focus states for accessibility */
+        .btn-primary:focus,
+        .product-whatsapp:focus,
+        nav a:focus,
+        .close-modal:focus {
+            outline: 2px solid #000;
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo-container">
+                    <img src="https://i.imgur.com/dYmnA0X.png" alt="Lume Moda Fitness Logo" class="logo-img">
+                    <a href="#" class="logo">LUME MODA FITNESS</a>
+                </div>
+                <nav id="desktop-nav">
+                    <ul>
+                        <li><a href="#home">Início</a></li>
+                        <li><a href="#categorias">Categorias</a></li>
+                        <li><a href="#produtos">Produtos</a></li>
+                        <li><a href="#contato">Contato</a></li>
+                    </ul>
+                </nav>
+                <div class="mobile-menu" id="mobile-menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <nav class="mobile-nav" id="mobile-nav">
+                    <ul>
+                        <li><a href="#home">Início</a></li>
+                        <li><a href="#categorias">Categorias</a></li>
+                        <li><a href="#produtos">Produtos</a></li>
+                        <li><a href="#contato">Contato</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Banner Slider -->
+    <div class="container">
+        <div class="banner-slider" id="home">
+            <div class="slide active slide1">
+                <div class="slide-content">
+                    <h2>Moda Fitness de Qualidade</h2>
+                    <p>Descubra nossa coleção exclusiva de roupas fitness para todos os estilos</p>
+                    <a href="#produtos" class="btn-primary">Ver Produtos</a>
+                </div>
+            </div>
+            <div class="slide slide2">
+                <div class="slide-content">
+                    <h2>Beach Tennis Collection</h2>
+                    <p>Estilo e performance para suas partidas na areia</p>
+                    <a href="#produtos" class="btn-primary">Explorar</a>
+                </div>
+            </div>
+            <div class="slide slide3">
+                <div class="slide-content">
+                    <h2>Acessórios Fitness</h2>
+                    <p>Complete seu look com nossos acessórios exclusivos</p>
+                    <a href="#produtos" class="btn-primary">Comprar</a>
+                </div>
+            </div>
+            <div class="slider-nav">
+                <div class="nav-dot active" onclick="currentSlide(1)"></div>
+                <div class="nav-dot" onclick="currentSlide(2)"></div>
+                <div class="nav-dot" onclick="currentSlide(3)"></div>
+            </div>
+        </div>
+    </div>
+
+   <!-- Products Section -->
+<div class="container">
+    <section class="products" id="produtos">
+        <h2 class="section-title">Produtos em Destaque</h2>
+
+        <div class="product-grid">
+            
+            <!-- produto 01 do firebase -->
+            <div class="product-card" id="produto01_card"></div>
+
+            <!-- produto 02 fixo -->
+            <div class="product-card" data-product-name="Calça preta,Modelo em poliamida." data-product-price="95,00" data-product-description="Calça R$ 95,00 | Top Lume R$ 45,00 |  Veste do 38 ao 42/44" data-product-image="https://i.imgur.com/HxkkCAX.jpeg">
+                <div class="product-image" onclick="openModal(this)">
+                    <img src="https://i.imgur.com/HxkkCAX.jpeg" alt="Calça preta,Modelo em poliamida ." />
+                </div>
+                <div class="product-info">
+                    <h4>Calça preta,Modelo em poliamida.</h4>
+                    <div class="product-price">R$95,00</div>
+                    <button class="product-whatsapp" onclick="buyProduct(this)">
+                        <i class="fab fa-whatsapp"></i> Comprar via WhatsApp
+                    </button>
+                </div>
+            </div>
+
+            <!-- produto 03 fixo -->
+            <div class="product-card" data-product-name="Calça azul,Modelo em poliamida." data-product-price="95,00" data-product-description="Calça R$ 95,00  Top Hiit R$ 110,00" data-product-image="https://i.imgur.com/nbba2hd.jpeg">
+                <div class="product-image" onclick="openModal(this)">
+                    <img src="https://i.imgur.com/nbba2hd.jpeg" alt="Calça R$ 95,00 /n Top Hiit R$ 110,00" />
+                </div>
+                <div class="product-info">
+                    <h4>Calça azul,Modelo em poliamida.</h4>
+                    <div class="product-price">R$ 95,00</div>
+                    <button class="product-whatsapp" onclick="buyProduct(this)">
+                        <i class="fab fa-whatsapp"></i> Comprar via WhatsApp
+                    </button>
+                </div>
+            </div>
+
+            <!-- produto 04 fixo -->
+            <div class="product-card" data-product-name="Modelo marron em poliamida." data-product-price="95,00" data-product-description="Calça R$ 95,00 | Top 45,00 | Veste do 38 ao 42/44" data-product-image="https://i.imgur.com/6QSU4nq.jpeg">
+                <div class="product-image" onclick="openModal(this)">
+                    <img src="https://i.imgur.com/6QSU4nq.jpeg" alt="Modelo marron em poliamida. Calça R$ 95,00 | Top 45,00 | Veste do 38 ao 42/44" />
+                </div>
+                <div class="product-info">
+                    <h4>Modelo marron em poliamida.</h4>
+                    <div class="product-price">R$ 95,00</div>
+                    <button class="product-whatsapp" onclick="buyProduct(this)">
+                        <i class="fab fa-whatsapp"></i> Comprar via WhatsApp
+                    </button>
+                </div>
+            </div>
+
+        </div> <!-- Fim da product-grid -->
+        
+    </section>
+</div>
+
+                <div class="product-card" data-product-name="Modelo verde em poliamida." data-product-price="95,00" data-product-description="Calça R$ 95,00 | Top Hiit R$ 110,00| Veste do 38 ao 42/44" data-product-image="https://i.imgur.com/gBYl4ri.jpeg">
+                    <div class="product-image" onclick="openModal(this)">
+                        <img src="https://i.imgur.com/gBYl4ri.jpeg" alt="Modelo verde em poliamida.| Veste do 38 ao 42/44" />
+                    </div>
+                    <div class="product-info">
+                        <h4>Modelo verde em poliamida.</h4>
+                        <div class="product-price">R$ 95,00</div>
+                        <button class="product-whatsapp" onclick="buyProduct(this)">
+                            <i class="fab fa-whatsapp"></i> Comprar via WhatsApp
+                        </button>
+                    </div>
+                </div>
+                <div class="product-card" data-product-name="Short Fitness Preto Live Active" data-product-price="69,90" data-product-description="Short Fitness Preto Live Active" data-product-image="https://storage-moda-br.github.io/lume-moda-fitness/imgup/short.jfif">
+                    <div class="product-image" onclick="openModal(this)">
+                        <img src="https://storage-moda-br.github.io/lume-moda-fitness/imgup/short.jfif" alt="Short Fitness Preto Live Active" />
+                    </div>
+                    <div class="product-info">
+                        <h4>Short Fitness Preto Live Active</h4>
+                        <div class="product-price">R$ 69,90</div>
+                        <button class="product-whatsapp" onclick="buyProduct(this)">
+                            <i class="fab fa-whatsapp"></i> Comprar via WhatsApp
+                        </button>
+                    </div>
+                </div>
+                <div class="product-card" data-product-name="Top com detalhe vazado e bicolor." data-product-price="195,00" data-product-description="Calça com cós e destaque valorizando a cintura. TAM único (36 ao 42)" data-product-image="https://storage-moda-br.github.io/lume-moda-fitness/imgup/IMG_6856.jpg">
+                    <div class="product-image" onclick="openModal(this)">
+                        <img src="https://storage-moda-br.github.io/lume-moda-fitness/imgup/IMG_6856.jpg" alt="Top com detalhe vazado e bicolor. Calça com cós e destaque valorizando a cintura. TAM único (36 ao 42)" />
+                    </div>
+                    <div class="product-info">
+                        <h4>Top com detalhe vazado e bicolor</h4>
+                        <div class="product-price">R$ 195,00</div>
+                        <button class="product-whatsapp" onclick="buyProduct(this)">
+                            <i class="fab fa-whatsapp"></i> Comprar via WhatsApp
+                        </button>
+                    </div>
+                </div>
+                <div class="product-card" data-product-name="Alta sustentação, modelagem e zero transparência" data-product-price="195,00" data-product-description="Modelo disponível TAM P,M,G,GG" data-product-image="https://storage-moda-br.github.io/lume-moda-fitness/imgup/IMG_6954.jpg">
+                    <div class="product-image" onclick="openModal(this)">
+                        <img src="https://storage-moda-br.github.io/lume-moda-fitness/imgup/IMG_6954.jpg" alt="Shorts feminino fitness rosa com cintura alta e tecido anti-celulite" />
+                    </div>
+                    <div class="product-info">
+                        <h4>Alta sustentação, modelagem e zero transparência</h4>
+                        <div class="product-price">R$ 195,00</div>
+                        <button class="product-whatsapp" onclick="buyProduct(this)">
+                            <i class="fab fa-whatsapp"></i> Comprar via WhatsApp
+                        </button>
+                    </div>
+                </div>
+                <div class="product-card" data-product-name="Mais que perfeito para chamar de seu" data-product-price="220,00" data-product-description="TAM P M G" data-product-image="https://storage-moda-br.github.io/lume-moda-fitness/imgup/IMG_6916.jpg">
+                    <div class="product-image" onclick="openModal(this)">
+                        <img src="https://storage-moda-br.github.io/lume-moda-fitness/imgup/IMG_6916.jpg" alt="Mais que perfeito para chamar de seu" />
+                    </div>
+                    <div class="product-info">
+                        <h4>Mais que perfeito para chamar de seu</h4>
+                        <div class="product-price">R$ 220,00</div>
+                        <button class="product-whatsapp" onclick="buyProduct(this)">
+                            <i class="fab fa-whatsapp"></i> Comprar via WhatsApp
+                        </button>
+                    </div>
+                </div>
+                <div class="product-card" data-product-name="Macacão cinza Discreto, esconde imperfeições" data-product-price="220,00" data-product-description="Disponivel TAM P/M" data-product-image="https://storage-moda-br.github.io/lume-moda-fitness/imgup/IMG_6997.jpg">
+                    <div class="product-image" onclick="openModal(this)">
+                        <img src="https://storage-moda-br.github.io/lume-moda-fitness/imgup/IMG_6997.jpg" alt="Macacão cinza Discreto, esconde imperfeições,Disponivel TAM P/M" />
+                    </div>
+                    <div class="product-info">
+                        <h4>Macacão cinza Discreto, esconde imperfeições</h4>
+                        <div class="product-price">R$ 220,00</div>
+                        <button class="product-whatsapp" onclick="buyProduct(this)">
+                            <i class="fab fa-whatsapp"></i> Comprar via WhatsApp
+                        </button>
+                    </div>
+                </div>
+                <div class="product-card" data-product-name="Microcanelado azul com 3 formas de uso." data-product-price="195,00" data-product-description="TAM único 36/42 " data-product-image="https://storage-moda-br.github.io/lume-moda-fitness/imgup/IMG_7043.jpg">
+                    <div class="product-image" onclick="openModal(this)">
+                        <img src="https://storage-moda-br.github.io/lume-moda-fitness/imgup/IMG_7043.jpg" alt="Microcanelado com 3 formas de uso.TAM único 36/42" />
+                    </div>
+                    <div class="product-info">
+                        <h4>Microcanelado azul com 3 formas de uso.</h4>
+                        <div class="product-price">R$ 195,00</div>
+                        <button class="product-whatsapp" onclick="buyProduct(this)">
+                            <i class="fab fa-whatsapp"></i> Comprar via WhatsApp
+                        </button>
+                    </div>
+                </div>
+                <div class="product-card" data-product-name="Macaquinho verde com bojo" data-product-price="85,00" data-product-description="TAM único (38 ao 42)" data-product-image="https://i.imgur.com/hLskjYB.jpeg">
+                    <div class="product-image" onclick="openModal(this)">
+                        <img src="https://i.imgur.com/hLskjYB.jpeg" alt="Macaquinho com bojo verde.Compressão na medida certa e modelagem impecável." />
+                    </div>
+                    <div class="product-info">
+                        <h4>Macaquinho com bojo verde.</h4>
+                        <div class="product-price">R$ 85,00</div>
+                        <button class="product-whatsapp" onclick="buyProduct(this)">
+                            <i class="fab fa-whatsapp"></i> Comprar via WhatsApp
+                        </button>
+                    </div>
+                </div>
+                <div class="product-card" data-product-name="Conjunto Fitness Marrom Elegance" data-product-price="69,90" data-product-description="TAM Único do 36 ao 42. Modelagem e detalhes perfeitos." data-product-image="https://storage-moda-br.github.io/lume-moda-fitness/imgup/conjuntomarrom.jfif">
+                    <div class="product-image" onclick="openModal(this)">
+                        <img src="https://storage-moda-br.github.io/lume-moda-fitness/imgup/conjuntomarrom.jfif" alt="Conjunto Fitness Marrom Elegance.TAM Único do 36 ao 42." />
+                    </div>
+                    <div class="product-info">
+                        <h4>Conjunto Fitness Marrom Elegance</h4>
+                        <div class="product-price">R$ 69,90</div>
+                        <button class="product-whatsapp" onclick="buyProduct(this)">
+                            <i class="fab fa-whatsapp"></i> Comprar via WhatsApp
+                        </button>
+                    </div>
+                </div>
+                <div class="product-card" data-product-name="Conjunto Fitness Terracota" data-product-price="69,90" data-product-description="Conforto e estilo em cada treino!TAM único (36 ao 42)" data-product-image="https://storage-moda-br.github.io/lume-moda-fitness/imgup/conjuntomarronclaro.jfif">
+                    <div class="product-image" onclick="openModal(this)">
+                        <img src="https://storage-moda-br.github.io/lume-moda-fitness/imgup/conjuntomarronclaro.jfif" alt="onjunto Fitness Terracota.Conforto e estilo em cada treino!" />
+                    </div>
+                    <div class="product-info">
+                        <h4>Conjunto Fitness Terracota</h4>
+                        <div class="product-price">R$ 69,90</div>
+                        <button class="product-whatsapp" onclick="buyProduct(this)">
+                            <i class="fab fa-whatsapp"></i> Comprar via WhatsApp
+                        </button>
+                    </div>
+                </div>
+                <div class="product-card" data-product-name="Conjunto Beach Tennis Coral" data-product-price="79,90" data-product-description="Conjunto beach tennis feminino coral com top e shorts coordenados em tecido premium" data-product-image="https://i.imgur.com/5Ye0nTY.jpeg">
+                    <div class="product-image" onclick="openModal(this)">
+                        <img src="https://i.imgur.com/5Ye0nTY.jpeg" alt="Conjunto beach tennis feminino coral com top e shorts coordenados em tecido premium" />
+                    </div>
+                    <div class="product-info">
+                        <h4>Conjunto Beach Tennis Coral</h4>
+                        <div class="product-price">R$ 79,90</div>
+                        <button class="product-whatsapp" onclick="buyProduct(this)">
+                            <i class="fab fa-whatsapp"></i> Comprar via WhatsApp
+                        </button>
+                    </div>
+                </div>
+                <div class="product-card" data-product-name="Conjunto manga longa + short com bolso" data-product-price="79,90" data-product-description="TAM único (36 ao 42)" data-product-image="https://i.imgur.com/bi2ehca.jpeg">
+                    <div class="product-image" onclick="openModal(this)">
+                        <img src="https://i.imgur.com/bi2ehca.jpeg" alt="Faixa de cabelo fitness rosa com tecido absorvente e design esportivo moderno" />
+                    </div>
+                    <div class="product-info">
+                        <h4>Conjunto manga longa + short com bolso</h4>
+                        <div class="product-price">R$ 79,90</div>
+                        <button class="product-whatsapp" onclick="buyProduct(this)">
+                            <i class="fab fa-whatsapp"></i> Comprar via WhatsApp
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal" id="product-modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <img class="modal-image" id="modal-image" src="" alt="Produto">
+            <div class="modal-info">
+                <h3 id="modal-title"></h3>
+                <p id="modal-description"></p>
+                <div class="product-price" id="modal-price"></div>
+                <button class="product-whatsapp" id="modal-whatsapp" onclick="buyFromModal()">
+                    <i class="fab fa-whatsapp"></i> Comprar via WhatsApp
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer id="contato">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Lume Moda Fitness</h3>
+                    <p>Entregas em Teresina e Timon, envios para todo o Brasil.</p>
+                    <p>Qualidade, estilo e performance em cada peça.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Contato</h3>
+                    <p><i class="fas fa-phone"></i> (86) 99533-2408</p>
+                    <p><i class="fas fa-envelope"></i> fitnesslume@gmail.com</p>
+                    <p><i class="fas fa-map-marker-alt"></i> Teresina, PI</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Categorias</h3>
+                    <a href="#categorias">Moda Fitness</a>
+                    <a href="#categorias">Beach Tennis</a>
+                    <a href="#categorias">Acessórios</a>
+                    <a href="#produtos">Todos os Produtos</a>
+                </div>
+            </div>
+            <div class="social-icons">
+                <a href="#" class="social-icon" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="#" class="social-icon" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                <a href="https://wa.me/5586995332408" class="social-icon" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+            </div>
+            <p style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #333;">
+                © 2025 Lume Moda Fitness. Todos os direitos reservados.
+            </p>
+        </div>
+    </footer>
+
+    <!-- WhatsApp Float Button -->
+    <a href="https://wa.me/5586995332408?text=Olá! Gostaria de conhecer os produtos da Lume Moda Fitness" class="whatsapp-float" aria-label="Contato WhatsApp">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <script>
+        // Banner Slider
+        let slideIndex = 1;
+        const slides = document.querySelectorAll('.slide');
+        const dots = document.querySelectorAll('.nav-dot');
+
+        function showSlide(n) {
+            if (n > slides.length) { slideIndex = 1 }
+            if (n < 1) { slideIndex = slides.length }
+            
+            slides.forEach(slide => slide.classList.remove('active'));
+            dots.forEach(dot => dot.classList.remove('active'));
+            
+            if (slides[slideIndex - 1]) {
+                slides[slideIndex - 1].classList.add('active');
+            }
+            if (dots[slideIndex - 1]) {
+                dots[slideIndex - 1].classList.add('active');
+            }
+        }
+
+        function currentSlide(n) {
+            slideIndex = n;
+            showSlide(slideIndex);
+        }
+
+        function nextSlide() {
+            slideIndex++;
+            showSlide(slideIndex);
+        }
+
+        // Auto slide
+        setInterval(nextSlide, 5000);
+
+        // Enhanced Product WhatsApp Integration
+        function buyProduct(button) {
+            const productCard = button.closest('.product-card');
+            const productName = productCard.getAttribute('data-product-name');
+            const productPrice = productCard.getAttribute('data-product-price');
+            const productDescription = productCard.getAttribute('data-product-description');
+            const productImage = productCard.getAttribute('data-product-image');
+            
+            const message = `🛒 *PEDIDO LUME MODA FITNESS*
+
+📦 *Produto:* ${productName}
+💰 *Preço:* R$ ${productPrice}
+
+📋 *Descrição:*
+${productDescription}
+
+🖼️ *Foto do produto:*
+${productImage}
+
+---
+Olá! Tenho interesse neste produto. Poderia me enviar mais informações sobre:
+- Tamanhos disponíveis
+- Cores disponíveis  
+- Formas de pagamento
+- Prazo de entrega
+
+Aguardo retorno! 😊`;
+            
+            const whatsappUrl = `https://wa.me/5586995332408?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank');
+        }
+
+        // Modal Functions
+        function openModal(element) {
+            const productCard = element.closest('.product-card');
+            const productName = productCard.getAttribute('data-product-name');
+            const productPrice = productCard.getAttribute('data-product-price');
+            const productDescription = productCard.getAttribute('data-product-description');
+            const productImage = productCard.getAttribute('data-product-image');
+            
+            const modal = document.getElementById('product-modal');
+            const modalImage = document.getElementById('modal-image');
+            const modalTitle = document.getElementById('modal-title');
+            const modalDescription = document.getElementById('modal-description');
+            const modalPrice = document.getElementById('modal-price');
+            
+            modalImage.src = productImage;
+            modalImage.alt = productDescription;
+            modalTitle.textContent = productName;
+            modalDescription.textContent = productDescription;
+            modalPrice.textContent = `R$ ${productPrice}`;
+            
+            // Store product data in modal for WhatsApp button
+            const modalWhatsapp = document.getElementById('modal-whatsapp');
+            modalWhatsapp.setAttribute('data-product-name', productName);
+            modalWhatsapp.setAttribute('data-product-price', productPrice);
+            modalWhatsapp.setAttribute('data-product-description', productDescription);
+            modalWhatsapp.setAttribute('data-product-image', productImage);
+            
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden'; // Prevent scrolling
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('product-modal');
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto'; // Restore scrolling
+        }
+
+        function buyFromModal() {
+            const modalWhatsapp = document.getElementById('modal-whatsapp');
+            const productName = modalWhatsapp.getAttribute('data-product-name');
+            const productPrice = modalWhatsapp.getAttribute('data-product-price');
+            const productDescription = modalWhatsapp.getAttribute('data-product-description');
+            const productImage = modalWhatsapp.getAttribute('data-product-image');
+            
+            const message = `🛒 *PEDIDO LUME MODA FITNESS*
+
+📦 *Produto:* ${productName}
+💰 *Preço:* R$ ${productPrice}
+
+📋 *Descrição:*
+${productDescription}
+
+🖼️ *Foto do produto:*
+${productImage}
+
+---
+Olá! Tenho interesse neste produto. Poderia me enviar mais informações sobre:
+- Tamanhos disponíveis
+- Cores disponíveis  
+- Formas de pagamento
+- Prazo de entrega
+
+Aguardo retorno! 😊`;
+            
+            const whatsappUrl = `https://wa.me/5586995332408?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank');
+            closeModal();
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('product-modal').addEventListener('click', function(event) {
+            if (event.target === this) {
+                closeModal();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        // Mobile Menu Toggle
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileNav = document.getElementById('mobile-nav');
+
+        mobileMenu.addEventListener('click', function() {
+            mobileMenu.classList.toggle('active');
+            mobileNav.classList.toggle('active');
+        });
+
+        // Close mobile menu when clicking on a link
+        const mobileNavLinks = mobileNav.querySelectorAll('a');
+        mobileNavLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                mobileMenu.classList.remove('active');
+                mobileNav.classList.remove('active');
+            });
+        });
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!mobileMenu.contains(event.target) && !mobileNav.contains(event.target)) {
+                mobileMenu.classList.remove('active');
+                mobileNav.classList.remove('active');
+            }
+        });
+
+        // Smooth Scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    const headerHeight = document.querySelector('header').offsetHeight;
+                    const targetPosition = target.offsetTop - headerHeight;
+                    
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Animation on Scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe elements for animation
+        document.querySelectorAll('.category-card, .product-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px)';
+            card.style.transition = 'all 0.6s ease';
+            observer.observe(card);
+        });
+
+        // Header background on scroll
+        window.addEventListener('scroll', function() {
+            const header = document.querySelector('header');
+            if (window.scrollY > 50) {
+                header.style.background = 'rgba(255, 255, 255, 0.98)';
+                header.style.backdropFilter = 'blur(15px)';
+            } else {
+                header.style.background = 'rgba(255, 255, 255, 0.95)';
+                header.style.backdropFilter = 'blur(10px)';
+            }
+        });
+
+        // Touch events for better mobile experience
+        let touchStartY = 0;
+        let touchEndY = 0;
+
+        document.addEventListener('touchstart', function(e) {
+            touchStartY = e.changedTouches[0].screenY;
+        });
+
+        document.addEventListener('touchend', function(e) {
+            touchEndY = e.changedTouches[0].screenY;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            const diff = touchStartY - touchEndY;
+            
+            if (Math.abs(diff) > swipeThreshold) {
+                // Optional: Add swipe gestures for slider
+                if (diff > 0) {
+                    // Swipe up
+                } else {
+                    // Swipe down
+                }
+            }
+        }
+
+        // Optimize images loading
+        function lazyLoadImages() {
+            const images = document.querySelectorAll('img');
+            const imageObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        if (img.dataset.src) {
+                            img.src = img.dataset.src;
+                            img.removeAttribute('data-src');
+                        }
+                        observer.unobserve(img);
+                    }
+                });
+            });
+
+            images.forEach(img => imageObserver.observe(img));
+        }
+
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            lazyLoadImages();
+            
+            // Ensure first slide is active
+            showSlide(1);
+            
+            // Add loading animation removal
+            document.body.classList.add('loaded');
+        });
+
+        // Performance optimization: debounce scroll events
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Apply debounce to scroll event
+        const debouncedScrollHandler = debounce(function() {
+            const header = document.querySelector('header');
+            if (window.scrollY > 50) {
+                header.style.background = 'rgba(255, 255, 255, 0.98)';
+                header.style.backdropFilter = 'blur(15px)';
+            } else {
+                header.style.background = 'rgba(255, 255, 255, 0.95)';
+                header.style.backdropFilter = 'blur(10px)';
+            }
+        }, 10);
+
+        window.addEventListener('scroll', debouncedScrollHandler);
+    </script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBzzYviQCkPUeRSCMZ-sxJiQlKGgUFy8xk",
+  authDomain: "lume-moda-fitness.firebaseapp.com",
+  projectId: "lume-moda-fitness",
+  storageBucket: "lume-moda-fitness.appspot.com",
+  messagingSenderId: "485446426887",
+  appId: "1:485446426887:web:93ba7f4b9d4f199af7e5a2"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+async function carregarProduto01(){
+  const ref = doc(db, "produtos", "produto01");
+  const snap = await getDoc(ref);
+
+  if(!snap.exists()) return;
+
+  const data = snap.data();
+
+  document.getElementById("produto01_card").innerHTML = `
+    <div class="product-image" 
+         onclick="openModal(this)" 
+         data-product-name="${data.nome}" 
+         data-product-price="${data.preco}" 
+         data-product-description="${data.descricao}" 
+         data-product-image="${data.imagem}">
+      <img src="${data.imagem}" alt="${data.descricao}">
+    </div>
+    <div class="product-info">
+      <h4>${data.nome}</h4>
+      <div class="product-price">R$ ${data.preco}</div>
+      <button class="product-whatsapp" onclick="buyProduct(this)">
+        <i class="fab fa-whatsapp"></i> Comprar via WhatsApp
+      </button>
+    </div>
+  `;
+}
+
+carregarProduto01();
+</script>
+
+</body>
+</html>
