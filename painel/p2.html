@@ -129,21 +129,32 @@ async function load(){
       const ref = doc(db,'produtos', id);
       const snap = await getDoc(ref);
       const data = snap.exists() ? snap.data() : {};
-      const img = data.imagem || 'https://via.placeholder.com/600x800?text=Sem+Imagem';
       const nome = data.nome || '(sem nome)';
+
+      // SE TIVER FOTO
+      let thumbHTML = '';
+      if(data.imagem){
+        thumbHTML = `<img src="${data.imagem}" alt="${nome}">`;
+      } else {
+        // SEM FOTO → bloco cinza
+        thumbHTML = `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#999;font-size:12px;font-weight:500">sem imagem</div>`;
+      }
 
       const card = document.createElement('div');
       card.className = 'card';
       card.onclick = ()=> location.href = `editor.html?pid=${encodeURIComponent(id)}`;
 
       card.innerHTML = `
-        <div class="thumb"><img src="${img}" alt="${nome}"></div>
+        <div class="thumb">${thumbHTML}</div>
         <div class="meta">
           <h3>${nome}</h3>
           <p>${id}</p>
         </div>`;
+
       grid.appendChild(card);
+
     }catch(e){
+      console.error('Erro produto', id, e);
       const card = document.createElement('div');
       card.className = 'card';
       card.innerHTML = `
@@ -153,11 +164,11 @@ async function load(){
           <p>${id}</p>
         </div>`;
       grid.appendChild(card);
-      console.error('Erro produto', id, e);
     }
   }
 }
 load();
+
 </script>
 </body>
 </html>
