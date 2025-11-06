@@ -77,8 +77,10 @@
       <div class="preview" id="preview"><span class="note">Prévia da imagem</span></div>
       <div style="margin-top:10px" class="row">
         <!-- câmera traseira no celular; ainda permite galeria -->
-        <input id="file" type="file" accept="image/*" capture="environment"/>
-        <span class="note">Selecione uma foto do celular</span>
+        <!-- selecionar imagem -->
+<input id="file" type="file" accept="image/*" style="display:none">
+<button id="btnSelectImage" class="btn btn-primary" type="button">Selecionar foto</button>
+
       </div>
       <div style="margin-top:10px" class="progress" aria-hidden="true"><div id="bar"></div></div>
       <div id="progText" class="note" style="margin-top:6px"></div>
@@ -260,6 +262,10 @@ elCopiar.addEventListener('click', async ()=>{
   await navigator.clipboard.writeText(currentImageUrl);
   elStatus.innerHTML = 'Link copiado ✅';
 });
+document.getElementById("btnSelectImage").addEventListener("click", ()=>{
+   document.getElementById("file").click();
+});
+
 </script>
 </body>
 </html>
