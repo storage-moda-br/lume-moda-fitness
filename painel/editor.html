@@ -217,9 +217,9 @@ elSalvar.addEventListener('click', async () => {
     const file = elFile.files?.[0];
     if (file){
       const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
-
       const storagePath = `produtos/${pid}-${Date.now()}.${ext}`;
       const storageRef = ref(st, storagePath);
+	  console.log("enviando para:", storagePath);
       const task = uploadBytesResumable(storageRef, file);
 
       task.on('state_changed', (snap)=>{
