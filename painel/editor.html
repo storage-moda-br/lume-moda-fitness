@@ -216,7 +216,8 @@ elSalvar.addEventListener('click', async () => {
     // se escolheu nova foto, faz upload
     const file = elFile.files?.[0];
     if (file){
-      const ext = (file.name.split('.').pop() || 'jpg').toLowerCase().slice(0,5);
+      const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+
       const storagePath = `produtos/${pid}-${Date.now()}.${ext}`;
       const storageRef = ref(st, storagePath);
       const task = uploadBytesResumable(storageRef, file);
