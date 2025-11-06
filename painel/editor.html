@@ -60,6 +60,8 @@
     opacity: 1;
   }
 </style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css">
+
 </head>
 <body>
 <!-- Toast topo -->
@@ -75,6 +77,13 @@
     <!-- Lado da imagem -->
     <div class="card">
       <div class="preview" id="preview"><span class="note">Prévia da imagem</span></div>
+	  <div id="cropArea" style="display:none; margin-top:10px;">
+  <img id="cropImg" style="max-width:100%; display:block;">
+  <button id="btnApplyCrop" class="btn btn-primary" type="button" style="margin-top:10px;width:100%;">
+    Aplicar corte e usar esta imagem
+  </button>
+</div>
+
       <div style="margin-top:10px" class="row">
         <!-- câmera traseira no celular; ainda permite galeria -->
         <!-- selecionar imagem -->
@@ -111,6 +120,9 @@
 </div>
 
 <script type="module">
+import Cropper from "https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.esm.js";
+let cropper = null;
+let croppedBlob = null;
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
@@ -127,7 +139,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 /* usa o databaseId "firestore" (o segundo DB do seu projeto) */
 const db = getFirestore(app, "firestore");
-const st = getStorage(app);
+const st = getStorage(app, "lume-moda-fitness.firebasestorage.app");
 
 // pega pid ?pid=produto01
 const params = new URLSearchParams(location.search);
@@ -168,15 +180,41 @@ let currentImageUrl = "";
   }
 })();
 
-/* Preview local da imagem */
+/* Preview local da imagem + iniciar crop */
 elFile.addEventListener('change', () => {
   const f = elFile.files?.[0];
-  if (f){
-    const r = new FileReader();
-    r.onload = () => elPrev.innerHTML = `<img src="${r.result}" alt="">`;
-    r.readAsDataURL(f);
-  }
+  if (!f) return;
+
+  // oculta preview normal
+  elPrev.style.display = "none";
+
+  // mostra área do crop
+  document.getElementById("cropArea").style.display = "block";
+
+  const cropImg = document.getElementById("cropImg");
+  const reader = new FileReader();
+
+  reader.onload = () => {
+    cropImg.src = reader.result;
+
+    // destruir crop anterior
+    if (cropper) {
+      cropper.destroy();
+      cropper = null;
+    }
+
+    // iniciar crop com 4:5
+    cropper = new Cropper(cropImg, {
+      aspectRatio: 4 / 5,
+      viewMode: 1,
+      dragMode: 'move',
+      autoCropArea: 1
+    });
+  };
+
+  reader.readAsDataURL(f);
 });
+
 
 /* Normaliza "89,90" → 89.9 (number) */
 function normalizePrecoToNumber(v){
@@ -197,6 +235,28 @@ function showToast(){
   }, 1400);
 }
 
+/* Aplicar corte -> gerar blob final */
+document.getElementById("btnApplyCrop").addEventListener("click", () => {
+  if (!cropper) return;
+
+  cropper.getCroppedCanvas({
+    width:1080,
+    height:1350,
+    fillColor:"#fff"
+  }).toBlob((blob) => {
+    croppedBlob = blob;
+
+    // mostra preview com resultante
+    const url = URL.createObjectURL(blob);
+    elPrev.innerHTML = `<img src="${url}" alt="">`;
+
+    // volta a preview normal e esconde cropper
+    elPrev.style.display = "flex";
+    document.getElementById("cropArea").style.display = "none";
+
+  }, "image/jpeg", 0.9);
+});
+
 /* Salvar */
 elSalvar.addEventListener('click', async () => {
   try{
@@ -213,15 +273,14 @@ elSalvar.addEventListener('click', async () => {
 
     let imageURL = currentImageUrl;
 
-    // se escolheu nova foto, faz upload
-    const file = elFile.files?.[0];
-    if (file){
-      const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+    // se teve crop, subir só o blob cropado
+    if (croppedBlob){
+      const ext = "jpg";
       const storagePath = `produtos/${pid}-${Date.now()}.${ext}`;
       const storageRef = ref(st, storagePath);
-	  console.log("enviando para:", storagePath);
-      const task = uploadBytesResumable(storageRef, file, { contentType: file.type });
+      console.log("enviando CROP para:", storagePath);
 
+      const task = uploadBytesResumable(storageRef, croppedBlob, { contentType: "image/jpeg" });
 
       task.on('state_changed', (snap)=>{
         const pct = Math.round((snap.bytesTransferred / snap.totalBytes) * 100);
@@ -257,6 +316,7 @@ elSalvar.addEventListener('click', async () => {
     setTimeout(()=>{ elProg.textContent = ''; }, 1200);
   }
 });
+
 
 /* Copiar link atual da imagem */
 elCopiar.addEventListener('click', async ()=>{
