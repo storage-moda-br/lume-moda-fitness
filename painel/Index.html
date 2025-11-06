@@ -1053,8 +1053,7 @@ Aguardo retorno! 🙂
 
         // Modal Functions
         function openModal(element) {
-            const productCard = element; // ← só isso muda
-
+            const productCard = element.closest('.product-card');
             const productName = productCard.getAttribute('data-product-name');
             const productPrice = productCard.getAttribute('data-product-price');
             const productDescription = productCard.getAttribute('data-product-description');
