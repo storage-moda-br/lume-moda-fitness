@@ -474,6 +474,14 @@ const payload = {
   data: serverTimestamp()
 };
 
+// limpa lixo antigo blob:
+for (let i=0; i<extraImages.length; i++){
+  if (typeof extraImages[i] === 'string' && extraImages[i].startsWith('blob:')){
+    extraImages[i] = null;
+  }
+}
+
+
 // extras -> remove nulos, fica só URLs válidas
 const finalArray = extraImages.filter(x => x);
 payload.imagens = finalArray; // se vazio, salva array vazio
