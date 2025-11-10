@@ -432,46 +432,54 @@ elSalvar.addEventListener('click', async () => {
     }
 
     // subir EXTRAS novas (slots com blob)
-    let novasURLsExtras = [];
-    for (let i=0; i<extraBlobs.length; i++){
-      const blob = extraBlobs[i];
-      if (!blob) continue;
+let novasURLsExtras = [];
+for (let i=0; i<extraBlobs.length; i++){
+  const blob = extraBlobs[i];
+  if (!blob) continue;
 
-      const ext = "jpg";
-      const storagePath = `produtos/${pid}-${Date.now()}-${i}.${ext}`;
-      const storageRef = ref(st, storagePath);
+  const ext = "jpg";
+  const storagePath = `produtos/${pid}-${Date.now()}-${i}.${ext}`;
+  const storageRef = ref(st, storagePath);
 
-      console.log("enviando EXTRA:", storagePath);
+  console.log("enviando EXTRA:", storagePath);
 
-      const task2 = uploadBytesResumable(storageRef, blob, {contentType:"image/jpeg"});
+  const task2 = uploadBytesResumable(storageRef, blob, {contentType:"image/jpeg"});
 
-      await new Promise(res=>{
-        task2.on('state_changed', snap=>{
-          const pct = Math.round((snap.bytesTransferred / snap.totalBytes) * 100);
-          elBar.style.width = pct + '%';
-          elProg.textContent = `Enviando imagem extra… ${pct}%`;
-        }, null, async ()=>{
-          const urlExtra = await getDownloadURL(storageRef);
-          novasURLsExtras.push(urlExtra);
-          res();
-        });
-      });
-    }
+  await new Promise(res=>{
+    task2.on('state_changed', snap=>{
+      const pct = Math.round((snap.bytesTransferred / snap.totalBytes) * 100);
+      elBar.style.width = pct + '%';
+      elProg.textContent = `Enviando imagem extra… ${pct}%`;
+    }, null, async ()=>{
+      const urlExtra = await getDownloadURL(storageRef);
+      novasURLsExtras.push(urlExtra);
+      res();
+    });
+  });
+}
 
-      // payload final
-    const payload = {
-      nome,
-      descricao,
-      preco: precoNumber,
-      imagem: imageURL || "",
-      data: serverTimestamp()
-    };
+// adiciona URLs novas no array local
+if (novasURLsExtras.length > 0){
+  for (let u of novasURLsExtras){
+    extraImages.push(u);
+  }
+}
 
-    // extras -> remove nulos, fica só URLs válidas
-    const finalArray = extraImages.filter(x => x);
-    payload.imagens = finalArray; // se vazio, salva array vazio
+// payload final
+const payload = {
+  nome,
+  descricao,
+  preco: precoNumber,
+  imagem: imageURL || "",
+  data: serverTimestamp()
+};
 
-    await setDoc(doc(db,'produtos', pid), payload, { merge: true });
+// extras -> remove nulos, fica só URLs válidas
+const finalArray = extraImages.filter(x => x);
+payload.imagens = finalArray; // se vazio, salva array vazio
+
+await setDoc(doc(db,'produtos', pid), payload, { merge: true });
+
 
     // reset pós-salvar
     currentImageUrl = imageURL;
