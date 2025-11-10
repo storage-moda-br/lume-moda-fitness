@@ -922,7 +922,7 @@
 
    <!-- Products Section -->
 <div class="container">
-    <section class="products" id="produtos">
+    <section class="products" id="produtos">f<img class="modal-image" id="modal-image" src="" alt="Produto">
         <h2 class="section-title">Produtos em Destaque</h2>
 
         <div class="product-grid" id="productsContainer"></div>
@@ -932,6 +932,8 @@
         <div class="modal-content">
             <span class="close-modal" onclick="closeModal()">&times;</span>
             <img class="modal-image" id="modal-image" src="" alt="Produto">
+			<div id="modal-thumbs" style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;justify-content:center;"></div>
+
             <div class="modal-info">
                 <h3 id="modal-title"></h3>
                 <p id="modal-description"></p>
@@ -1056,36 +1058,56 @@ Aguardo retorno! 🙂
         }
 
         // Modal Functions
-        function openModal(element) {
-            const productCard = element.closest('.product-card');
-            const productName = productCard.getAttribute('data-product-name');
-            const productPrice = productCard.getAttribute('data-product-price');
-            const productDescription = productCard.getAttribute('data-product-description');
-            const productImage = productCard.getAttribute('data-product-image');
-            
-            const modal = document.getElementById('product-modal');
-            const modalImage = document.getElementById('modal-image');
-            const modalTitle = document.getElementById('modal-title');
-            const modalDescription = document.getElementById('modal-description');
-            const modalPrice = document.getElementById('modal-price');
-            
-            modalImage.src = productImage;
-            modalImage.alt = productDescription;
-            modalTitle.textContent = productName;
-            modalDescription.textContent = productDescription;
-            modalPrice.textContent = `R$ ${parseFloat(productPrice).toFixed(2).replace(".", ",")}`;
+       function openModal(element) {
+    const productCard = element.closest('.product-card');
+    const productName = productCard.getAttribute('data-product-name');
+    const productPrice = productCard.getAttribute('data-product-price');
+    const productDescription = productCard.getAttribute('data-product-description');
+    const productImage = productCard.getAttribute('data-product-image');
+    const productExtras = productCard.getAttribute('data-product-extras') || "";
 
-            
-            // Store product data in modal for WhatsApp button
-            const modalWhatsapp = document.getElementById('modal-whatsapp');
-            modalWhatsapp.setAttribute('data-product-name', productName);
-            modalWhatsapp.setAttribute('data-product-price', productPrice);
-            modalWhatsapp.setAttribute('data-product-description', productDescription);
-            modalWhatsapp.setAttribute('data-product-image', productImage);
-            
-            modal.style.display = 'flex';
-            document.body.style.overflow = 'hidden'; // Prevent scrolling
+    const modal = document.getElementById('product-modal');
+    const modalImage = document.getElementById('modal-image');
+    const modalTitle = document.getElementById('modal-title');
+    const modalDescription = document.getElementById('modal-description');
+    const modalPrice = document.getElementById('modal-price');
+    const modalThumbs = document.getElementById('modal-thumbs');
+
+    modalImage.src = productImage;
+    modalImage.alt = productDescription;
+    modalTitle.textContent = productName;
+    modalDescription.textContent = productDescription;
+    modalPrice.textContent = `R$ ${parseFloat(productPrice).toFixed(2).replace(".", ",")}`;
+
+    // monta thumbs
+    modalThumbs.innerHTML = "";
+
+    // principal
+    modalThumbs.innerHTML += `
+      <img src="${productImage}" style="width:50px;height:62px;object-fit:cover;border-radius:6px;cursor:pointer;border:2px solid #000" onclick="document.getElementById('modal-image').src='${productImage}'">
+    `;
+
+    // extras
+    if (productExtras.length > 0){
+        const arr = productExtras.split("|").filter(x=>x);
+        for (const url of arr){
+            modalThumbs.innerHTML += `
+              <img src="${url}" style="width:50px;height:62px;object-fit:cover;border-radius:6px;cursor:pointer;border:2px solid transparent" onclick="document.getElementById('modal-image').src='${url}'">
+            `;
         }
+    }
+
+    // Store para o botão WhatsApp
+    const modalWhatsapp = document.getElementById('modal-whatsapp');
+    modalWhatsapp.setAttribute('data-product-name', productName);
+    modalWhatsapp.setAttribute('data-product-price', productPrice);
+    modalWhatsapp.setAttribute('data-product-description', productDescription);
+    modalWhatsapp.setAttribute('data-product-image', productImage);
+
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
 
         function closeModal() {
             const modal = document.getElementById('product-modal');
@@ -1335,12 +1357,17 @@ async function load(){
     const d = snap.data();
     const precoFmt = parseFloat(d.preco).toFixed(2).replace(".",",");
 
-    cont.innerHTML += `
+    // monta lista das extras, se existir
+const extras = Array.isArray(d.imagens) ? d.imagens.filter(x=>x).join("|") : "";
+
+cont.innerHTML += `
       <div class="product-card"
            data-product-name="${d.nome}"
            data-product-price="${precoFmt}"
            data-product-description="${d.descricao}"
-           data-product-image="${d.imagem}">
+           data-product-image="${d.imagem}"
+           data-product-extras="${extras}">
+
           
           <div class="product-image" onclick="openModal(this)">
             <img src="${d.imagem}" alt="${d.descricao}">
