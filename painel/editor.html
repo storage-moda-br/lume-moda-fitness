@@ -523,24 +523,25 @@ const payload = {
   data: serverTimestamp()
 };
 
-// zera slots com blob (lixo local)
+// --- salvar IMAGENS EXTRAS FINAL ---
 for (let i=0; i<extraImages.length; i++){
-  if (typeof extraImages[i] === "string" && extraImages[i].startsWith("blob:")){
+  if (!extraImages[i] || extraImages[i].startsWith("blob:")){
     extraImages[i] = null;
   }
 }
 
-// mantém só URLs válidas (remove null e blob temporário)
-const finalExtras = extraImages.filter(x => x && typeof x === "string" && !x.startsWith("blob:"));
+// GARANTE no máximo 5
+extraImages = extraImages.slice(0,5);
+
+// remove nulls
+const finalExtras = extraImages.filter(x=>x);
 payload.imagens = finalExtras;
 
+// grava no firestore
 await setDoc(doc(db,'produtos', pid), payload, { merge: true });
 
-
-
-
-    // reset pós-salvar
-    currentImageUrl = imageURL;
+// reset pós-salvar
+currentImageUrl = imageURL;
 elStatus.textContent = '';
 
 if (autoSave){
@@ -550,27 +551,16 @@ if (autoSave){
   showToast();
 }
 
-
-
-  }catch(err){
-    console.error(err);
-    elStatus.innerHTML = '<span class="err">Erro ao salvar. Veja o console.</span>';
-    elBar.style.width = '0%';
-  }finally{
-    elSalvar.disabled = false;
-    setTimeout(()=>{ elProg.textContent = ''; }, 1200);
-  }
+} catch(err){
+  console.error(err);
+  elStatus.innerHTML = '<span class="err">Erro ao salvar. Veja o console.</span>';
+  elBar.style.width = '0%';
+} finally {
+  elSalvar.disabled = false;
+  setTimeout(()=>{ elProg.textContent = ''; }, 1200);
+}
 });
 
-/* Copiar link atual da imagem */
-elCopiar.addEventListener('click', async ()=>{
-  if (!currentImageUrl){ elStatus.textContent = 'Sem imagem ainda.'; return; }
-  await navigator.clipboard.writeText(currentImageUrl);
-  elStatus.innerHTML = 'Link copiado ✅';
-});
-document.getElementById("btnSelectImage").addEventListener("click", ()=>{
-   document.getElementById("file").click();
-});
 </script>
 </body>
 </html>
