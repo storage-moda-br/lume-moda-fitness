@@ -942,9 +942,10 @@
       <h3 id="modal-title"></h3>
       <p id="modal-description"></p>
       <div class="product-price" id="modal-price"></div>
-      <button class="product-whatsapp" id="modal-whatsapp" onclick="buyFromModal()">
-        <i class="fab fa-whatsapp"></i> Comprar via WhatsApp
-      </button>
+      <button class="product-whatsapp" id="modal-whatsapp">
+  <i class="fab fa-whatsapp"></i> Comprar via WhatsApp
+</button>
+
     </div>
   </div>
 </div>
@@ -1480,25 +1481,63 @@ modalThumbs.innerHTML += `
     }
 
     // dados para WhatsApp (se existir)
-    const modalWhatsapp = document.getElementById('modal-whatsapp');
-    if (modalWhatsapp) {
-      modalWhatsapp.setAttribute('data-product-name', productName);
-      modalWhatsapp.setAttribute('data-product-price', productPrice);
-      modalWhatsapp.setAttribute('data-product-description', productDescription);
-      modalWhatsapp.setAttribute('data-product-image', productImage);
-    }
+const modalWhatsapp = document.getElementById('modal-whatsapp');
+if (modalWhatsapp) {
+  modalWhatsapp.setAttribute('data-product-name', productName);
+  modalWhatsapp.setAttribute('data-product-price', productPrice);
+  modalWhatsapp.setAttribute('data-product-description', productDescription);
+  modalWhatsapp.setAttribute('data-product-image', productImage);
 
-    modal.style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-  } catch (e) {
-    console.error("openModal error:", e);
-  }
+  // garante o handler correto a cada abertura do modal
+  modalWhatsapp.onclick = buyFromModal;
 }
 
-// IMPORTANTE: expor as funções no escopo global (necessário se o script é type="module")
-window.openModal = openModal;
+
+
+// coloca AQUI a função do modal whatsapp
+function buyFromModal(){
+  const btn = document.getElementById('modal-whatsapp');
+  if (!btn) return;
+
+  const productName = btn.getAttribute('data-product-name') || '';
+  const productPrice = btn.getAttribute('data-product-price') || '0';
+  const productDescription = btn.getAttribute('data-product-description') || '';
+  const productImage = btn.getAttribute('data-product-image') || '';
+
+  const message = `
+*PEDIDO LUME MODA FITNESS*
+
+*Produto:* ${productName}
+*Preço:* R$ ${parseFloat(productPrice).toFixed(2).replace(".", ",")}
+
+*Descrição:*
+${productDescription}
+
+*Foto do produto:*
+${productImage}
+
+---------------------------
+Olá! Tenho interesse neste produto.
+
+Poderia me enviar mais informações sobre:
+
+• Tamanhos disponíveis
+• Cores disponíveis
+• Formas de pagamento
+• Prazo de entrega
+
+Aguardo retorno!
+  `;
+
+  const url = 'https://wa.me/5598991611664?text=' + encodeURIComponent(message);
+  window.open(url, '_blank');
+}
+
+// no final do script (junto com os outros)
+window.buyFromModal = buyFromModal;
 window.closeModal = closeModal;
 window.modalSetImage = modalSetImage;
+window.buyFromModal = buyFromModal;  // <- ADICIONE ESTA LINHA AQUI
 
 </script>
 </body>
