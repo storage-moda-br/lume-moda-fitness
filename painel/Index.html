@@ -1405,9 +1405,97 @@ cont.innerHTML += `
 }
 
 load();
-</script>
-  
-</script>
 
+// --- Modal: util troca imagem e destaca thumb ativa ---
+function modalSetImage(url, element){
+  try {
+    const main = document.getElementById('modal-image');
+    main.src = url;
+
+    const thumbs = document.querySelectorAll('#modal-thumbs img');
+    thumbs.forEach(t => t.style.border = "2px solid transparent");
+
+    if (element) element.style.border = "2px solid #000";
+  } catch (e) {
+    console.error("modalSetImage error:", e);
+  }
+}
+
+// --- Modal: fechar ---
+function closeModal() {
+  const modal = document.getElementById('product-modal');
+  if (modal) modal.style.display = 'none';
+  document.body.style.overflow = 'auto';
+}
+
+// --- Modal: abrir ---
+function openModal(element) {
+  try {
+    const productCard = element.closest('.product-card');
+    const productName = productCard.getAttribute('data-product-name') || "";
+    const productPrice = productCard.getAttribute('data-product-price') || "0";
+    const productDescription = productCard.getAttribute('data-product-description') || "";
+    const productImage = productCard.getAttribute('data-product-image') || "";
+    const productExtras = productCard.getAttribute('data-product-extras') || "";
+
+    const modal = document.getElementById('product-modal');
+    const modalImage = document.getElementById('modal-image');
+    const modalTitle = document.getElementById('modal-title');
+    const modalDescription = document.getElementById('modal-description');
+    const modalPrice = document.getElementById('modal-price');
+    const modalThumbs = document.getElementById('modal-thumbs');
+
+    if (!modal || !modalImage || !modalThumbs) {
+      console.error("Modal elements not found. Confira se o HTML do modal está correto.");
+      return;
+    }
+
+    // conteúdo principal
+    modalImage.src = productImage;
+    modalImage.alt = productDescription;
+    if (modalTitle) modalTitle.textContent = productName;
+    if (modalDescription) modalDescription.textContent = productDescription;
+    if (modalPrice) modalPrice.textContent = `R$ ${parseFloat(productPrice).toFixed(2).replace(".", ",")}`;
+
+    // monta thumbs: principal + extras
+    modalThumbs.innerHTML = `
+      <img src="${productImage}"
+           style="width:60px;height:75px;object-fit:cover;border-radius:8px;cursor:pointer;border:2px solid #000;"
+           onclick="modalSetImage('${productImage}', this)">
+    `;
+
+    if (productExtras) {
+      const arr = productExtras.split("|").filter(x => x);
+      for (const url of arr) {
+        modalThumbs.innerHTML += `
+          <img src="${url}"
+               style="width:60px;height:75px;object-fit:cover;border-radius:8px;cursor:pointer;border:2px solid transparent;"
+               onclick="modalSetImage('${url}', this)">
+        `;
+      }
+    }
+
+    // dados para WhatsApp (se existir)
+    const modalWhatsapp = document.getElementById('modal-whatsapp');
+    if (modalWhatsapp) {
+      modalWhatsapp.setAttribute('data-product-name', productName);
+      modalWhatsapp.setAttribute('data-product-price', productPrice);
+      modalWhatsapp.setAttribute('data-product-description', productDescription);
+      modalWhatsapp.setAttribute('data-product-image', productImage);
+    }
+
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  } catch (e) {
+    console.error("openModal error:", e);
+  }
+}
+
+// IMPORTANTE: expor as funções no escopo global (necessário se o script é type="module")
+window.openModal = openModal;
+window.closeModal = closeModal;
+window.modalSetImage = modalSetImage;
+
+</script>
 </body>
 </html>
