@@ -359,6 +359,7 @@ function showToast(){
 }
 
 /* Aplicar corte (principal ou extra) */
+/* Aplicar corte (principal ou extra) */
 document.getElementById("btnApplyCrop").addEventListener("click", () => {
   if (!cropper) return;
 
@@ -368,34 +369,43 @@ document.getElementById("btnApplyCrop").addEventListener("click", () => {
     fillColor:"#fff"
   }).toBlob((blob) => {
 
-  if (editingExtra){
-  const url = URL.createObjectURL(blob);
+    if (editingExtra){
+      const url = URL.createObjectURL(blob);
 
-  // salva local para pré-visualização
-  extraImages[currentSlotEdit] = url;
+      // salva local pré visualização
+      extraImages[currentSlotEdit] = url;
 
-  // ESSENCIAL: guarda blob para upload
-  extraBlobs[currentSlotEdit] = blob;
+      // guarda blob para upload
+      extraBlobs[currentSlotEdit] = blob;
 
-  renderExtraSlots();
-}
+      renderExtraSlots();
 
+      // reset UI
+      editingExtra = false;
+      currentSlotEdit = null;
+      elPrev.style.display = "flex";
+      document.getElementById("cropArea").style.display = "none";
 
-else {
-      // é a principal
+      // AUTO SAVE extra
+      elSalvar.click();
+
+    } else {
+      // principal
       const url = URL.createObjectURL(blob);
       elPrev.innerHTML = `<img src="${url}" alt="">`;
       croppedBlob = blob;
-    }
 
-    // reset UI comum
-    editingExtra = false;
-    currentSlotEdit = null;
-    elPrev.style.display = "flex";
-    document.getElementById("cropArea").style.display = "none";
+      // reset UI
+      elPrev.style.display = "flex";
+      document.getElementById("cropArea").style.display = "none";
+
+      // AUTO SAVE principal
+      elSalvar.click();
+    }
 
   }, "image/jpeg", 0.9);
 });
+
 
 // click no X para apagar extra
 document.addEventListener("click",(ev)=>{
