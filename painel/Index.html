@@ -1025,8 +1025,8 @@
         setInterval(nextSlide, 5000);
 
         // Enhanced Product WhatsApp Integration
-function buyProduct(element) {
-  const productCard = element.closest('.product-card');
+function buyProduct(el) {
+  const productCard = el.closest('.product-card');
   if (!productCard) return;
 
   const productName = productCard.getAttribute('data-product-name') || "";
@@ -1062,6 +1062,7 @@ Aguardo retorno!
   const url = 'https://wa.me/5598991611664?text=' + encodeURIComponent(message);
   window.open(url, '_blank');
 }
+
 
 
        function openModal(element) {
@@ -1396,7 +1397,8 @@ cont.innerHTML += `
       <div class="product-info">
         <h4>${d.nome}</h4>
         <div class="product-price">R$ ${precoFmt}</div>
-        <button class="product-whatsapp" onclick="buyProduct(this.parentElement.parentElement.querySelector('.product-image'))">
+        <button class="product-whatsapp" onclick="buyProduct(this)">
+
           <i class="fab fa-whatsapp"></i> Comprar via WhatsApp
         </button>
       </div>
