@@ -1025,14 +1025,16 @@
         setInterval(nextSlide, 5000);
 
         // Enhanced Product WhatsApp Integration
-        function buyProduct(button) {
-            const productCard = button.closest('.product-card');
-            const productName = productCard.getAttribute('data-product-name');
-            const productPrice = productCard.getAttribute('data-product-price');
-            const productDescription = productCard.getAttribute('data-product-description');
-            const productImage = productCard.getAttribute('data-product-image');
-            
-            const message = `
+function buyProduct(element) {
+  const productCard = element.closest('.product-card');
+  if (!productCard) return;
+
+  const productName = productCard.getAttribute('data-product-name') || "";
+  const productPrice = productCard.getAttribute('data-product-price') || "0";
+  const productDescription = productCard.getAttribute('data-product-description') || "";
+  const productImage = productCard.getAttribute('data-product-image') || "";
+
+  const message = `
 *PEDIDO LUME MODA FITNESS*
 
 *Produto:* ${productName}
@@ -1054,14 +1056,13 @@ Poderia me enviar mais informações sobre:
 • Formas de pagamento
 • Prazo de entrega
 
-Aguardo retorno! 🙂
-`;
+Aguardo retorno!
+  `;
 
+  const url = 'https://wa.me/5598991611664?text=' + encodeURIComponent(message);
+  window.open(url, '_blank');
+}
 
-            
-            const whatsappUrl = `https://wa.me/5586995332408?text=${encodeURIComponent(message)}`;
-            window.open(whatsappUrl, '_blank');
-        }
 
        function openModal(element) {
   const productCard = element.closest('.product-card');
