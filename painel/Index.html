@@ -942,7 +942,7 @@
       <h3 id="modal-title"></h3>
       <p id="modal-description"></p>
       <div class="product-price" id="modal-price"></div>
-      <button class="product-whatsapp" id="modal-whatsapp">
+      <button class="product-whatsapp" onclick="buyProduct(this)">
   <i class="fab fa-whatsapp"></i> Comprar via WhatsApp
 </button>
 
@@ -1062,6 +1062,7 @@ Aguardo retorno!
   const url = 'https://wa.me/5598991611664?text=' + encodeURIComponent(message);
   window.open(url, '_blank');
 }
+
 
 
 
@@ -1546,6 +1547,8 @@ window.openModal = openModal;
 window.closeModal = closeModal;
 window.modalSetImage = modalSetImage;
 window.buyFromModal = buyFromModal;
+window.buyProduct = buyProduct;
+
 
 load(); // <- DEVE SER A ÚLTIMA LINHA
 
