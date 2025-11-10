@@ -923,25 +923,32 @@
    <!-- Products Section -->
 <div class="container">
     <section class="products" id="produtos">
-        <h2 class="section-title">Produtos em Destaque</h2>
+	     <h2 class="section-title">Produtos em Destaque</h2>
 
         <div class="product-grid" id="productsContainer"></div>
 
-    <!-- Modal -->
-    <div class="modal" id="product-modal">
-        <div class="modal-content">
-            <span class="close-modal" onclick="closeModal()">&times;</span>
-            <img class="modal-image" id="modal-image" src="" alt="Produto">
-            <div class="modal-info">
-                <h3 id="modal-title"></h3>
-                <p id="modal-description"></p>
-                <div class="product-price" id="modal-price"></div>
-                <button class="product-whatsapp" id="modal-whatsapp" onclick="buyFromModal()">
-                    <i class="fab fa-whatsapp"></i> Comprar via WhatsApp
-                </button>
-            </div>
-        </div>
+   <!-- Modal -->
+<div class="modal" id="product-modal" style="display:none;">
+  <div class="modal-content">
+    <span class="close-modal" onclick="closeModal()">&times;</span>
+
+    <!-- Agrupa imagem e miniaturas -->
+    <div class="modal-media" style="display:flex;flex-direction:column;align-items:center;">
+      <img class="modal-image" id="modal-image" src="" alt="Produto" style="display:block;max-width:100%;max-height:55vh;object-fit:contain;">
+      <div id="modal-thumbs" style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;justify-content:center;"></div>
     </div>
+
+    <div class="modal-info">
+      <h3 id="modal-title"></h3>
+      <p id="modal-description"></p>
+      <div class="product-price" id="modal-price"></div>
+      <button class="product-whatsapp" id="modal-whatsapp" onclick="buyFromModal()">
+        <i class="fab fa-whatsapp"></i> Comprar via WhatsApp
+      </button>
+    </div>
+  </div>
+</div>
+
 
     <!-- Footer -->
     <footer id="contato">
@@ -1055,43 +1062,77 @@ Aguardo retorno! 🙂
             window.open(whatsappUrl, '_blank');
         }
 
-        // Modal Functions
-        function openModal(element) {
-            const productCard = element.closest('.product-card');
-            const productName = productCard.getAttribute('data-product-name');
-            const productPrice = productCard.getAttribute('data-product-price');
-            const productDescription = productCard.getAttribute('data-product-description');
-            const productImage = productCard.getAttribute('data-product-image');
-            
-            const modal = document.getElementById('product-modal');
-            const modalImage = document.getElementById('modal-image');
-            const modalTitle = document.getElementById('modal-title');
-            const modalDescription = document.getElementById('modal-description');
-            const modalPrice = document.getElementById('modal-price');
-            
-            modalImage.src = productImage;
-            modalImage.alt = productDescription;
-            modalTitle.textContent = productName;
-            modalDescription.textContent = productDescription;
-            modalPrice.textContent = `R$ ${parseFloat(productPrice).toFixed(2).replace(".", ",")}`;
+       function openModal(element) {
+  const productCard = element.closest('.product-card');
+  const productName = productCard.getAttribute('data-product-name');
+  const productPrice = productCard.getAttribute('data-product-price');
+  const productDescription = productCard.getAttribute('data-product-description');
+  const productImage = productCard.getAttribute('data-product-image');
+  const productExtras = productCard.getAttribute('data-product-extras') || "";
 
-            
-            // Store product data in modal for WhatsApp button
-            const modalWhatsapp = document.getElementById('modal-whatsapp');
-            modalWhatsapp.setAttribute('data-product-name', productName);
-            modalWhatsapp.setAttribute('data-product-price', productPrice);
-            modalWhatsapp.setAttribute('data-product-description', productDescription);
-            modalWhatsapp.setAttribute('data-product-image', productImage);
-            
-            modal.style.display = 'flex';
-            document.body.style.overflow = 'hidden'; // Prevent scrolling
-        }
+  const modal = document.getElementById('product-modal');
+  const modalImage = document.getElementById('modal-image');
+  const modalTitle = document.getElementById('modal-title');
+  const modalDescription = document.getElementById('modal-description');
+  const modalPrice = document.getElementById('modal-price');
+  const modalThumbs = document.getElementById('modal-thumbs');
+
+  modalImage.src = productImage;
+  modalImage.alt = productDescription;
+  modalTitle.textContent = productName;
+  modalDescription.textContent = productDescription;
+  modalPrice.textContent = `R$ ${parseFloat(productPrice).toFixed(2).replace(".", ",")}`;
+
+  // monta thumbs
+  modalThumbs.innerHTML = `
+    <img src="${productImage}" 
+         style="width:50px;height:62px;object-fit:cover;border-radius:6px;cursor:pointer;border:2px solid #000" 
+         onclick="modalSetImage('${productImage}', this)">
+  `;
+
+  if (productExtras.length > 0) {
+    const arr = productExtras.split("|").filter(x => x);
+    for (const url of arr) {
+      modalThumbs.innerHTML += `
+        <img src="${url}" 
+             style="width:50px;height:62px;object-fit:cover;border-radius:6px;cursor:pointer;border:2px solid transparent"
+             onclick="modalSetImage('${url}', this)">
+      `;
+    }
+  }
+
+  const modalWhatsapp = document.getElementById('modal-whatsapp');
+  modalWhatsapp.setAttribute('data-product-name', productName);
+  modalWhatsapp.setAttribute('data-product-price', productPrice);
+  modalWhatsapp.setAttribute('data-product-description', productDescription);
+  modalWhatsapp.setAttribute('data-product-image', productImage);
+
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+}
+
 
         function closeModal() {
             const modal = document.getElementById('product-modal');
             modal.style.display = 'none';
             document.body.style.overflow = 'auto'; // Restore scrolling
         }
+		
+		// troca imagem principal e marca seleção
+function modalSetImage(url, element){
+  const main = document.getElementById('modal-image');
+  main.src = url;
+
+  // remove estilo ativo dos outros thumbs
+  const thumbs = document.querySelectorAll('#modal-thumbs img');
+  thumbs.forEach(t => t.style.border = "2px solid transparent");
+
+  // ativa o clicado
+  element.style.border = "2px solid #000";
+}
+
 
         function buyFromModal() {
             const modalWhatsapp = document.getElementById('modal-whatsapp');
@@ -1335,33 +1376,170 @@ async function load(){
     const d = snap.data();
     const precoFmt = parseFloat(d.preco).toFixed(2).replace(".",",");
 
-    cont.innerHTML += `
-      <div class="product-card"
-           data-product-name="${d.nome}"
-           data-product-price="${precoFmt}"
-           data-product-description="${d.descricao}"
-           data-product-image="${d.imagem}">
-          
-          <div class="product-image" onclick="openModal(this)">
-            <img src="${d.imagem}" alt="${d.descricao}">
-          </div>
+    // monta lista das extras, se existir
+const extras = Array.isArray(d.imagens) ? d.imagens.join("|") : "";
 
-          <div class="product-info">
-            <h4>${d.nome}</h4>
-            <div class="product-price">R$ ${precoFmt}</div>
-            <button class="product-whatsapp" onclick="buyProduct(this.parentElement.parentElement.querySelector('.product-image'))">
-              <i class="fab fa-whatsapp"></i> Comprar via WhatsApp
-            </button>
-          </div>
+cont.innerHTML += `
+  <div class="product-card"
+       data-product-name="${d.nome}"
+       data-product-price="${precoFmt}"
+       data-product-description="${d.descricao}"
+       data-product-image="${d.imagem}"
+       data-product-extras="${extras}">
+      
+      <div class="product-image" onclick="openModal(this)">
+        <img src="${d.imagem}" alt="${d.descricao}">
       </div>
-    `;
+
+      <div class="product-info">
+        <h4>${d.nome}</h4>
+        <div class="product-price">R$ ${precoFmt}</div>
+        <button class="product-whatsapp" onclick="buyProduct(this.parentElement.parentElement.querySelector('.product-image'))">
+          <i class="fab fa-whatsapp"></i> Comprar via WhatsApp
+        </button>
+      </div>
+  </div>
+`;
+
   }
 }
 
 load();
-</script>
-  
-</script>
 
+// --- Modal: util troca imagem e destaca thumb ativa ---
+function modalSetImage(url, element){
+  try {
+    const main = document.getElementById('modal-image');
+    main.src = url;
+
+    const thumbs = document.querySelectorAll('#modal-thumbs img');
+    thumbs.forEach(t => t.style.border = "2px solid transparent");
+
+    if (element) element.style.border = "2px solid #000";
+  } catch (e) {
+    console.error("modalSetImage error:", e);
+  }
+}
+
+// --- Modal: fechar ---
+function closeModal() {
+  const modal = document.getElementById('product-modal');
+  if (modal) modal.style.display = 'none';
+  document.body.style.overflow = 'auto';
+}
+
+// --- Modal: abrir ---
+function openModal(element) {
+  try {
+    const productCard = element.closest('.product-card');
+    const productName = productCard.getAttribute('data-product-name') || "";
+    const productPrice = productCard.getAttribute('data-product-price') || "0";
+    const productDescription = productCard.getAttribute('data-product-description') || "";
+    const productImage = productCard.getAttribute('data-product-image') || "";
+    const productExtras = productCard.getAttribute('data-product-extras') || "";
+
+    const modal = document.getElementById('product-modal');
+    const modalImage = document.getElementById('modal-image');
+    const modalTitle = document.getElementById('modal-title');
+    const modalDescription = document.getElementById('modal-description');
+    const modalPrice = document.getElementById('modal-price');
+    const modalThumbs = document.getElementById('modal-thumbs');
+
+    if (!modal || !modalImage || !modalThumbs) {
+      console.error("Modal elements not found. Confira se o HTML do modal está correto.");
+      return;
+    }
+
+    // conteúdo principal
+    modalImage.src = productImage;
+    modalImage.alt = productDescription;
+    if (modalTitle) modalTitle.textContent = productName;
+    if (modalDescription) modalDescription.textContent = productDescription;
+    if (modalPrice) modalPrice.textContent = `R$ ${parseFloat(productPrice).toFixed(2).replace(".", ",")}`;
+
+    // limpa thumbs ANTES
+modalThumbs.innerHTML = "";
+
+// monta thumbs: principal + extras
+modalThumbs.innerHTML += `
+  <img src="${productImage}"
+       style="width:60px;height:75px;object-fit:cover;border-radius:8px;cursor:pointer;border:2px solid #000;"
+       onclick="modalSetImage('${productImage}', this)">
+`;
+
+
+    if (productExtras) {
+      const arr = productExtras.split("|").filter(x => x);
+      for (const url of arr) {
+        modalThumbs.innerHTML += `
+          <img src="${url}"
+               style="width:60px;height:75px;object-fit:cover;border-radius:8px;cursor:pointer;border:2px solid transparent;"
+               onclick="modalSetImage('${url}', this)">
+        `;
+      }
+    }
+
+    // dados para WhatsApp (se existir)
+    const modalWhatsapp = document.getElementById('modal-whatsapp');
+    if (modalWhatsapp) {
+      modalWhatsapp.setAttribute('data-product-name', productName);
+      modalWhatsapp.setAttribute('data-product-price', productPrice);
+      modalWhatsapp.setAttribute('data-product-description', productDescription);
+      modalWhatsapp.setAttribute('data-product-image', productImage);
+    }
+
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  } catch (e) {
+    console.error("openModal error:", e);
+  }
+}
+
+
+// coloca AQUI a função do modal whatsapp
+function buyFromModal(){
+  const modalWhatsapp = document.getElementById('modal-whatsapp');
+
+  const productName = modalWhatsapp.getAttribute('data-product-name');
+  const productPrice = modalWhatsapp.getAttribute('data-product-price');
+  const productDescription = modalWhatsapp.getAttribute('data-product-description');
+  const productImage = modalWhatsapp.getAttribute('data-product-image');
+
+  const message = `
+*PEDIDO LUME MODA FITNESS*
+
+*Produto:* ${productName}
+*Preço:* R$ ${parseFloat(productPrice).toFixed(2).replace(".", ",")}
+
+*Descrição:*
+${productDescription}
+
+*Foto do produto:*
+${productImage}
+
+---------------------------
+Olá! Tenho interesse neste produto.
+
+Poderia me enviar mais informações sobre:
+
+• Tamanhos disponíveis
+• Cores disponíveis
+• Formas de pagamento
+• Prazo de entrega
+
+Aguardo retorno!
+  `;
+
+  const url = 'https://wa.me/5598991611664?text='+ encodeURIComponent(message);
+  window.open(url, '_blank');
+}
+
+// *** deixa sempre NO FINAL ***
+window.openModal = openModal;
+window.closeModal = closeModal;
+window.modalSetImage = modalSetImage;
+window.buyFromModal = buyFromModal;  // <- ADICIONE ESTA LINHA AQUI
+
+</script>
 </body>
 </html>
