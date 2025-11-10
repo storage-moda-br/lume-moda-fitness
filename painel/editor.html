@@ -140,6 +140,8 @@
 import Cropper from "https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.esm.js";
 let cropper = null;
 let croppedBlob = null;
+let autoSave = false;
+
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
@@ -379,6 +381,8 @@ document.getElementById("btnApplyCrop").addEventListener("click", () => {
       extraBlobs[currentSlotEdit] = blob;
 
       renderExtraSlots();
+	  autoSave = true;
+elSalvar.click();
 
       // reset UI
       editingExtra = false;
@@ -394,6 +398,9 @@ document.getElementById("btnApplyCrop").addEventListener("click", () => {
       const url = URL.createObjectURL(blob);
       elPrev.innerHTML = `<img src="${url}" alt="">`;
       croppedBlob = blob;
+	  autoSave = true;
+elSalvar.click();
+
 
       // reset UI
       elPrev.style.display = "flex";
@@ -517,11 +524,15 @@ await setDoc(doc(db,'produtos', pid), payload, { merge: true });
 
     // reset pós-salvar
     currentImageUrl = imageURL;
-    croppedBlob = null;
-    extraBlobs = [];
+elStatus.textContent = '';
 
-    elStatus.textContent = '';
-    showToast();
+if (autoSave){
+  autoSave = false;
+  elStatus.textContent = 'Salvo!';
+} else {
+  showToast();
+}
+
 
   }catch(err){
     console.error(err);
