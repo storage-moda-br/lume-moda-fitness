@@ -1457,12 +1457,16 @@ function openModal(element) {
     if (modalDescription) modalDescription.textContent = productDescription;
     if (modalPrice) modalPrice.textContent = `R$ ${parseFloat(productPrice).toFixed(2).replace(".", ",")}`;
 
-    // monta thumbs: principal + extras
-    modalThumbs.innerHTML = `
-      <img src="${productImage}"
-           style="width:60px;height:75px;object-fit:cover;border-radius:8px;cursor:pointer;border:2px solid #000;"
-           onclick="modalSetImage('${productImage}', this)">
-    `;
+    // limpa thumbs ANTES
+modalThumbs.innerHTML = "";
+
+// monta thumbs: principal + extras
+modalThumbs.innerHTML += `
+  <img src="${productImage}"
+       style="width:60px;height:75px;object-fit:cover;border-radius:8px;cursor:pointer;border:2px solid #000;"
+       onclick="modalSetImage('${productImage}', this)">
+`;
+
 
     if (productExtras) {
       const arr = productExtras.split("|").filter(x => x);
