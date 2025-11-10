@@ -1405,7 +1405,6 @@ cont.innerHTML += `
   }
 }
 
-load();
 
 // --- Modal: util troca imagem e destaca thumb ativa ---
 function modalSetImage(url, element){
@@ -1488,13 +1487,19 @@ if (modalWhatsapp) {
   modalWhatsapp.setAttribute('data-product-description', productDescription);
   modalWhatsapp.setAttribute('data-product-image', productImage);
 
-  // garante o handler correto a cada abertura do modal
   modalWhatsapp.onclick = buyFromModal;
 }
 
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+
+} catch (e) {
+  console.error("openModal error:", e);
+}
+} //  ← FECHA O openModal AQUI
 
 
-// coloca AQUI a função do modal whatsapp
+// FUNÇÃO BUYFROMMODAL FORA DA OPENMODAL
 function buyFromModal(){
   const btn = document.getElementById('modal-whatsapp');
   if (!btn) return;
@@ -1527,17 +1532,19 @@ Poderia me enviar mais informações sobre:
 • Prazo de entrega
 
 Aguardo retorno!
-  `;
+`;
 
   const url = 'https://wa.me/5598991611664?text=' + encodeURIComponent(message);
   window.open(url, '_blank');
 }
 
-// no final do script (junto com os outros)
-window.buyFromModal = buyFromModal;
+
+window.openModal = openModal;
 window.closeModal = closeModal;
 window.modalSetImage = modalSetImage;
-window.buyFromModal = buyFromModal;  // <- ADICIONE ESTA LINHA AQUI
+window.buyFromModal = buyFromModal;
+
+load(); // <- DEVE SER A ÚLTIMA LINHA
 
 </script>
 </body>
