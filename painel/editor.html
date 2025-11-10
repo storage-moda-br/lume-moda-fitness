@@ -518,10 +518,12 @@ for (let i=0; i<extraImages.length; i++){
   }
 }
 
-// mantém ordem / nulls
-payload.imagens = extraImages.slice(); 
+// mantém só URLs válidas (remove null e blob temporário)
+const finalExtras = extraImages.filter(x => x && typeof x === "string" && !x.startsWith("blob:"));
+payload.imagens = finalExtras;
 
 await setDoc(doc(db,'produtos', pid), payload, { merge: true });
+
 
 
 
