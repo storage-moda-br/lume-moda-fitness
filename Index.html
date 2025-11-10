@@ -943,8 +943,9 @@
       <p id="modal-description"></p>
       <div class="product-price" id="modal-price"></div>
       <button class="product-whatsapp" id="modal-whatsapp" onclick="buyFromModal()">
-        <i class="fab fa-whatsapp"></i> Comprar via WhatsApp
-      </button>
+  <i class="fab fa-whatsapp"></i> Comprar via WhatsApp
+</button>
+
     </div>
   </div>
 </div>
@@ -1024,14 +1025,17 @@
         setInterval(nextSlide, 5000);
 
         // Enhanced Product WhatsApp Integration
-        function buyProduct(button) {
-            const productCard = button.closest('.product-card');
-            const productName = productCard.getAttribute('data-product-name');
-            const productPrice = productCard.getAttribute('data-product-price');
-            const productDescription = productCard.getAttribute('data-product-description');
-            const productImage = productCard.getAttribute('data-product-image');
-            
-            const message = `
+// --- botão comprar do CARD ---
+function buyProduct(el) {
+  const productCard = el.closest('.product-card');
+  if (!productCard) return;
+
+  const productName = productCard.getAttribute('data-product-name') || "";
+  const productPrice = productCard.getAttribute('data-product-price') || "0";
+  const productDescription = productCard.getAttribute('data-product-description') || "";
+  const productImage = productCard.getAttribute('data-product-image') || "";
+
+  const message = `
 *PEDIDO LUME MODA FITNESS*
 
 *Produto:* ${productName}
@@ -1045,24 +1049,14 @@ ${productImage}
 
 ---------------------------
 Olá! Tenho interesse neste produto.
+Poderia me enviar mais informações?
+  `;
 
-Poderia me enviar mais informações sobre:
+  const url = 'https://wa.me/5598991611664?text=' + encodeURIComponent(message);
+  window.open(url, '_blank');
+}
 
-• Tamanhos disponíveis
-• Cores disponíveis
-• Formas de pagamento
-• Prazo de entrega
-
-Aguardo retorno! 🙂
-`;
-
-
-            
-            const whatsappUrl = `https://wa.me/5586995332408?text=${encodeURIComponent(message)}`;
-            window.open(whatsappUrl, '_blank');
-        }
-
-       function openModal(element) {
+  function openModal(element) {
   const productCard = element.closest('.product-card');
   const productName = productCard.getAttribute('data-product-name');
   const productPrice = productCard.getAttribute('data-product-price');
@@ -1109,8 +1103,6 @@ Aguardo retorno! 🙂
 
   modal.style.display = 'flex';
   document.body.style.overflow = 'hidden';
-}
-
 }
 
 
@@ -1394,9 +1386,10 @@ cont.innerHTML += `
       <div class="product-info">
         <h4>${d.nome}</h4>
         <div class="product-price">R$ ${precoFmt}</div>
-        <button class="product-whatsapp" onclick="buyProduct(this.parentElement.parentElement.querySelector('.product-image'))">
-          <i class="fab fa-whatsapp"></i> Comprar via WhatsApp
-        </button>
+        <button class="product-whatsapp" onclick="buyProduct(this)">
+  <i class="fab fa-whatsapp"></i> Comprar via WhatsApp
+</button>
+
       </div>
   </div>
 `;
@@ -1404,7 +1397,6 @@ cont.innerHTML += `
   }
 }
 
-load();
 
 // --- Modal: util troca imagem e destaca thumb ativa ---
 function modalSetImage(url, element){
@@ -1480,30 +1472,34 @@ modalThumbs.innerHTML += `
     }
 
     // dados para WhatsApp (se existir)
-    const modalWhatsapp = document.getElementById('modal-whatsapp');
-    if (modalWhatsapp) {
-      modalWhatsapp.setAttribute('data-product-name', productName);
-      modalWhatsapp.setAttribute('data-product-price', productPrice);
-      modalWhatsapp.setAttribute('data-product-description', productDescription);
-      modalWhatsapp.setAttribute('data-product-image', productImage);
-    }
+const modalWhatsapp = document.getElementById('modal-whatsapp');
+if (modalWhatsapp) {
+  modalWhatsapp.setAttribute('data-product-name', productName);
+  modalWhatsapp.setAttribute('data-product-price', productPrice);
+  modalWhatsapp.setAttribute('data-product-description', productDescription);
+  modalWhatsapp.setAttribute('data-product-image', productImage);
 
-    modal.style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-  } catch (e) {
-    console.error("openModal error:", e);
-  }
+  modalWhatsapp.onclick = buyFromModal;
 }
 
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
 
-// coloca AQUI a função do modal whatsapp
+} catch (e) {
+  console.error("openModal error:", e);
+}
+} //  ← FECHA O openModal AQUI
+
+
+// FUNÇÃO BUYFROMMODAL FORA DA OPENMODAL
 function buyFromModal(){
-  const modalWhatsapp = document.getElementById('modal-whatsapp');
+  const btn = document.getElementById('modal-whatsapp');
+  if (!btn) return;
 
-  const productName = modalWhatsapp.getAttribute('data-product-name');
-  const productPrice = modalWhatsapp.getAttribute('data-product-price');
-  const productDescription = modalWhatsapp.getAttribute('data-product-description');
-  const productImage = modalWhatsapp.getAttribute('data-product-image');
+  const productName = btn.getAttribute('data-product-name') || '';
+  const productPrice = btn.getAttribute('data-product-price') || '0';
+  const productDescription = btn.getAttribute('data-product-description') || '';
+  const productImage = btn.getAttribute('data-product-image') || '';
 
   const message = `
 *PEDIDO LUME MODA FITNESS*
@@ -1528,17 +1524,23 @@ Poderia me enviar mais informações sobre:
 • Prazo de entrega
 
 Aguardo retorno!
-  `;
+`;
 
-  const url = 'https://wa.me/5598991611664?text='+ encodeURIComponent(message);
+  const url = 'https://wa.me/5598991611664?text=' + encodeURIComponent(message);
   window.open(url, '_blank');
 }
 
-// *** deixa sempre NO FINAL ***
+
+// --- EXPORTA TUDO PRO ESCOPO GLOBAL ---
 window.openModal = openModal;
 window.closeModal = closeModal;
 window.modalSetImage = modalSetImage;
-window.buyFromModal = buyFromModal;  // <- ADICIONE ESTA LINHA AQUI
+window.buyFromModal = buyFromModal;
+window.buyProduct = buyProduct;
+
+
+// tem que ser a ÚLTIMA linha
+load();
 
 </script>
 </body>
