@@ -190,15 +190,26 @@ let extraBlobs = [];        // blobs a subir dos slots (só novas/alteradas)
     const snap = await getDoc(refDoc);
     if (snap.exists()){
       const d = snap.data();
+
       elNome.value = d.nome || "";
       elDesc.value = d.descricao || "";
       elPreco.value = (typeof d.preco === 'number' ? d.preco.toFixed(2) : (d.preco || "")).toString().replace('.', ',');
+
+      // principal
       if (d.imagem){
         currentImageUrl = d.imagem;
         elPrev.innerHTML = `<img src="${d.imagem}" alt="">`;
       }
+
+      // extras
       if (Array.isArray(d.imagens)){
-        extraImages = d.imagens.slice(0,5); // garante no máximo 5
+        // carrega exatamente como está salvo no banco
+        extraImages = d.imagens.slice(); // copia igual
+        extraBlobs = new Array(extraImages.length).fill(null); // zera blobs locais
+        renderExtraSlots();
+      } else {
+        extraImages = [];
+        extraBlobs = [];
         renderExtraSlots();
       }
     }
@@ -207,6 +218,7 @@ let extraBlobs = [];        // blobs a subir dos slots (só novas/alteradas)
     elStatus.innerHTML = '<span class="err">Erro ao carregar produto.</span>';
   }
 })();
+
 
 /* Renderiza as miniaturas dos slots extras */
 function renderExtraSlots(){
