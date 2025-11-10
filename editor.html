@@ -59,7 +59,12 @@
     top: 20px;
     opacity: 1;
   }
+  .slotExtra:hover .delExtra{
+  display:flex !important;
+}
+
 </style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css">
 </head>
 <body>
 <!-- Toast topo -->
@@ -75,13 +80,34 @@
     <!-- Lado da imagem -->
     <div class="card">
       <div class="preview" id="preview"><span class="note">Prévia da imagem</span></div>
+
+      <!-- Área de crop (única) -->
+      <div id="cropArea" style="display:none; margin-top:10px;">
+        <img id="cropImg" style="max-width:100%; display:block;">
+        <button id="btnApplyCrop" class="btn btn-primary" type="button" style="margin-top:10px;width:100%;">
+          Aplicar corte e usar esta imagem
+        </button>
+      </div>
+
       <div style="margin-top:10px" class="row">
-        <!-- câmera traseira no celular; ainda permite galeria -->
         <!-- selecionar imagem -->
-<input id="file" type="file" accept="image/*" style="display:none">
-<button id="btnSelectImage" class="btn btn-primary" type="button">Selecionar foto</button>
+        <input id="file" type="file" accept="image/*" style="display:none">
+        <input id="fileExtra" type="file" accept="image/*" style="display:none">
+        <button id="btnSelectImage" class="btn btn-primary" type="button">Selecionar foto</button>
+
+        <div style="margin-top:14px;font-size:12px;color:#555;font-weight:600;">Fotos extras (até 5):</div>
+
+        <div id="extraImagesWrap" style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap;">
+  <div class="slotExtra" data-slot="0" style="width:59px;height:74px;position:relative;background:#fafafa;border:1px dashed #ccc;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#999;cursor:pointer;">+</div>
+  <div class="slotExtra" data-slot="1" style="width:59px;height:74px;position:relative;background:#fafafa;border:1px dashed #ccc;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#999;cursor:pointer;">+</div>
+  <div class="slotExtra" data-slot="2" style="width:59px;height:74px;position:relative;background:#fafafa;border:1px dashed #ccc;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#999;cursor:pointer;">+</div>
+  <div class="slotExtra" data-slot="3" style="width:59px;height:74px;position:relative;background:#fafafa;border:1px dashed #ccc;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#999;cursor:pointer;">+</div>
+  <div class="slotExtra" data-slot="4" style="width:59px;height:74px;position:relative;background:#fafafa;border:1px dashed #ccc;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#999;cursor:pointer;">+</div>
+</div>
+
 
       </div>
+
       <div style="margin-top:10px" class="progress" aria-hidden="true"><div id="bar"></div></div>
       <div id="progText" class="note" style="margin-top:6px"></div>
     </div>
@@ -111,6 +137,12 @@
 </div>
 
 <script type="module">
+import Cropper from "https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.esm.js";
+let cropper = null;
+let croppedBlob = null;
+let autoSave = false;
+
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
@@ -146,6 +178,10 @@ const elBar = document.getElementById('bar');
 const elProg = document.getElementById('progText');
 
 let currentImageUrl = "";
+let extraImages = [];       // URLs (Firebase ou blob URL para preview)
+let currentSlotEdit = null; // índice do slot sendo editado
+let editingExtra = false;   // se estamos cropando extra
+let extraBlobs = [];        // blobs a subir dos slots (só novas/alteradas)
 
 /* Carrega dados atuais */
 (async () => {
@@ -161,6 +197,10 @@ let currentImageUrl = "";
         currentImageUrl = d.imagem;
         elPrev.innerHTML = `<img src="${d.imagem}" alt="">`;
       }
+      if (Array.isArray(d.imagens)){
+        extraImages = d.imagens.slice(0,5); // garante no máximo 5
+        renderExtraSlots();
+      }
     }
   }catch(e){
     console.error(e);
@@ -168,14 +208,137 @@ let currentImageUrl = "";
   }
 })();
 
-/* Preview local da imagem */
+/* Renderiza as miniaturas dos slots extras */
+function renderExtraSlots(){
+  const wrap = document.getElementById("extraImagesWrap");
+  const slots = wrap.querySelectorAll(".slotExtra");
+
+  slots.forEach((slot, idx)=>{
+    const url = extraImages[idx];
+    if (url){
+      slot.innerHTML = `
+        <img src="${url}" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">
+        <div class="delExtra" data-idx="${idx}" 
+          style="
+            position:absolute;
+            top:4px;right:4px;
+            background:rgba(0,0,0,0.6);
+            color:#fff;
+            width:18px;height:18px;
+            font-size:14px;
+            border-radius:4px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            cursor:pointer;
+          ">×</div>
+      `;
+    } else {
+      slot.innerHTML = "+";
+    }
+  });
+}
+
+
+
+/* Clique nos slots extras → abrir seleção */
+document.querySelectorAll(".slotExtra").forEach(slot=>{
+  slot.addEventListener("click",()=>{
+    currentSlotEdit = parseInt(slot.dataset.slot);
+    editingExtra = true;
+    document.getElementById("fileExtra").click(); // abre seleção
+  });
+});
+// DELETE EXTRA — captura clique no X
+document.addEventListener("click",(ev)=>{
+  const btn = ev.target.closest(".delExtra");
+  if (!btn) return;
+
+  ev.stopPropagation(); // impede abrir o fileExtra
+
+  const slotDiv = btn.closest(".slotExtra");
+  const idx = parseInt(slotDiv.dataset.slot);
+
+  // remove da memória
+  extraImages[idx] = null; // marca vazio
+
+  // atualiza visual
+  slotDiv.innerHTML = "+";
+});
+
+
+/* Preview local da imagem PRINCIPAL + iniciar crop */
 elFile.addEventListener('change', () => {
   const f = elFile.files?.[0];
-  if (f){
-    const r = new FileReader();
-    r.onload = () => elPrev.innerHTML = `<img src="${r.result}" alt="">`;
-    r.readAsDataURL(f);
-  }
+  if (!f) return;
+
+  // reset do blob principal ao iniciar novo crop
+  croppedBlob = null;
+
+  // oculta preview normal
+  elPrev.style.display = "none";
+
+  // mostra área do crop
+  document.getElementById("cropArea").style.display = "block";
+
+  const cropImg = document.getElementById("cropImg");
+  const reader = new FileReader();
+
+  reader.onload = () => {
+    cropImg.src = reader.result;
+
+    // destruir crop anterior
+    if (cropper) {
+      cropper.destroy();
+      cropper = null;
+    }
+
+    // iniciar crop com 4:5
+    cropper = new Cropper(cropImg, {
+      aspectRatio: 4 / 5,
+      viewMode: 1,
+      dragMode: 'move',
+      autoCropArea: 1
+    });
+  };
+
+  reader.readAsDataURL(f);
+});
+
+/* Preview local da IMAGEM EXTRA + iniciar crop (usa mesma área) */
+document.getElementById("fileExtra").addEventListener("change", () => {
+  const f = document.getElementById("fileExtra").files?.[0];
+  if (!f) return;
+
+  // reset do blob principal ao iniciar crop de extra (evita subir errado)
+  croppedBlob = null;
+
+  // esconder preview principal
+  elPrev.style.display = "none";
+
+  // mostrar crop
+  document.getElementById("cropArea").style.display = "block";
+
+  const cropImg = document.getElementById("cropImg");
+  const reader = new FileReader();
+
+  reader.onload = () => {
+    cropImg.src = reader.result;
+
+    if (cropper) {
+      cropper.destroy();
+      cropper = null;
+    }
+
+    cropper = new Cropper(cropImg, {
+      aspectRatio: 4 / 5,
+      viewMode: 1,
+      dragMode: 'move',
+      autoCropArea: 1
+    });
+  };
+
+  reader.readAsDataURL(f);
 });
 
 /* Normaliza "89,90" → 89.9 (number) */
@@ -197,13 +360,83 @@ function showToast(){
   }, 1400);
 }
 
+/* Aplicar corte (principal ou extra) */
+/* Aplicar corte (principal ou extra) */
+document.getElementById("btnApplyCrop").addEventListener("click", () => {
+  if (!cropper) return;
+
+  cropper.getCroppedCanvas({
+    width:1080,
+    height:1350,
+    fillColor:"#fff"
+  }).toBlob((blob) => {
+
+    if (editingExtra){
+      const url = URL.createObjectURL(blob);
+
+      // salva local pré visualização
+      extraImages[currentSlotEdit] = url;
+
+      // guarda blob para upload
+      extraBlobs[currentSlotEdit] = blob;
+
+      renderExtraSlots();
+	  autoSave = true;
+elSalvar.click();
+
+      // reset UI
+      editingExtra = false;
+      currentSlotEdit = null;
+      elPrev.style.display = "flex";
+      document.getElementById("cropArea").style.display = "none";
+
+      // AUTO SAVE extra
+      elSalvar.click();
+
+    } else {
+      // principal
+      const url = URL.createObjectURL(blob);
+      elPrev.innerHTML = `<img src="${url}" alt="">`;
+      croppedBlob = blob;
+	  autoSave = true;
+elSalvar.click();
+
+
+      // reset UI
+      elPrev.style.display = "flex";
+      document.getElementById("cropArea").style.display = "none";
+
+      // AUTO SAVE principal
+      elSalvar.click();
+    }
+
+  }, "image/jpeg", 0.9);
+});
+
+
+// click no X para apagar extra
+document.addEventListener("click",(ev)=>{
+  if (ev.target.classList.contains("delExtra")){
+    ev.stopPropagation();
+    const idx = parseInt(ev.target.dataset.idx);
+
+    // zera esse slot local
+    extraImages[idx] = null;
+    extraBlobs[idx] = null; // caso estivesse carregado pra upload ainda
+
+    // re-renderizar slots
+    renderExtraSlots();
+  }
+});
+
+
 /* Salvar */
 elSalvar.addEventListener('click', async () => {
   try{
     elSalvar.disabled = true;
     elStatus.textContent = 'Salvando...';
 
-    // zera barra de progresso visual
+    // zera barra
     elBar.style.width = '0%';
     elProg.textContent = '';
 
@@ -213,15 +446,14 @@ elSalvar.addEventListener('click', async () => {
 
     let imageURL = currentImageUrl;
 
-    // se escolheu nova foto, faz upload
-    const file = elFile.files?.[0];
-    if (file){
-      const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+    // subir PRINCIPAL (se tiver blob)
+    if (croppedBlob){
+      const ext = "jpg";
       const storagePath = `produtos/${pid}-${Date.now()}.${ext}`;
       const storageRef = ref(st, storagePath);
-	  console.log("enviando para:", storagePath);
-      const task = uploadBytesResumable(storageRef, file, { contentType: file.type });
+      console.log("enviando CROP para:", storagePath);
 
+      const task = uploadBytesResumable(storageRef, croppedBlob, { contentType: "image/jpeg" });
 
       task.on('state_changed', (snap)=>{
         const pct = Math.round((snap.bytesTransferred / snap.totalBytes) * 100);
@@ -233,20 +465,74 @@ elSalvar.addEventListener('click', async () => {
       imageURL = await getDownloadURL(storageRef);
     }
 
-    // grava no Firestore (merge)
-    const payload = {
-      nome,
-      descricao,
-      preco: precoNumber,
-      imagem: imageURL || "",
-      data: serverTimestamp()
-    };
+    // subir EXTRAS novas (slots com blob)
+let novasURLsExtras = [];
+for (let i=0; i<extraBlobs.length; i++){
+  const blob = extraBlobs[i];
+  if (!blob) continue;
 
-    await setDoc(doc(db,'produtos', pid), payload, { merge: true });
+  const ext = "jpg";
+  const storagePath = `produtos/${pid}-${Date.now()}-${i}.${ext}`;
+  const storageRef = ref(st, storagePath);
 
+  console.log("enviando EXTRA:", storagePath);
+
+  const task2 = uploadBytesResumable(storageRef, blob, {contentType:"image/jpeg"});
+
+  await new Promise(res=>{
+    task2.on('state_changed', snap=>{
+      const pct = Math.round((snap.bytesTransferred / snap.totalBytes) * 100);
+      elBar.style.width = pct + '%';
+      elProg.textContent = `Enviando imagem extra… ${pct}%`;
+    }, null, async ()=>{
+      const urlExtra = await getDownloadURL(storageRef);
+      novasURLsExtras.push(urlExtra);
+      res();
+    });
+  });
+}
+
+// adiciona URLs novas no array local
+if (novasURLsExtras.length > 0){
+  for (let u of novasURLsExtras){
+    extraImages.push(u);
+  }
+}
+
+// payload final
+const payload = {
+  nome,
+  descricao,
+  preco: precoNumber,
+  imagem: imageURL || "",
+  data: serverTimestamp()
+};
+
+// zera slots com blob (lixo local)
+for (let i=0; i<extraImages.length; i++){
+  if (typeof extraImages[i] === "string" && extraImages[i].startsWith("blob:")){
+    extraImages[i] = null;
+  }
+}
+
+// mantém ordem / nulls
+payload.imagens = extraImages.slice(); 
+
+await setDoc(doc(db,'produtos', pid), payload, { merge: true });
+
+
+
+    // reset pós-salvar
     currentImageUrl = imageURL;
-    elStatus.textContent = ''; // limpa status
-    showToast(); // ✅ toast + voltar pro painel
+elStatus.textContent = '';
+
+if (autoSave){
+  autoSave = false;
+  elStatus.textContent = 'Salvo!';
+} else {
+  showToast();
+}
+
 
   }catch(err){
     console.error(err);
@@ -267,7 +553,6 @@ elCopiar.addEventListener('click', async ()=>{
 document.getElementById("btnSelectImage").addEventListener("click", ()=>{
    document.getElementById("file").click();
 });
-
 </script>
 </body>
 </html>
