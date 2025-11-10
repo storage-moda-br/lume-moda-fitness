@@ -373,6 +373,7 @@ function showToast(){
 
 
 /* Aplicar corte (principal ou extra) */
+/* Aplicar corte (principal ou extra) */
 document.getElementById("btnApplyCrop").addEventListener("click", () => {
   if (!cropper) return;
 
@@ -385,15 +386,13 @@ document.getElementById("btnApplyCrop").addEventListener("click", () => {
     if (editingExtra){
       const url = URL.createObjectURL(blob);
 
-      // salva local pré visualização
       extraImages[currentSlotEdit] = url;
-
-      // guarda blob para upload
       extraBlobs[currentSlotEdit] = blob;
 
       renderExtraSlots();
-	  autoSave = true;
-elSalvar.click();
+
+      autoSave = true;
+      elSalvar.click(); // SOMENTE esse
 
       // reset UI
       editingExtra = false;
@@ -401,24 +400,17 @@ elSalvar.click();
       elPrev.style.display = "flex";
       document.getElementById("cropArea").style.display = "none";
 
-      // AUTO SAVE extra
-      elSalvar.click();
-
     } else {
-      // principal
+
       const url = URL.createObjectURL(blob);
       elPrev.innerHTML = `<img src="${url}" alt="">`;
       croppedBlob = blob;
-	  autoSave = true;
-elSalvar.click();
 
+      autoSave = true;
+      elSalvar.click(); // SOMENTE esse
 
-      // reset UI
       elPrev.style.display = "flex";
       document.getElementById("cropArea").style.display = "none";
-
-      // AUTO SAVE principal
-      elSalvar.click();
     }
 
   }, "image/jpeg", 0.9);
