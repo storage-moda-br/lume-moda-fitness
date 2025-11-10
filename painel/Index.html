@@ -1057,55 +1057,60 @@ Aguardo retorno! 🙂
             window.open(whatsappUrl, '_blank');
         }
 
-        // Modal Functions
-       function openModal(element) {
-    const productCard = element.closest('.product-card');
-    const productName = productCard.getAttribute('data-product-name');
-    const productPrice = productCard.getAttribute('data-product-price');
-    const productDescription = productCard.getAttribute('data-product-description');
-    const productImage = productCard.getAttribute('data-product-image');
-    const productExtras = productCard.getAttribute('data-product-extras') || "";
+       // Modal Functions
+function openModal(element) {
+  const productCard = element.closest('.product-card');
+  const productName = productCard.getAttribute('data-product-name');
+  const productPrice = productCard.getAttribute('data-product-price');
+  const productDescription = productCard.getAttribute('data-product-description');
+  const productImage = productCard.getAttribute('data-product-image');
+  const productExtras = productCard.getAttribute('data-product-extras') || "";
 
-    const modal = document.getElementById('product-modal');
-    const modalImage = document.getElementById('modal-image');
-    const modalTitle = document.getElementById('modal-title');
-    const modalDescription = document.getElementById('modal-description');
-    const modalPrice = document.getElementById('modal-price');
-    const modalThumbs = document.getElementById('modal-thumbs');
+  const modal = document.getElementById('product-modal');
+  const modalImage = document.getElementById('modal-image');
+  const modalTitle = document.getElementById('modal-title');
+  const modalDescription = document.getElementById('modal-description');
+  const modalPrice = document.getElementById('modal-price');
+  const modalThumbs = document.getElementById('modal-thumbs');
 
-    modalImage.src = productImage;
-    modalImage.alt = productDescription;
-    modalTitle.textContent = productName;
-    modalDescription.textContent = productDescription;
-    modalPrice.textContent = `R$ ${parseFloat(productPrice).toFixed(2).replace(".", ",")}`;
+  // define conteúdo principal
+  modalImage.src = productImage;
+  modalImage.alt = productDescription;
+  modalTitle.textContent = productName;
+  modalDescription.textContent = productDescription;
+  modalPrice.textContent = `R$ ${parseFloat(productPrice).toFixed(2).replace(".", ",")}`;
 
-    // monta thumbs
-    modalThumbs.innerHTML = "";
+  // limpa thumbs antigas
+  modalThumbs.innerHTML = "";
 
-    // principal
-    modalThumbs.innerHTML += `
-      <img src="${productImage}" style="width:50px;height:62px;object-fit:cover;border-radius:6px;cursor:pointer;border:2px solid #000" onclick="document.getElementById('modal-image').src='${productImage}'">
-    `;
+  // adiciona principal
+  modalThumbs.innerHTML += `
+    <img src="${productImage}" 
+         style="width:60px;height:75px;object-fit:cover;border-radius:8px;cursor:pointer;border:2px solid #000;"
+         onclick="document.getElementById('modal-image').src='${productImage}'">
+  `;
 
-    // extras
-    if (productExtras.length > 0){
-        const arr = productExtras.split("|").filter(x=>x);
-        for (const url of arr){
-            modalThumbs.innerHTML += `
-              <img src="${url}" style="width:50px;height:62px;object-fit:cover;border-radius:6px;cursor:pointer;border:2px solid transparent" onclick="document.getElementById('modal-image').src='${url}'">
-            `;
-        }
+  // adiciona extras se houver
+  if (productExtras.length > 0) {
+    const arr = productExtras.split("|").filter(x => x);
+    for (const url of arr) {
+      modalThumbs.innerHTML += `
+        <img src="${url}" 
+             style="width:60px;height:75px;object-fit:cover;border-radius:8px;cursor:pointer;border:2px solid transparent;"
+             onclick="document.getElementById('modal-image').src='${url}'">
+      `;
     }
+  }
 
-    // Store para o botão WhatsApp
-    const modalWhatsapp = document.getElementById('modal-whatsapp');
-    modalWhatsapp.setAttribute('data-product-name', productName);
-    modalWhatsapp.setAttribute('data-product-price', productPrice);
-    modalWhatsapp.setAttribute('data-product-description', productDescription);
-    modalWhatsapp.setAttribute('data-product-image', productImage);
+  // prepara botão WhatsApp
+  const modalWhatsapp = document.getElementById('modal-whatsapp');
+  modalWhatsapp.setAttribute('data-product-name', productName);
+  modalWhatsapp.setAttribute('data-product-price', productPrice);
+  modalWhatsapp.setAttribute('data-product-description', productDescription);
+  modalWhatsapp.setAttribute('data-product-image', productImage);
 
-    modal.style.display = 'flex';
-    document.body.style.overflow = 'hidden';
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
 }
 
 
@@ -1358,30 +1363,30 @@ async function load(){
     const precoFmt = parseFloat(d.preco).toFixed(2).replace(".",",");
 
     // monta lista das extras, se existir
-const extras = Array.isArray(d.imagens) ? d.imagens.filter(x=>x).join("|") : "";
+const extras = Array.isArray(d.imagens) ? d.imagens.join("|") : "";
 
 cont.innerHTML += `
-      <div class="product-card"
-           data-product-name="${d.nome}"
-           data-product-price="${precoFmt}"
-           data-product-description="${d.descricao}"
-           data-product-image="${d.imagem}"
-           data-product-extras="${extras}">
-
-          
-          <div class="product-image" onclick="openModal(this)">
-            <img src="${d.imagem}" alt="${d.descricao}">
-          </div>
-
-          <div class="product-info">
-            <h4>${d.nome}</h4>
-            <div class="product-price">R$ ${precoFmt}</div>
-            <button class="product-whatsapp" onclick="buyProduct(this.parentElement.parentElement.querySelector('.product-image'))">
-              <i class="fab fa-whatsapp"></i> Comprar via WhatsApp
-            </button>
-          </div>
+  <div class="product-card"
+       data-product-name="${d.nome}"
+       data-product-price="${precoFmt}"
+       data-product-description="${d.descricao}"
+       data-product-image="${d.imagem}"
+       data-product-extras="${extras}">
+      
+      <div class="product-image" onclick="openModal(this)">
+        <img src="${d.imagem}" alt="${d.descricao}">
       </div>
-    `;
+
+      <div class="product-info">
+        <h4>${d.nome}</h4>
+        <div class="product-price">R$ ${precoFmt}</div>
+        <button class="product-whatsapp" onclick="buyProduct(this.parentElement.parentElement.querySelector('.product-image'))">
+          <i class="fab fa-whatsapp"></i> Comprar via WhatsApp
+        </button>
+      </div>
+  </div>
+`;
+
   }
 }
 
