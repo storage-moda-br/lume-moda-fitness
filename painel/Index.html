@@ -1025,6 +1025,7 @@
         setInterval(nextSlide, 5000);
 
         // Enhanced Product WhatsApp Integration
+// --- botão comprar do CARD ---
 function buyProduct(el) {
   const productCard = el.closest('.product-card');
   if (!productCard) return;
@@ -1048,20 +1049,25 @@ ${productImage}
 
 ---------------------------
 Olá! Tenho interesse neste produto.
-
-Poderia me enviar mais informações sobre:
-
-• Tamanhos disponíveis
-• Cores disponíveis
-• Formas de pagamento
-• Prazo de entrega
-
-Aguardo retorno!
+Poderia me enviar mais informações?
   `;
 
   const url = 'https://wa.me/5598991611664?text=' + encodeURIComponent(message);
   window.open(url, '_blank');
 }
+
+
+// --- EXPORTA TUDO PRO ESCOPO GLOBAL ---
+window.openModal = openModal;
+window.closeModal = closeModal;
+window.modalSetImage = modalSetImage;
+window.buyFromModal = buyFromModal;
+window.buyProduct = buyProduct;
+
+
+// tem que ser a ÚLTIMA linha
+load();
+
 
 
 
@@ -1399,9 +1405,9 @@ cont.innerHTML += `
         <h4>${d.nome}</h4>
         <div class="product-price">R$ ${precoFmt}</div>
         <button class="product-whatsapp" onclick="buyProduct(this)">
+  <i class="fab fa-whatsapp"></i> Comprar via WhatsApp
+</button>
 
-          <i class="fab fa-whatsapp"></i> Comprar via WhatsApp
-        </button>
       </div>
   </div>
 `;
@@ -1543,6 +1549,7 @@ Aguardo retorno!
 }
 
 
+// --- EXPORTA TUDO PRO ESCOPO GLOBAL ---
 window.openModal = openModal;
 window.closeModal = closeModal;
 window.modalSetImage = modalSetImage;
@@ -1550,7 +1557,8 @@ window.buyFromModal = buyFromModal;
 window.buyProduct = buyProduct;
 
 
-load(); // <- DEVE SER A ÚLTIMA LINHA
+// tem que ser a ÚLTIMA linha
+load();
 
 </script>
 </body>
