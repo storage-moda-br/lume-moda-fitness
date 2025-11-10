@@ -922,28 +922,33 @@
 
    <!-- Products Section -->
 <div class="container">
-    <section class="products" id="produtos">f<img class="modal-image" id="modal-image" src="" alt="Produto">
-        <h2 class="section-title">Produtos em Destaque</h2>
+    <section class="products" id="produtos">
+	     <h2 class="section-title">Produtos em Destaque</h2>
 
         <div class="product-grid" id="productsContainer"></div>
 
-    <!-- Modal -->
-    <div class="modal" id="product-modal">
-        <div class="modal-content">
-            <span class="close-modal" onclick="closeModal()">&times;</span>
-            <img class="modal-image" id="modal-image" src="" alt="Produto">
-			<div id="modal-thumbs" style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;justify-content:center;"></div>
+   <!-- Modal -->
+<div class="modal" id="product-modal" style="display:none;">
+  <div class="modal-content">
+    <span class="close-modal" onclick="closeModal()">&times;</span>
 
-            <div class="modal-info">
-                <h3 id="modal-title"></h3>
-                <p id="modal-description"></p>
-                <div class="product-price" id="modal-price"></div>
-                <button class="product-whatsapp" id="modal-whatsapp" onclick="buyFromModal()">
-                    <i class="fab fa-whatsapp"></i> Comprar via WhatsApp
-                </button>
-            </div>
-        </div>
+    <!-- Agrupa imagem e miniaturas -->
+    <div class="modal-media" style="display:flex;flex-direction:column;align-items:center;">
+      <img class="modal-image" id="modal-image" src="" alt="Produto" style="display:block;max-width:100%;max-height:55vh;object-fit:contain;">
+      <div id="modal-thumbs" style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;justify-content:center;"></div>
     </div>
+
+    <div class="modal-info">
+      <h3 id="modal-title"></h3>
+      <p id="modal-description"></p>
+      <div class="product-price" id="modal-price"></div>
+      <button class="product-whatsapp" id="modal-whatsapp" onclick="buyFromModal()">
+        <i class="fab fa-whatsapp"></i> Comprar via WhatsApp
+      </button>
+    </div>
+  </div>
+</div>
+
 
     <!-- Footer -->
     <footer id="contato">
@@ -1057,8 +1062,7 @@ Aguardo retorno! 🙂
             window.open(whatsappUrl, '_blank');
         }
 
-       // Modal Functions
-function openModal(element) {
+       function openModal(element) {
   const productCard = element.closest('.product-card');
   const productName = productCard.getAttribute('data-product-name');
   const productPrice = productCard.getAttribute('data-product-price');
@@ -1073,36 +1077,32 @@ function openModal(element) {
   const modalPrice = document.getElementById('modal-price');
   const modalThumbs = document.getElementById('modal-thumbs');
 
-  // define conteúdo principal
+  // conteúdo principal
   modalImage.src = productImage;
   modalImage.alt = productDescription;
   modalTitle.textContent = productName;
   modalDescription.textContent = productDescription;
   modalPrice.textContent = `R$ ${parseFloat(productPrice).toFixed(2).replace(".", ",")}`;
 
-  // limpa thumbs antigas
-  modalThumbs.innerHTML = "";
-
-  // adiciona principal
-  modalThumbs.innerHTML += `
-    <img src="${productImage}" 
+  // thumbs
+  modalThumbs.innerHTML = `
+    <img src="${productImage}"
          style="width:60px;height:75px;object-fit:cover;border-radius:8px;cursor:pointer;border:2px solid #000;"
          onclick="document.getElementById('modal-image').src='${productImage}'">
   `;
 
-  // adiciona extras se houver
   if (productExtras.length > 0) {
     const arr = productExtras.split("|").filter(x => x);
     for (const url of arr) {
       modalThumbs.innerHTML += `
-        <img src="${url}" 
+        <img src="${url}"
              style="width:60px;height:75px;object-fit:cover;border-radius:8px;cursor:pointer;border:2px solid transparent;"
              onclick="document.getElementById('modal-image').src='${url}'">
       `;
     }
   }
 
-  // prepara botão WhatsApp
+  // dados para WhatsApp
   const modalWhatsapp = document.getElementById('modal-whatsapp');
   modalWhatsapp.setAttribute('data-product-name', productName);
   modalWhatsapp.setAttribute('data-product-price', productPrice);
