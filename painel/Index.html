@@ -1056,23 +1056,7 @@ Poderia me enviar mais informações?
   window.open(url, '_blank');
 }
 
-
-// --- EXPORTA TUDO PRO ESCOPO GLOBAL ---
-window.openModal = openModal;
-window.closeModal = closeModal;
-window.modalSetImage = modalSetImage;
-window.buyFromModal = buyFromModal;
-window.buyProduct = buyProduct;
-
-
-// tem que ser a ÚLTIMA linha
-load();
-
-
-
-
-
-       function openModal(element) {
+  function openModal(element) {
   const productCard = element.closest('.product-card');
   const productName = productCard.getAttribute('data-product-name');
   const productPrice = productCard.getAttribute('data-product-price');
