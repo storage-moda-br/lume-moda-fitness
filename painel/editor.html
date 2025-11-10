@@ -202,22 +202,22 @@ let extraBlobs = [];        // blobs a subir dos slots (só novas/alteradas)
       }
 
       // extras
-      if (Array.isArray(d.imagens)){
-        // carrega exatamente como está salvo no banco
-        extraImages = d.imagens.slice(); // copia igual
-        extraBlobs = new Array(extraImages.length).fill(null); // zera blobs locais
-        renderExtraSlots();
-      } else {
-        extraImages = [];
-        extraBlobs = [];
-        renderExtraSlots();
-      }
-    }
-  }catch(e){
-    console.error(e);
-    elStatus.innerHTML = '<span class="err">Erro ao carregar produto.</span>';
-  }
-})();
+if (Array.isArray(d.imagens)){
+  
+  // remove null, undefined, "", etc
+  extraImages = d.imagens.filter(u => u).slice(0,5);
+
+  // cria extraBlobs com mesmo tamanho
+  extraBlobs = new Array(extraImages.length).fill(null);
+
+  renderExtraSlots();
+
+} else {
+  extraImages = [];
+  extraBlobs = [];
+  renderExtraSlots();
+}
+
 
 
 /* Renderiza as miniaturas dos slots extras */
