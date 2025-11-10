@@ -351,16 +351,26 @@ function normalizePrecoToNumber(v){
 
 /* Toast + redirecionamento */
 function showToast(){
-  // se for autosave -> NÃO REDIRECIONA
+  // se autosave → só mostra o texto e NÃO redireciona
   if (autoSave) return;
 
   const t = document.getElementById("toast");
   t.classList.add("show");
+
   setTimeout(()=>{
     t.classList.remove("show");
-    setTimeout(()=>{ window.location.href = "painel.html"; }, 400);
+
+    // só redireciona se NÃO for autosave
+    if (!autoSave){
+      setTimeout(()=>{
+        window.location.href = "painel.html";
+      }, 400);
+    }
+
   }, 1400);
 }
+
+
 
 /* Aplicar corte (principal ou extra) */
 document.getElementById("btnApplyCrop").addEventListener("click", () => {
