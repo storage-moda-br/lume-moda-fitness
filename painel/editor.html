@@ -369,16 +369,18 @@ document.getElementById("btnApplyCrop").addEventListener("click", () => {
     fillColor:"#fff"
   }).toBlob((blob) => {
 
-    if (editingExtra){
-
+  if (editingExtra){
   const url = URL.createObjectURL(blob);
+
+  // salva local para pré-visualização
   extraImages[currentSlotEdit] = url;
 
-  // salva o blob dessa imagem extra também
+  // ESSENCIAL: guarda blob para upload
   extraBlobs[currentSlotEdit] = blob;
 
   renderExtraSlots();
 }
+
 
 else {
       // é a principal
