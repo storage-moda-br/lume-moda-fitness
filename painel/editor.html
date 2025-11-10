@@ -351,16 +351,17 @@ function normalizePrecoToNumber(v){
 
 /* Toast + redirecionamento */
 function showToast(){
+  // se for autosave -> NÃO REDIRECIONA
+  if (autoSave) return;
+
   const t = document.getElementById("toast");
   t.classList.add("show");
-  // visível 1.4s, some 0.4s, redireciona
   setTimeout(()=>{
     t.classList.remove("show");
     setTimeout(()=>{ window.location.href = "painel.html"; }, 400);
   }, 1400);
 }
 
-/* Aplicar corte (principal ou extra) */
 /* Aplicar corte (principal ou extra) */
 document.getElementById("btnApplyCrop").addEventListener("click", () => {
   if (!cropper) return;
@@ -532,6 +533,7 @@ if (autoSave){
 } else {
   showToast();
 }
+
 
 
   }catch(err){
