@@ -59,6 +59,10 @@
     top: 20px;
     opacity: 1;
   }
+  .slotExtra:hover .delExtra{
+  display:flex !important;
+}
+
 </style>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css">
 </head>
@@ -94,13 +98,34 @@
         <div style="margin-top:14px;font-size:12px;color:#555;font-weight:600;">Fotos extras (até 5):</div>
 
         <div id="extraImagesWrap" style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap;">
-          <!-- 5 slots (4:5) -->
-          <div class="slotExtra" data-slot="0" style="width:59px;height:74px;background:#fafafa;border:1px dashed #ccc;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#999;cursor:pointer;">+</div>
-          <div class="slotExtra" data-slot="1" style="width:59px;height:74px;background:#fafafa;border:1px dashed #ccc;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#999;cursor:pointer;">+</div>
-          <div class="slotExtra" data-slot="2" style="width:59px;height:74px;background:#fafafa;border:1px dashed #ccc;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#999;cursor:pointer/">+</div>
-          <div class="slotExtra" data-slot="3" style="width:59px;height:74px;background:#fafafa;border:1px dashed #ccc;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#999;cursor:pointer;">+</div>
-          <div class="slotExtra" data-slot="4" style="width:59px;height:74px;background:#fafafa;border:1px dashed #ccc;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#999;cursor:pointer;">+</div>
-        </div>
+  
+  <div class="slotExtra" data-slot="0" style="width:59px;height:74px;position:relative;background:#fafafa;border:1px dashed #ccc;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#999;cursor:pointer;">
+    +
+    <div class="delExtra" style="display:none;position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.6);color:#fff;width:18px;height:18px;font-size:14px;border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;">×</div>
+  </div>
+
+  <div class="slotExtra" data-slot="1" style="width:59px;height:74px;position:relative;background:#fafafa;border:1px dashed #ccc;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#999;cursor:pointer;">
+    +
+    <div class="delExtra" style="display:none;position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.6);color:#fff;width:18px;height:18px;font-size:14px;border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;">×</div>
+  </div>
+
+  <div class="slotExtra" data-slot="2" style="width:59px;height:74px;position:relative;background:#fafafa;border:1px dashed #ccc;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#999;cursor:pointer;">
+    +
+    <div class="delExtra" style="display:none;position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.6);color:#fff;width:18px;height:18px;font-size:14px;border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;">×</div>
+  </div>
+
+  <div class="slotExtra" data-slot="3" style="width:59px;height:74px;position:relative;background:#fafafa;border:1px dashed #ccc;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#999;cursor:pointer;">
+    +
+    <div class="delExtra" style="display:none;position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.6);color:#fff;width:18px;height:18px;font-size:14px;border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;">×</div>
+  </div>
+
+  <div class="slotExtra" data-slot="4" style="width:59px;height:74px;position:relative;background:#fafafa;border:1px dashed #ccc;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#999;cursor:pointer;">
+    +
+    <div class="delExtra" style="display:none;position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.6);color:#fff;width:18px;height:18px;font-size:14px;border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;">×</div>
+  </div>
+
+</div>
+
       </div>
 
       <div style="margin-top:10px" class="progress" aria-hidden="true"><div id="bar"></div></div>
@@ -223,6 +248,23 @@ document.querySelectorAll(".slotExtra").forEach(slot=>{
     document.getElementById("fileExtra").click(); // abre seleção
   });
 });
+// DELETE EXTRA — captura clique no X
+document.addEventListener("click",(ev)=>{
+  const btn = ev.target.closest(".delExtra");
+  if (!btn) return;
+
+  ev.stopPropagation(); // impede abrir o fileExtra
+
+  const slotDiv = btn.closest(".slotExtra");
+  const idx = parseInt(slotDiv.dataset.slot);
+
+  // remove da memória
+  extraImages[idx] = null; // marca vazio
+
+  // atualiza visual
+  slotDiv.innerHTML = "+";
+});
+
 
 /* Preview local da imagem PRINCIPAL + iniciar crop */
 elFile.addEventListener('change', () => {
@@ -328,12 +370,17 @@ document.getElementById("btnApplyCrop").addEventListener("click", () => {
   }).toBlob((blob) => {
 
     if (editingExtra){
-      // é uma foto extra → atualiza slot atual
-      const url = URL.createObjectURL(blob);
-      extraImages[currentSlotEdit] = url;      // preview local
-      extraBlobs[currentSlotEdit] = blob;      // blob real para upload
-      renderExtraSlots();
-    } else {
+
+  const url = URL.createObjectURL(blob);
+  extraImages[currentSlotEdit] = url;
+
+  // salva o blob dessa imagem extra também
+  extraBlobs[currentSlotEdit] = blob;
+
+  renderExtraSlots();
+}
+
+else {
       // é a principal
       const url = URL.createObjectURL(blob);
       elPrev.innerHTML = `<img src="${url}" alt="">`;
@@ -411,12 +458,7 @@ elSalvar.addEventListener('click', async () => {
       });
     }
 
-    // se teve extras novas, faz append no array local
-    if (novasURLsExtras.length > 0){
-      extraImages = extraImages.concat(novasURLsExtras);
-    }
-
-    // payload final
+      // payload final
     const payload = {
       nome,
       descricao,
@@ -425,10 +467,9 @@ elSalvar.addEventListener('click', async () => {
       data: serverTimestamp()
     };
 
-    // só envia 'imagens' se houver novidades
-    if (novasURLsExtras.length > 0){
-      payload.imagens = extraImages;
-    }
+    // extras -> remove nulos, fica só URLs válidas
+    const finalArray = extraImages.filter(x => x);
+    payload.imagens = finalArray; // se vazio, salva array vazio
 
     await setDoc(doc(db,'produtos', pid), payload, { merge: true });
 
