@@ -1077,33 +1077,30 @@ Aguardo retorno! 🙂
   const modalPrice = document.getElementById('modal-price');
   const modalThumbs = document.getElementById('modal-thumbs');
 
-  // conteúdo principal
   modalImage.src = productImage;
   modalImage.alt = productDescription;
   modalTitle.textContent = productName;
   modalDescription.textContent = productDescription;
   modalPrice.textContent = `R$ ${parseFloat(productPrice).toFixed(2).replace(".", ",")}`;
 
-  // thumbs
-  modalThumbs.innerHTML += 
-  `<img src="${url}" 
-        style="width:50px;height:62px;object-fit:cover;border-radius:6px;cursor:pointer;border:2px solid transparent" 
-        onclick="modalSetImage('${url}', this)">`;
-
-
+  // monta thumbs
+  modalThumbs.innerHTML = `
+    <img src="${productImage}" 
+         style="width:50px;height:62px;object-fit:cover;border-radius:6px;cursor:pointer;border:2px solid #000" 
+         onclick="modalSetImage('${productImage}', this)">
+  `;
 
   if (productExtras.length > 0) {
     const arr = productExtras.split("|").filter(x => x);
     for (const url of arr) {
       modalThumbs.innerHTML += `
-        <img src="${url}"
-             style="width:60px;height:75px;object-fit:cover;border-radius:8px;cursor:pointer;border:2px solid transparent;"
-             onclick="document.getElementById('modal-image').src='${url}'">
+        <img src="${url}" 
+             style="width:50px;height:62px;object-fit:cover;border-radius:6px;cursor:pointer;border:2px solid transparent"
+             onclick="modalSetImage('${url}', this)">
       `;
     }
   }
 
-  // dados para WhatsApp
   const modalWhatsapp = document.getElementById('modal-whatsapp');
   modalWhatsapp.setAttribute('data-product-name', productName);
   modalWhatsapp.setAttribute('data-product-price', productPrice);
@@ -1112,6 +1109,8 @@ Aguardo retorno! 🙂
 
   modal.style.display = 'flex';
   document.body.style.overflow = 'hidden';
+}
+
 }
 
 
