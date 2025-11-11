@@ -1135,6 +1135,81 @@
   }
 }
 
+/* --- Estrutura uniforme dos cards --- */
+.product-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.product-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 14px 14px 18px;
+  text-align: left;
+}
+
+/* nome fixo com altura mínima */
+.product-info h4 {
+  font-size: 1rem;
+  line-height: 1.3;
+  margin: 0 0 6px 0;
+  color: #111;
+  min-height: 46px; /* segura nomes curtos */
+}
+
+/* preço fixo e nivelado */
+.product-price {
+  font-weight: 600;
+  font-size: 1.05rem;
+  margin-bottom: 16px;
+  color: #111;
+  min-height: 24px; /* garante altura constante */
+}
+
+/* grupo de botões */
+.product-actions {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* botão de frete e WhatsApp */
+.btnFrete,
+.product-whatsapp {
+  width: 100%;
+  text-align: center;
+  padding: 10px 16px;
+  border-radius: 999px;
+  font-weight: 600;
+  transition: all .2s ease;
+}
+
+.btnFrete {
+  background: white;
+  border: 1.8px solid #111;
+  color: #111;
+}
+.btnFrete:hover {
+  background: #111;
+  color: white;
+}
+
+.product-whatsapp {
+  background: #25D366;
+  color: white;
+  border: none;
+}
+.product-whatsapp:hover {
+  filter: brightness(1.1);
+}
+
 
     </style>
 </head>
