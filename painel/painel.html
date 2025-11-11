@@ -81,26 +81,26 @@
 /* ===== CABEÇALHO LUME MODA FITNESS – versão preto e branco ===== */
 .lume-header {
   position: relative;
-  background: linear-gradient(135deg, #000 0%, #111 50%, #1c1c1c 100%);
+  background: linear-gradient(135deg, #000 0%, #1a1a1a 50%, #2b2b2b 100%);
   color: #fff;
-  padding: 24px 30px;
+  padding: 28px 30px;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
   box-shadow: 0 3px 12px rgba(0,0,0,0.4);
-  border-bottom: 1px solid rgba(255,255,255,0.08);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
 }
 
-/* leve textura de brilho */
+/* leve brilho suave ao fundo */
 .lume-header::before {
   content: "";
   position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.07), transparent 60%);
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 40% 20%, rgba(255,255,255,0.05), transparent 70%);
   pointer-events: none;
 }
 
@@ -108,7 +108,7 @@
   position: absolute;
   inset: 0;
   background: rgba(255,255,255,0.02);
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(6px);
   z-index: 1;
 }
 
@@ -117,48 +117,20 @@
   z-index: 2;
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 22px;
 }
 
 .lume-logo {
-  height: 52px;
+  height: 64px; /* aumentamos o tamanho */
   width: auto;
   border-radius: 10px;
-  filter: drop-shadow(0 0 6px rgba(255,255,255,0.2));
+  filter: drop-shadow(0 0 8px rgba(255,255,255,0.25)); /* mais brilho */
+  transition: transform 0.3s ease, filter 0.3s ease;
 }
 
-.header-title h1 {
-  margin: 0;
-  font-size: 1.5rem;
-  font-weight: 700;
-  letter-spacing: 0.8px;
-  text-transform: uppercase;
-  color: #fff;
-}
-
-.header-title p {
-  margin: 4px 0 0;
-  font-size: 0.9rem;
-  color: #d9d9d9;
-  letter-spacing: 0.3px;
-}
-
-/* responsivo */
-@media (max-width:600px){
-  .lume-header {
-    flex-direction: column;
-    padding: 18px;
-  }
-  .header-content {
-    flex-direction: column;
-    text-align: center;
-  }
-  .lume-logo {
-    height: 46px;
-  }
-  .header-title h1 {
-    font-size: 1.3rem;
-  }
+.lume-logo:hover {
+  transform: scale(1.05);
+  filter: drop-shadow(0 0 12px rgba(255,255,255,0.4));
 }
 
 
