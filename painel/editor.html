@@ -418,6 +418,12 @@ elSalvar.addEventListener('click', async () => {
     setTimeout(()=>{ elProg.textContent = ''; }, 1200);
   }
 });
+/* botão Selecionar foto principal */
+document.getElementById("btnSelectImage").addEventListener("click", ()=>{
+  const elFile = document.getElementById("file");
+  if (elFile) elFile.click();
+});
+
 </script>
 
 </body>
