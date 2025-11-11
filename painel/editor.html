@@ -365,61 +365,72 @@ document.getElementById("btnApplyCrop").addEventListener("click", () => {
 
 /* SALVAR */
 elSalvar.addEventListener('click', async () => {
-  try{
+  try {
     elSalvar.disabled = true;
-    elStatus.textContent = 'Salvando...';
+    elStatus.textContent = ''; // agora texto não aparece embaixo do botão
     elBar.style.width = '0%';
-    elProg.textContent = '';
+    elProg.textContent = 'Salvando...';
 
     const nome = elNome.value.trim();
     const descricao = elDesc.value.trim();
     const precoNumber = normalizePrecoToNumber(elPreco.value);
+
     let imageURL = currentImageUrl;
 
-    // subir principal
-    if (croppedBlob){
+    // subir PRINCIPAL (somente se tiver crop novo)
+    if (croppedBlob) {
       const ext = "jpg";
       const storagePath = `produtos/${pid}-${Date.now()}.${ext}`;
       const storageRef = ref(st, storagePath);
+
       const task = uploadBytesResumable(storageRef, croppedBlob, { contentType: "image/jpeg" });
-      task.on('state_changed',(snap)=>{
+      task.on('state_changed', (snap) => {
         const pct = Math.round((snap.bytesTransferred / snap.totalBytes) * 100);
         elBar.style.width = pct + '%';
-        elProg.textContent = `Enviando imagem… ${pct}%`;
+        elProg.textContent = `Enviando imagem principal… ${pct}%`;
       });
+
       await task;
       imageURL = await getDownloadURL(storageRef);
+      croppedBlob = null; // limpa blob após upload
     }
 
-    // extras
+    // subir SOMENTE o slot que tem blob (evita reenvios)
     let novasURLsExtras = [];
-    for (let i=0; i<extraBlobs.length; i++){
+    for (let i = 0; i < extraBlobs.length; i++) {
       const blob = extraBlobs[i];
       if (!blob) continue;
+
       const ext = "jpg";
       const storagePath = `produtos/${pid}-${Date.now()}-${i}.${ext}`;
       const storageRef = ref(st, storagePath);
-      const task2 = uploadBytesResumable(storageRef, blob, {contentType:"image/jpeg"});
-      await new Promise(res=>{
-        task2.on('state_changed', snap=>{
+
+      const task2 = uploadBytesResumable(storageRef, blob, { contentType: "image/jpeg" });
+      await new Promise(res => {
+        task2.on('state_changed', snap => {
           const pct = Math.round((snap.bytesTransferred / snap.totalBytes) * 100);
           elBar.style.width = pct + '%';
-          elProg.textContent = `Enviando imagem extra… ${pct}%`;
-        }, null, async ()=>{
+          elProg.textContent = `Enviando imagem extra ${i + 1}… ${pct}%`;
+        }, null, async () => {
           const urlExtra = await getDownloadURL(storageRef);
-          novasURLsExtras.push(urlExtra);
+          novasURLsExtras[i] = urlExtra; // salva pelo índice correto
           res();
         });
       });
+
+      extraBlobs[i] = null; // limpa o blob pra não reenviar depois
     }
 
-    if (novasURLsExtras.length > 0){
-      for (let u of novasURLsExtras){
-        extraImages.push(u);
+    // substitui no array base
+    for (let i = 0; i < novasURLsExtras.length; i++) {
+      if (novasURLsExtras[i]) {
+        extraImages[i] = novasURLsExtras[i];
       }
     }
 
-    extraImages = extraImages.filter(u=>u && !u.startsWith("blob:")).slice(0,5);
+    // limpa nulls, blobs e limita 5
+    extraImages = extraImages.filter(u => u && !u.startsWith("blob:")).slice(0, 5);
+
     const payload = {
       nome,
       descricao,
@@ -429,26 +440,24 @@ elSalvar.addEventListener('click', async () => {
       imagens: extraImages
     };
 
-    await setDoc(doc(db,'produtos', pid), payload, { merge: true });
+    await setDoc(doc(db, 'produtos', pid), payload, { merge: true });
+
     currentImageUrl = imageURL;
-    elStatus.textContent = '';
+    elBar.style.width = '100%';
+    elProg.textContent = '✔️ Salvo!';
 
-    if (autoSave){
-      autoSave = false;
-      elStatus.textContent = 'Salvo!';
-    } else {
-      showToast();
-    }
+    if (autoSave) autoSave = false;
 
-  } catch(err){
+  } catch (err) {
     console.error(err);
-    elStatus.innerHTML = '<span class="err">Erro ao salvar. Veja o console.</span>';
+    elProg.textContent = 'Erro ao salvar. Veja o console.';
     elBar.style.width = '0%';
   } finally {
     elSalvar.disabled = false;
-    setTimeout(()=>{ elProg.textContent = ''; }, 1200);
+    setTimeout(() => { elProg.textContent = ''; }, 2000);
   }
 });
+
 /* botão Selecionar foto principal */
 document.getElementById("btnSelectImage").addEventListener("click", ()=>{
   const elFile = document.getElementById("file");
