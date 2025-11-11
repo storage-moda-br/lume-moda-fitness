@@ -219,13 +219,18 @@ function renderExtraSlots(){
 }
 
 /* =============== EVENTOS =============== */
+/* Clique nos slots extras → abrir seleção (sem conflito com X) */
 document.querySelectorAll(".slotExtra").forEach(slot=>{
-  slot.addEventListener("click",()=>{
+  slot.addEventListener("click",(ev)=>{
+    // se clicou no X (ícone de exclusão), ignora
+    if (ev.target.classList.contains("delExtra") || ev.target.closest(".delExtra")) return;
+
     currentSlotEdit = parseInt(slot.dataset.slot);
     editingExtra = true;
     document.getElementById("fileExtra").click();
   });
 });
+
 
 /* exclusão das imagens extras (sem abrir seletor) */
 /* exclusão das imagens extras (sem abrir upload e com autosave) */
