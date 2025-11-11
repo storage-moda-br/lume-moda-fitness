@@ -377,7 +377,7 @@ document.getElementById("btnApplyCrop").addEventListener("click", () => {
 elSalvar.addEventListener('click', async () => {
   try {
     elSalvar.disabled = true;
-    elStatus.textContent = ''; // agora texto não aparece embaixo do botão
+    elStatus.textContent = '';
     elBar.style.width = '0%';
     elProg.textContent = 'Salvando...';
 
@@ -387,25 +387,23 @@ elSalvar.addEventListener('click', async () => {
 
     let imageURL = currentImageUrl;
 
-    // subir PRINCIPAL (somente se tiver crop novo)
+    // subir imagem principal (se houver novo crop)
     if (croppedBlob) {
       const ext = "jpg";
       const storagePath = `produtos/${pid}-${Date.now()}.${ext}`;
       const storageRef = ref(st, storagePath);
-
       const task = uploadBytesResumable(storageRef, croppedBlob, { contentType: "image/jpeg" });
       task.on('state_changed', (snap) => {
         const pct = Math.round((snap.bytesTransferred / snap.totalBytes) * 100);
         elBar.style.width = pct + '%';
         elProg.textContent = `Enviando imagem principal… ${pct}%`;
       });
-
       await task;
       imageURL = await getDownloadURL(storageRef);
-      croppedBlob = null; // limpa blob após upload
+      croppedBlob = null;
     }
 
-    // subir SOMENTE o slot que tem blob (evita reenvios)
+    // subir somente extras novos
     let novasURLsExtras = [];
     for (let i = 0; i < extraBlobs.length; i++) {
       const blob = extraBlobs[i];
@@ -423,22 +421,22 @@ elSalvar.addEventListener('click', async () => {
           elProg.textContent = `Enviando imagem extra ${i + 1}… ${pct}%`;
         }, null, async () => {
           const urlExtra = await getDownloadURL(storageRef);
-          novasURLsExtras[i] = urlExtra; // salva pelo índice correto
+          novasURLsExtras[i] = urlExtra;
           res();
         });
       });
 
-      extraBlobs[i] = null; // limpa o blob pra não reenviar depois
+      extraBlobs[i] = null;
     }
 
-    // substitui no array base
+    // substitui as URLs novas
     for (let i = 0; i < novasURLsExtras.length; i++) {
       if (novasURLsExtras[i]) {
         extraImages[i] = novasURLsExtras[i];
       }
     }
 
-    // limpa nulls, blobs e limita 5
+    // limpeza final
     extraImages = extraImages.filter(u => u && !u.startsWith("blob:")).slice(0, 5);
 
     const payload = {
@@ -456,7 +454,14 @@ elSalvar.addEventListener('click', async () => {
     elBar.style.width = '100%';
     elProg.textContent = '✔️ Salvo!';
 
-    if (autoSave) autoSave = false;
+    // 🔁 comportamento pós-salvar
+    if (autoSave) {
+      autoSave = false; // mantém no editor
+    } else {
+      // ⏳ pequena pausa para feedback visual
+      await new Promise(r => setTimeout(r, 600));
+      window.location.href = "painel.html"; // redireciona no clique manual
+    }
 
   } catch (err) {
     console.error(err);
@@ -467,6 +472,7 @@ elSalvar.addEventListener('click', async () => {
     setTimeout(() => { elProg.textContent = ''; }, 2000);
   }
 });
+
 
 /* botão Selecionar foto principal */
 document.getElementById("btnSelectImage").addEventListener("click", ()=>{
