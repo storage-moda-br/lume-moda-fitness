@@ -228,19 +228,29 @@ document.querySelectorAll(".slotExtra").forEach(slot=>{
 });
 
 /* exclusão das imagens extras (sem abrir seletor) */
+/* exclusão das imagens extras (sem abrir upload e com autosave) */
 document.addEventListener("click", (ev) => {
   const btn = ev.target.closest(".delExtra");
   if (!btn) return;
 
-  // impede o clique de “vazar” pro slot
+  // impede o clique de vazar para o slot de fundo
   ev.stopImmediatePropagation();
   ev.preventDefault();
 
   const idx = parseInt(btn.dataset.idx);
+
+  // remove localmente
   extraImages[idx] = null;
   extraBlobs[idx] = null;
+
+  // re-renderiza os slots
   renderExtraSlots();
+
+  // salva automaticamente (igual ao crop)
+  autoSave = true;
+  elSalvar.click();
 });
+
 
 
 /* selecionar imagem principal */
