@@ -77,6 +77,88 @@
   margin:0;
   letter-spacing:-0.2px;
 }
+/* ===== CABEÇALHO LUME MODA FITNESS ===== */
+.lume-header {
+  position: relative;
+  background: linear-gradient(135deg, #000 0%, #222 40%, #420052 100%);
+  color: #fff;
+  padding: 24px 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.4);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+/* leve textura de brilho */
+.lume-header::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.08), transparent 60%);
+  pointer-events: none;
+}
+
+.header-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0.03);
+  backdrop-filter: blur(8px);
+  z-index: 1;
+}
+
+.header-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.lume-logo {
+  height: 52px;
+  width: auto;
+  border-radius: 10px;
+  filter: drop-shadow(0 0 6px rgba(255,255,255,0.2));
+}
+
+.header-title h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+.header-title p {
+  margin: 4px 0 0;
+  font-size: 0.9rem;
+  color: #ccc;
+  letter-spacing: 0.3px;
+}
+
+/* responsivo */
+@media (max-width:600px){
+  .lume-header {
+    flex-direction: column;
+    padding: 18px;
+  }
+  .header-content {
+    flex-direction: column;
+    text-align: center;
+  }
+  .lume-logo {
+    height: 46px;
+  }
+  .header-title h1 {
+    font-size: 1.3rem;
+  }
+}
+
 
 
 
@@ -86,11 +168,16 @@
 </head>
 <body>
 
-     <div class="header">
-    <img src="https://i.imgur.com/dYmnA0X.png" class="logo" />
-     </div>
-
-<header><h1>Painel – Produtos</h1></header>
+    <header class="lume-header">
+  <div class="header-overlay"></div>
+  <div class="header-content">
+    <img src="https://i.imgur.com/dYmnA0X.png" alt="Lume Moda Fitness" class="lume-logo">
+    <div class="header-title">
+      <h1>Painel de Produtos</h1>
+      <p>Lume Moda Fitness</p>
+    </div>
+  </div>
+</header>
 <div class="wrap">
   <div id="grid" class="grid"></div>
 </div>
