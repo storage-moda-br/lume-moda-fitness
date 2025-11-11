@@ -123,13 +123,13 @@
 
 <script type="module">
 import Cropper from "https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.esm.js";
-let cropper = null;
-let croppedBlob = null;
-let autoSave = false;
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
+
+let cropper = null;
+let croppedBlob = null;
+let autoSave = false;
 
 const firebaseConfig = {
   apiKey: "AIzaSyBzzYviQCkPUeRSCMZ-sxJiQlKGgUFy8xk",
@@ -160,18 +160,18 @@ const elBar = document.getElementById('bar');
 const elProg = document.getElementById('progText');
 
 let currentImageUrl = "";
-let extraImages = [];     
+let extraImages = [];
 let currentSlotEdit = null;
 let editingExtra = false;
-let extraBlobs = [];      
+let extraBlobs = [];
 
+/* =============== CARREGA PRODUTO =============== */
 (async () => {
   try{
     const refDoc = doc(db, 'produtos', pid);
     const snap = await getDoc(refDoc);
     if (snap.exists()){
       const d = snap.data();
-
       elNome.value = d.nome || "";
       elDesc.value = d.descricao || "";
       elPreco.value = (typeof d.preco === 'number' ? d.preco.toFixed(2) : (d.preco || "")).toString().replace('.', ',');
@@ -181,45 +181,36 @@ let extraBlobs = [];
         elPrev.innerHTML = `<img src="${d.imagem}" alt="">`;
       }
 
-      // --- CONVERTER OBJETO PARA ARRAY AUTOMÁTICO
-      if (Array.isArray(d.imagens)){
-        extraImages = d.imagens;
-      } else if (d.imagens && typeof d.imagens === "object"){
-        extraImages = Object.values(d.imagens);
-      } else {
-        extraImages = [];
-      }
+      // converte objeto → array e limpa
+      if (Array.isArray(d.imagens)) extraImages = d.imagens;
+      else if (d.imagens && typeof d.imagens === "object") extraImages = Object.values(d.imagens);
+      else extraImages = [];
 
       extraImages = extraImages.filter(u => u).slice(0,5);
       extraBlobs = new Array(extraImages.length).fill(null);
-
       renderExtraSlots();
     }
-  }catch(err){ console.error(err); }
+  } catch(err){
+    console.error(err);
+  }
+})(); // FECHA BLOCO ASSÍNCRONO
 
+/* =============== FUNÇÃO DE RENDERIZAÇÃO =============== */
 function renderExtraSlots(){
   const wrap = document.getElementById("extraImagesWrap");
   const slots = wrap.querySelectorAll(".slotExtra");
-
   slots.forEach((slot, idx)=>{
     const url = extraImages[idx];
     if (url){
       slot.innerHTML = `
         <img src="${url}" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">
-        <div class="delExtra" data-idx="${idx}" 
-          style="
-            position:absolute;
-            top:4px;right:4px;
-            background:rgba(0,0,0,0.6);
-            color:#fff;
-            width:18px;height:18px;
-            font-size:14px;
-            border-radius:4px;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            cursor:pointer;
-          ">×</div>
+        <div class="delExtra" data-idx="${idx}" style="
+            position:absolute;top:4px;right:4px;
+            background:rgba(0,0,0,0.6);color:#fff;
+            width:18px;height:18px;font-size:14px;
+            border-radius:4px;display:flex;
+            align-items:center;justify-content:center;
+            cursor:pointer;">×</div>
       `;
     } else {
       slot.innerHTML = "+";
@@ -227,6 +218,7 @@ function renderExtraSlots(){
   });
 }
 
+/* =============== EVENTOS =============== */
 document.querySelectorAll(".slotExtra").forEach(slot=>{
   slot.addEventListener("click",()=>{
     currentSlotEdit = parseInt(slot.dataset.slot);
@@ -238,7 +230,6 @@ document.querySelectorAll(".slotExtra").forEach(slot=>{
 document.addEventListener("click",(ev)=>{
   const btn = ev.target.closest(".delExtra");
   if (!btn) return;
-
   ev.stopPropagation();
   const idx = parseInt(btn.dataset.idx);
   extraImages[idx] = null;
@@ -246,56 +237,51 @@ document.addEventListener("click",(ev)=>{
   renderExtraSlots();
 });
 
+/* selecionar imagem principal */
 elFile.addEventListener('change', () => {
   const f = elFile.files?.[0];
   if (!f) return;
-
   croppedBlob = null;
   elPrev.style.display = "none";
   document.getElementById("cropArea").style.display = "block";
-
   const cropImg = document.getElementById("cropImg");
   const reader = new FileReader();
-
   reader.onload = () => {
     cropImg.src = reader.result;
     if (cropper) cropper.destroy();
     cropper = new Cropper(cropImg, {
-      aspectRatio: 4 / 5,
+      aspectRatio: 4/5,
       viewMode: 1,
       dragMode: 'move',
       autoCropArea: 1
     });
   };
-
   reader.readAsDataURL(f);
 });
 
+/* selecionar imagem extra */
 document.getElementById("fileExtra").addEventListener("change", () => {
   const f = document.getElementById("fileExtra").files?.[0];
   if (!f) return;
-
   croppedBlob = null;
   elPrev.style.display = "none";
   document.getElementById("cropArea").style.display = "block";
-
   const cropImg = document.getElementById("cropImg");
   const reader = new FileReader();
-
   reader.onload = () => {
     cropImg.src = reader.result;
     if (cropper) cropper.destroy();
     cropper = new Cropper(cropImg, {
-      aspectRatio: 4 / 5,
+      aspectRatio: 4/5,
       viewMode: 1,
       dragMode: 'move',
       autoCropArea: 1
     });
   };
-
   reader.readAsDataURL(f);
 });
 
+/* utilidades */
 function normalizePrecoToNumber(v){
   if (!v) return 0;
   const cleaned = v.replace(/\s/g,'').replace(/\./g,'').replace(',', '.');
@@ -317,20 +303,16 @@ function showToast(){
   }, 1400);
 }
 
+/* aplicar corte */
 document.getElementById("btnApplyCrop").addEventListener("click", () => {
   if (!cropper) return;
-
   cropper.getCroppedCanvas({
-    width:1080,
-    height:1350,
-    fillColor:"#fff"
+    width:1080,height:1350,fillColor:"#fff"
   }).toBlob((blob) => {
-
     if (editingExtra){
       const url = URL.createObjectURL(blob);
       extraImages[currentSlotEdit] = url;
       extraBlobs[currentSlotEdit] = blob;
-
       renderExtraSlots();
       autoSave = true;
       elSalvar.click();
@@ -338,9 +320,7 @@ document.getElementById("btnApplyCrop").addEventListener("click", () => {
       currentSlotEdit = null;
       elPrev.style.display = "flex";
       document.getElementById("cropArea").style.display = "none";
-
     } else {
-
       const url = URL.createObjectURL(blob);
       elPrev.innerHTML = `<img src="${url}" alt="">`;
       croppedBlob = blob;
@@ -349,53 +329,46 @@ document.getElementById("btnApplyCrop").addEventListener("click", () => {
       elPrev.style.display = "flex";
       document.getElementById("cropArea").style.display = "none";
     }
-
   }, "image/jpeg", 0.9);
 });
+
 /* SALVAR */
 elSalvar.addEventListener('click', async () => {
   try{
     elSalvar.disabled = true;
     elStatus.textContent = 'Salvando...';
-
     elBar.style.width = '0%';
     elProg.textContent = '';
 
     const nome = elNome.value.trim();
     const descricao = elDesc.value.trim();
     const precoNumber = normalizePrecoToNumber(elPreco.value);
-
     let imageURL = currentImageUrl;
 
-    // subir PRINCIPAL
+    // subir principal
     if (croppedBlob){
       const ext = "jpg";
       const storagePath = `produtos/${pid}-${Date.now()}.${ext}`;
       const storageRef = ref(st, storagePath);
-
       const task = uploadBytesResumable(storageRef, croppedBlob, { contentType: "image/jpeg" });
       task.on('state_changed',(snap)=>{
         const pct = Math.round((snap.bytesTransferred / snap.totalBytes) * 100);
         elBar.style.width = pct + '%';
         elProg.textContent = `Enviando imagem… ${pct}%`;
       });
-
       await task;
       imageURL = await getDownloadURL(storageRef);
     }
 
-    // subir EXTRAS novas
+    // extras
     let novasURLsExtras = [];
     for (let i=0; i<extraBlobs.length; i++){
       const blob = extraBlobs[i];
       if (!blob) continue;
-
       const ext = "jpg";
       const storagePath = `produtos/${pid}-${Date.now()}-${i}.${ext}`;
       const storageRef = ref(st, storagePath);
-
       const task2 = uploadBytesResumable(storageRef, blob, {contentType:"image/jpeg"});
-
       await new Promise(res=>{
         task2.on('state_changed', snap=>{
           const pct = Math.round((snap.bytesTransferred / snap.totalBytes) * 100);
@@ -409,28 +382,23 @@ elSalvar.addEventListener('click', async () => {
       });
     }
 
-    // adiciona URLs novas
     if (novasURLsExtras.length > 0){
       for (let u of novasURLsExtras){
         extraImages.push(u);
       }
     }
 
-    // LIMPA TUDO: remove null, remove blob, limita 5
-    extraImages = extraImages.filter(u=>u && !u.startsWith("blob:"));
-    extraImages = extraImages.slice(0,5);
-
+    extraImages = extraImages.filter(u=>u && !u.startsWith("blob:")).slice(0,5);
     const payload = {
       nome,
       descricao,
       preco: precoNumber,
       imagem: imageURL || "",
       data: serverTimestamp(),
-      imagens: extraImages // sempre array definitivo
+      imagens: extraImages
     };
 
     await setDoc(doc(db,'produtos', pid), payload, { merge: true });
-
     currentImageUrl = imageURL;
     elStatus.textContent = '';
 
@@ -451,5 +419,6 @@ elSalvar.addEventListener('click', async () => {
   }
 });
 </script>
+
 </body>
 </html>
