@@ -1019,6 +1019,30 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* --------- Alinhamento perfeito dos cards --------- */
+.product-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.product-image {
+  flex-shrink: 0;
+}
+
+.product-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding-bottom: 10px;
+}
+
+/* faz o botão WhatsApp ficar sempre na base */
+.product-info button.product-whatsapp {
+  margin-top: auto;
+}
 
     </style>
 </head>
