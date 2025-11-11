@@ -852,6 +852,65 @@
    margin-top: clamp(12px, 3vw, 32px);
 }
 
+/* ==================== FRETE LUME ==================== */
+.frete-box {
+  margin-top: 18px;
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 14px;
+  padding: 14px 16px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+}
+
+.frete-box h4 {
+  margin: 0 0 10px 0;
+  font-size: 15px;
+  color: #111;
+  font-weight: 600;
+}
+
+.frete-input {
+  display: flex;
+  gap: 8px;
+}
+
+.frete-input input {
+  flex: 1;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+.frete-input button {
+  background: #000;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.frete-input button:hover {
+  background: #222;
+}
+
+.resultado {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #333;
+  line-height: 1.5;
+  animation: fadeIn .3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+
     </style>
 </head>
 <body>
@@ -1339,7 +1398,7 @@ Aguardo retorno! 🙂
         }, 10);
 
         window.addEventListener('scroll', debouncedScrollHandler);
-    </script>
+</script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
@@ -1367,131 +1426,107 @@ async function load(){
 
     const d = snap.data();
     const precoFmt = parseFloat(d.preco).toFixed(2).replace(".",",");
+    const extras = Array.isArray(d.imagens) ? d.imagens.join("|") : "";
 
-    // monta lista das extras, se existir
-const extras = Array.isArray(d.imagens) ? d.imagens.join("|") : "";
+    cont.innerHTML += `
+      <div class="product-card"
+           data-product-name="${d.nome}"
+           data-product-price="${precoFmt}"
+           data-product-description="${d.descricao}"
+           data-product-image="${d.imagem}"
+           data-product-extras="${extras}">
+          
+          <div class="product-image" onclick="openModal(this)">
+            <img src="${d.imagem}" alt="${d.descricao}">
+          </div>
 
-cont.innerHTML += `
-  <div class="product-card"
-       data-product-name="${d.nome}"
-       data-product-price="${precoFmt}"
-       data-product-description="${d.descricao}"
-       data-product-image="${d.imagem}"
-       data-product-extras="${extras}">
-      
-      <div class="product-image" onclick="openModal(this)">
-        <img src="${d.imagem}" alt="${d.descricao}">
+          <div class="product-info">
+            <h4>${d.nome}</h4>
+            <div class="product-price">R$ ${precoFmt}</div>
+
+            <!-- 🔹 bloco de frete -->
+            <div class="frete-box">
+              <h4>📦 Calcule o Frete</h4>
+              <div class="frete-input">
+                <input type="text" class="cep" placeholder="Digite seu CEP" maxlength="9">
+                <button class="btnFrete">Calcular</button>
+              </div>
+              <div class="resultado"></div>
+            </div>
+            <!-- 🔹 fim do bloco -->
+
+            <button class="product-whatsapp" onclick="buyProduct(this)">
+              <i class="fab fa-whatsapp"></i> Comprar via WhatsApp
+            </button>
+          </div>
       </div>
-
-      <div class="product-info">
-        <h4>${d.nome}</h4>
-        <div class="product-price">R$ ${precoFmt}</div>
-        <button class="product-whatsapp" onclick="buyProduct(this)">
-  <i class="fab fa-whatsapp"></i> Comprar via WhatsApp
-</button>
-
-      </div>
-  </div>
-`;
-
+    `;
   }
 }
 
-
-// --- Modal: util troca imagem e destaca thumb ativa ---
+/* ================== MODAL ================== */
 function modalSetImage(url, element){
-  try {
-    const main = document.getElementById('modal-image');
-    main.src = url;
-
-    const thumbs = document.querySelectorAll('#modal-thumbs img');
-    thumbs.forEach(t => t.style.border = "2px solid transparent");
-
-    if (element) element.style.border = "2px solid #000";
-  } catch (e) {
-    console.error("modalSetImage error:", e);
-  }
+  const main = document.getElementById('modal-image');
+  main.src = url;
+  const thumbs = document.querySelectorAll('#modal-thumbs img');
+  thumbs.forEach(t => t.style.border = "2px solid transparent");
+  if (element) element.style.border = "2px solid #000";
 }
 
-// --- Modal: fechar ---
 function closeModal() {
   const modal = document.getElementById('product-modal');
   if (modal) modal.style.display = 'none';
   document.body.style.overflow = 'auto';
 }
 
-// --- Modal: abrir ---
 function openModal(element) {
-  try {
-    const productCard = element.closest('.product-card');
-    const productName = productCard.getAttribute('data-product-name') || "";
-    const productPrice = productCard.getAttribute('data-product-price') || "0";
-    const productDescription = productCard.getAttribute('data-product-description') || "";
-    const productImage = productCard.getAttribute('data-product-image') || "";
-    const productExtras = productCard.getAttribute('data-product-extras') || "";
+  const productCard = element.closest('.product-card');
+  const productName = productCard.getAttribute('data-product-name') || "";
+  const productPrice = productCard.getAttribute('data-product-price') || "0";
+  const productDescription = productCard.getAttribute('data-product-description') || "";
+  const productImage = productCard.getAttribute('data-product-image') || "";
+  const productExtras = productCard.getAttribute('data-product-extras') || "";
 
-    const modal = document.getElementById('product-modal');
-    const modalImage = document.getElementById('modal-image');
-    const modalTitle = document.getElementById('modal-title');
-    const modalDescription = document.getElementById('modal-description');
-    const modalPrice = document.getElementById('modal-price');
-    const modalThumbs = document.getElementById('modal-thumbs');
+  const modal = document.getElementById('product-modal');
+  const modalImage = document.getElementById('modal-image');
+  const modalTitle = document.getElementById('modal-title');
+  const modalDescription = document.getElementById('modal-description');
+  const modalPrice = document.getElementById('modal-price');
+  const modalThumbs = document.getElementById('modal-thumbs');
 
-    if (!modal || !modalImage || !modalThumbs) {
-      console.error("Modal elements not found. Confira se o HTML do modal está correto.");
-      return;
+  modalImage.src = productImage;
+  modalTitle.textContent = productName;
+  modalDescription.textContent = productDescription;
+  modalPrice.textContent = `R$ ${parseFloat(productPrice).toFixed(2).replace(".", ",")}`;
+
+  modalThumbs.innerHTML = `
+    <img src="${productImage}"
+         style="width:60px;height:75px;object-fit:cover;border-radius:8px;cursor:pointer;border:2px solid #000;"
+         onclick="modalSetImage('${productImage}', this)">
+  `;
+  if (productExtras) {
+    const arr = productExtras.split("|").filter(x => x);
+    for (const url of arr) {
+      modalThumbs.innerHTML += `
+        <img src="${url}"
+             style="width:60px;height:75px;object-fit:cover;border-radius:8px;cursor:pointer;border:2px solid transparent;"
+             onclick="modalSetImage('${url}', this)">
+      `;
     }
+  }
 
-    // conteúdo principal
-    modalImage.src = productImage;
-    modalImage.alt = productDescription;
-    if (modalTitle) modalTitle.textContent = productName;
-    if (modalDescription) modalDescription.textContent = productDescription;
-    if (modalPrice) modalPrice.textContent = `R$ ${parseFloat(productPrice).toFixed(2).replace(".", ",")}`;
-
-    // limpa thumbs ANTES
-modalThumbs.innerHTML = "";
-
-// monta thumbs: principal + extras
-modalThumbs.innerHTML += `
-  <img src="${productImage}"
-       style="width:60px;height:75px;object-fit:cover;border-radius:8px;cursor:pointer;border:2px solid #000;"
-       onclick="modalSetImage('${productImage}', this)">
-`;
-
-
-    if (productExtras) {
-      const arr = productExtras.split("|").filter(x => x);
-      for (const url of arr) {
-        modalThumbs.innerHTML += `
-          <img src="${url}"
-               style="width:60px;height:75px;object-fit:cover;border-radius:8px;cursor:pointer;border:2px solid transparent;"
-               onclick="modalSetImage('${url}', this)">
-        `;
-      }
-    }
-
-    // dados para WhatsApp (se existir)
-const modalWhatsapp = document.getElementById('modal-whatsapp');
-if (modalWhatsapp) {
+  const modalWhatsapp = document.getElementById('modal-whatsapp');
   modalWhatsapp.setAttribute('data-product-name', productName);
   modalWhatsapp.setAttribute('data-product-price', productPrice);
   modalWhatsapp.setAttribute('data-product-description', productDescription);
   modalWhatsapp.setAttribute('data-product-image', productImage);
-
   modalWhatsapp.onclick = buyFromModal;
-}
 
   modal.style.display = 'flex';
   document.body.style.overflow = 'hidden';
-
-} catch (e) {
-  console.error("openModal error:", e);
 }
-} //  ← FECHA O openModal AQUI
 
-
-// FUNÇÃO BUYFROMMODAL FORA DA OPENMODAL
+/* ================== WHATSAPP ================== */
 function buyFromModal(){
   const btn = document.getElementById('modal-whatsapp');
   if (!btn) return;
@@ -1525,23 +1560,42 @@ Poderia me enviar mais informações sobre:
 
 Aguardo retorno!
 `;
-
   const url = 'https://wa.me/5598991611664?text=' + encodeURIComponent(message);
   window.open(url, '_blank');
 }
 
+/* ================== FRETE ================== */
+document.addEventListener("click", async (ev) => {
+  if (!ev.target.classList.contains("btnFrete")) return;
+  const card = ev.target.closest(".product-card");
+  const cepInput = card.querySelector(".cep");
+  const resultado = card.querySelector(".resultado");
 
-// --- EXPORTA TUDO PRO ESCOPO GLOBAL ---
+  const cep = cepInput.value.replace(/\D/g, '');
+  if (cep.length !== 8) {
+    resultado.innerHTML = "<span style='color:#dc2626;'>CEP inválido. Digite 8 números.</span>";
+    cepInput.focus();
+    return;
+  }
+
+  resultado.innerHTML = "Calculando frete...";
+  await new Promise(r => setTimeout(r, 900));
+
+  resultado.innerHTML = `
+    <div>🚚 <strong>Sedex</strong>: R$ 22,90 — 3 dias úteis</div>
+    <div>📦 <strong>PAC</strong>: R$ 17,50 — 5 dias úteis</div>
+  `;
+});
+
+/* ================== EXPORTA FUNÇÕES ================== */
 window.openModal = openModal;
 window.closeModal = closeModal;
 window.modalSetImage = modalSetImage;
 window.buyFromModal = buyFromModal;
 window.buyProduct = buyProduct;
 
-
-// tem que ser a ÚLTIMA linha
 load();
-
 </script>
+
 </body>
 </html>
