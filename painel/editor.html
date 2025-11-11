@@ -227,15 +227,21 @@ document.querySelectorAll(".slotExtra").forEach(slot=>{
   });
 });
 
-document.addEventListener("click",(ev)=>{
+/* exclusão das imagens extras (sem abrir seletor) */
+document.addEventListener("click", (ev) => {
   const btn = ev.target.closest(".delExtra");
   if (!btn) return;
-  ev.stopPropagation();
+
+  // impede o clique de “vazar” pro slot
+  ev.stopImmediatePropagation();
+  ev.preventDefault();
+
   const idx = parseInt(btn.dataset.idx);
   extraImages[idx] = null;
   extraBlobs[idx] = null;
   renderExtraSlots();
 });
+
 
 /* selecionar imagem principal */
 elFile.addEventListener('change', () => {
