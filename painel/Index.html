@@ -1089,6 +1089,52 @@
   min-height: 440px;
 }
 
+.product-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 14px 14px 18px;
+  text-align: left;
+}
+
+/* agrupamento estável: nome, preço e botões */
+.product-info h4 {
+  font-size: 1rem;
+  line-height: 1.3;
+  margin: 0 0 6px 0;
+  color: #111;
+  min-height: 44px;
+}
+
+.product-price {
+  font-weight: 600;
+  font-size: 1.05rem;
+  margin-bottom: 12px;
+  color: #333;
+}
+
+/* grupo de botões com espaçamento fixo */
+.product-actions {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* botão de frete e WhatsApp */
+.btnFrete,
+.product-whatsapp {
+  width: 100%;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .product-card {
+    min-height: 460px; /* mais espaço para descrições longas */
+  }
+}
+
 
     </style>
 </head>
@@ -1610,33 +1656,34 @@ async function load(){
     const extras = Array.isArray(d.imagens) ? d.imagens.join("|") : "";
 
     cont.innerHTML += `
-      <div class="product-card"
-           data-product-name="${d.nome}"
-           data-product-price="${precoFmt}"
-           data-product-description="${d.descricao}"
-           data-product-image="${d.imagem}"
-           data-product-extras="${extras}">
-          
-          <div class="product-image" onclick="openModal(this)">
-            <img src="${d.imagem}" alt="${d.descricao}">
-          </div>
-
-          <div class="product-info">
-            <h4>${d.nome}</h4>
-            <div class="product-price">R$ ${precoFmt}</div>
-
-            <!-- 🔹 BOTÃO DE FRETE (dentro do card) -->
-<button class="btnFrete" onclick="openFreteModal()">📦 Calcular Frete</button>
-
-
-            <button class="product-whatsapp" onclick="buyProduct(this)">
-              <i class="fab fa-whatsapp"></i> Comprar via WhatsApp
-            </button>
-          </div>
+  <div class="product-card"
+       data-product-name="${d.nome}"
+       data-product-price="${precoFmt}"
+       data-product-description="${d.descricao}"
+       data-product-image="${d.imagem}"
+       data-product-extras="${extras}">
+      
+      <div class="product-image" onclick="openModal(this)">
+        <img src="${d.imagem}" alt="${d.descricao}">
       </div>
-    `;
-  }
-}
+
+      <div class="product-info">
+        <h4>${d.nome}</h4>
+        <div class="product-price">R$ ${precoFmt}</div>
+
+        <div class="product-actions">
+          <button class="btnFrete" onclick="openFreteModal()">
+            📦 Calcular Frete
+          </button>
+
+          <button class="product-whatsapp" onclick="buyProduct(this)">
+            <i class="fab fa-whatsapp"></i> Comprar via WhatsApp
+          </button>
+        </div>
+      </div>
+  </div>
+`;
+
 
 /* ================== MODAL ================== */
 function modalSetImage(url, element){
