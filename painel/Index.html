@@ -1646,43 +1646,49 @@ const cont = document.getElementById("productsContainer");
 const ids = Array.from({length:16}, (_,i)=>`produto${String(i+1).padStart(2,"0")}`);
 
 async function load(){
-  for(const id of ids){
-    const ref = doc(db,'produtos',id);
+  for (const id of ids){
+    const ref = doc(db, 'produtos', id);
     const snap = await getDoc(ref);
     if(!snap.exists()) continue;
 
     const d = snap.data();
-    const precoFmt = parseFloat(d.preco).toFixed(2).replace(".",",");
+    const precoFmt = parseFloat(d.preco).toFixed(2).replace(".", ",");
+
+    // monta lista das extras, se existir
     const extras = Array.isArray(d.imagens) ? d.imagens.join("|") : "";
 
+    // monta o card do produto
     cont.innerHTML += `
-  <div class="product-card"
-       data-product-name="${d.nome}"
-       data-product-price="${precoFmt}"
-       data-product-description="${d.descricao}"
-       data-product-image="${d.imagem}"
-       data-product-extras="${extras}">
-      
-      <div class="product-image" onclick="openModal(this)">
-        <img src="${d.imagem}" alt="${d.descricao}">
+      <div class="product-card"
+           data-product-name="${d.nome}"
+           data-product-price="${precoFmt}"
+           data-product-description="${d.descricao}"
+           data-product-image="${d.imagem}"
+           data-product-extras="${extras}">
+          
+          <div class="product-image" onclick="openModal(this)">
+            <img src="${d.imagem}" alt="${d.descricao}">
+          </div>
+
+          <div class="product-info">
+            <h4>${d.nome}</h4>
+            <div class="product-price">R$ ${precoFmt}</div>
+
+            <div class="product-actions">
+              <button class="btnFrete" onclick="openFreteModal()">
+                📦 Calcular Frete
+              </button>
+
+              <button class="product-whatsapp" onclick="buyProduct(this)">
+                <i class="fab fa-whatsapp"></i> Comprar via WhatsApp
+              </button>
+            </div>
+          </div>
       </div>
+    `;
+  }
+}
 
-      <div class="product-info">
-        <h4>${d.nome}</h4>
-        <div class="product-price">R$ ${precoFmt}</div>
-
-        <div class="product-actions">
-          <button class="btnFrete" onclick="openFreteModal()">
-            📦 Calcular Frete
-          </button>
-
-          <button class="product-whatsapp" onclick="buyProduct(this)">
-            <i class="fab fa-whatsapp"></i> Comprar via WhatsApp
-          </button>
-        </div>
-      </div>
-  </div>
-`;
 
 
 /* ================== MODAL ================== */
