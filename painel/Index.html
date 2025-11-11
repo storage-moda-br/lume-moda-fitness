@@ -961,6 +961,69 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* Modal Frete Simples */
+.frete-modal {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
+  align-items: center; justify-content: center;
+  z-index: 9999;
+}
+
+.frete-modal-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 14px;
+  width: 90%;
+  max-width: 320px;
+  text-align: center;
+  animation: fadeIn .3s ease;
+}
+
+.frete-modal-content h3 {
+  margin-bottom: 10px;
+  color: #111;
+}
+
+#cepInput {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+#calcFreteBtn {
+  background: #000;
+  color: #fff;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+#freteResultado {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #333;
+}
+
+.frete-close {
+  position: absolute;
+  right: 20px; top: 10px;
+  font-size: 22px;
+  color: #999;
+  cursor: pointer;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 
 
     </style>
@@ -1100,6 +1163,8 @@
     <a href="https://wa.me/5586995332408?text=Olá! Gostaria de conhecer os produtos da Lume Moda Fitness" class="whatsapp-float" aria-label="Contato WhatsApp">
         <i class="fab fa-whatsapp"></i>
     </a>
+	
+	
 
     <script>
         // Banner Slider
@@ -1496,16 +1561,8 @@ async function load(){
             <h4>${d.nome}</h4>
             <div class="product-price">R$ ${precoFmt}</div>
 
-            <!-- 🔹 bloco de frete -->
-            <div class="frete-box">
-              <h4>📦 Calcule o Frete</h4>
-              <div class="frete-input">
-                <input type="text" class="cep" placeholder="Digite seu CEP" maxlength="9">
-                <button class="btnFrete">Calcular</button>
-              </div>
-              <div class="resultado"></div>
-            </div>
-            <!-- 🔹 fim do bloco -->
+            <button class="btnFrete" onclick="openFreteModal()">📦 Calcular Frete</button>
+
 
             <button class="product-whatsapp" onclick="buyProduct(this)">
               <i class="fab fa-whatsapp"></i> Comprar via WhatsApp
@@ -1648,6 +1705,53 @@ window.buyProduct = buyProduct;
 
 load();
 </script>
+<!-- 🔹 Modal Frete Simples -->
+<div id="freteModal" class="frete-modal">
+  <div class="frete-modal-content">
+    <span class="frete-close" onclick="closeFreteModal()">&times;</span>
+    <h3>Calcular Frete</h3>
+    <input type="text" id="cepInput" placeholder="Digite seu CEP" maxlength="9">
+    <button id="calcFreteBtn">Calcular</button>
+    <div id="freteResultado"></div>
+  </div>
+</div>
+<!-- seu script principal do Firebase -->
+<script type="module">
+  ... (todo o código atual da loja)
+</script>
+
+<!-- 🔹 Script do Modal de Frete -->
+<script>
+function openFreteModal(){
+  document.getElementById("freteModal").style.display = "flex";
+  document.body.style.overflow = "hidden";
+  document.getElementById("freteResultado").innerHTML = "";
+  document.getElementById("cepInput").value = "";
+}
+
+function closeFreteModal(){
+  document.getElementById("freteModal").style.display = "none";
+  document.body.style.overflow = "auto";
+}
+
+document.getElementById("calcFreteBtn").addEventListener("click", async ()=>{
+  const cep = document.getElementById("cepInput").value.replace(/\D/g,'');
+  const res = document.getElementById("freteResultado");
+  if(cep.length !== 8){
+    res.innerHTML = "<span style='color:#dc2626'>CEP inválido.</span>";
+    return;
+  }
+  res.textContent = "Calculando...";
+  await new Promise(r=>setTimeout(r,700));
+  res.innerHTML = `
+    🚚 <strong>Sedex:</strong> R$ 22,90 — 3 dias úteis<br>
+    📦 <strong>PAC:</strong> R$ 17,50 — 5 dias úteis
+  `;
+});
+</script>
+</body>
+</html>
+
 
 </body>
 </html>
