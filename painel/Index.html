@@ -1019,12 +1019,14 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* --------- Alinhamento perfeito dos cards --------- */
+/* === LAYOUT LIMPO E ALINHADO === */
 .product-card {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   height: 100%;
+  border-radius: 14px;
+  overflow: hidden;
 }
 
 .product-image {
@@ -1035,14 +1037,58 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  padding-bottom: 10px;
+  justify-content: flex-start;
+  padding: 14px 14px 18px;
+  text-align: left;
 }
 
-/* faz o botão WhatsApp ficar sempre na base */
-.product-info button.product-whatsapp {
+.product-info h4 {
+  font-size: 1rem;
+  line-height: 1.3;
+  margin: 0 0 6px 0;
+  color: #111;
+  min-height: 42px; /* segura textos curtos */
+}
+
+.product-price {
+  font-weight: 600;
+  font-size: 1.05rem;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+/* botão Calcular Frete mais bonito */
+.product-info .frete-btn,
+.btnFrete {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: white;
+  border: 1.8px solid #111;
+  border-radius: 50px;
+  font-weight: 600;
+  color: #111;
+  padding: 9px 16px;
+  margin: 4px 0 12px;
+  transition: all .2s ease;
+}
+.product-info .frete-btn:hover,
+.btnFrete:hover {
+  background: #111;
+  color: white;
+}
+
+/* botão WhatsApp sempre alinhado na base */
+.product-info .product-whatsapp {
   margin-top: auto;
 }
+
+/* opcional: altura uniforme */
+.product-card {
+  min-height: 440px;
+}
+
 
     </style>
 </head>
