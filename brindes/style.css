@@ -6,8 +6,9 @@
 }
 
 body {
-    background: #f2f2f2; /* cinza claro apenas no fundo externo */
+    background: #f0f0f0;
 }
+
 
 
 /* CABEÇALHO FINAL */
@@ -338,31 +339,35 @@ header img {
 
 /* Card do produto */
 .produto {
-    background: #ffffff; /* branco total */
-    padding: 18px;
-    border-radius: 25px;
+    background: #ffffff !important;
+    padding: 22px;
+    border-radius: 30px;
     margin-bottom: 25px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
 }
 
 
-/* Área da imagem */
+
+
 .produto-img-box {
     width: 100%;
-    background: #fff; /* agora é branco */
-    border-radius: 15px;
-    padding: 20px; /* mais espaço interno para imagem crescer */
+    background: #ffffff !important; /* Totalmente BRANCO */
+    border-radius: 20px;
+    padding: 0; /* remove padding para a imagem crescer */
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
 .produto-img-box img {
-    width: 80%;      /* AUMENTA A IMAGEM */
-    max-width: 230px;
+    width: 90%;       /* aumenta bastante a imagem */
+    max-width: 260px; /* aumenta no celular */
     height: auto;
     object-fit: contain;
+    display: block;
 }
+
+
 
 
 /* Informações do produto */
