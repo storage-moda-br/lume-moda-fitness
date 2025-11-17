@@ -382,3 +382,80 @@ header img {
     color:#888;
     line-height:1.3;
 }
+
+/* AJUSTES MOBILE PARA O HEADER */
+@media (max-width: 600px) {
+
+    /* aproxima o menu da logo */
+    .header-left {
+        gap: 8px !important; /* diminui o espaço */
+    }
+
+    /* diminui o tamanho do nome */
+    .site-title {
+        font-size: 14px !important;   /* antes estava grande */
+        line-height: 16px !important;
+        margin-left: 4px !important;  /* mais próximo da logo */
+        white-space: nowrap;          /* impede quebrar a linha */
+    }
+
+    /* ajusta o tamanho máximo para não ultrapassar */
+    .site-title {
+        max-width: 160px !important;
+        overflow: hidden;
+        text-overflow: ellipsis;      /* adiciona "..." se passar */
+    }
+
+    /* logo mais próxima do menu */
+    .logo-box {
+        margin-left: 0 !important; 
+    }
+
+    /* diminuir levemente o tamanho da logo */
+    .logo-box img {
+        width: 32px !important;
+        height: 32px !important;
+    }
+}
+
+/* ÁREA DO TOPO */
+.topo {
+    display: flex;
+    align-items: center;
+    gap: 12px; /* distância entre menu e logo */
+    padding: 10px 15px;
+    background: #ff6a00;
+}
+
+/* BOTÃO DO MENU */
+.menu-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+/* ÍCONE DO MENU */
+.menu-icon {
+    width: 28px;
+    height: 3px;
+    background: #fff;
+    display: block;
+    position: relative;
+}
+
+.menu-icon::before,
+.menu-icon::after {
+    content: "";
+    width: 28px;
+    height: 3px;
+    background: #fff;
+    position: absolute;
+    left: 0;
+}
+
+.menu-icon::before { top: -8px; }
+.menu-icon::after { top: 8px; }
+
+/* ÁREA DO LOGO + NOME */
+.topo-logo-area {
