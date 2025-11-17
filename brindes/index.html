@@ -1,1 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Personalizados Goiás</title>
+<link rel="stylesheet" href="style.css">
+</head>
 
+<body>
+
+<!-- MENU LATERAL MOBILE -->
+<nav id="menuMobile" class="menu-mobile">
+    <div class="menu-header">
+        <button id="closeMenu" class="close-btn">✖</button>
+    </div>
+
+    <div class="menu-search">
+        <input type="text" placeholder="Pesquisa de palavras-chave...">
+        <button class="btn-search">🔍</button>
+    </div>
+
+    <ul class="menu-list">
+        <li><a href="#">HOME</a></li>
+        <li><a href="#">PRODUTOS</a></li>
+        <li><a href="#">EMPRESA</a></li>
+        <li><a href="#">CONTATO</a></li>
+    </ul>
+</nav>
+
+<!-- CABEÇALHO -->
+<header class="topo">
+   <button id="openMenu" class="menu-btn">
+    <span class="menu-icon"></span>
+</button>
+
+    <div class="topo-logo-area">
+        <img src="logo.png" class="logo-header" alt="Logo">
+        <span class="nome-loja">PERSONALIZADOS GOIÁS</span>
+    </div>
+</header>
+
+
+<!-- BANNERS MOBILE -->
+<section class="banner-area">
+    <div class="banner-slider">
+        <div class="banner"><img src="banner1.jpg"></div>
+        <div class="banner"><img src="banner2.jpg"></div>
+        <div class="banner"><img src="banner3.jpg"></div>
+    </div>
+</section>
+
+<!-- PRODUTOS -->
+<section class="produtos">
+    <h2 class="titulo-sec">Produtos</h2>
+
+    <div id="listaProdutos" class="produtos-grid">
+        <!-- inseridos via JS -->
+    </div>
+</section>
+
+<!-- BARRA INFERIOR MOBILE -->
+<div class="barra-inferior">
+    <a href="#" class="item"><img src="home.png"><span>Home</span></a>
+    <a href="#" class="item"><img src="fav.png"><span>Favoritos</span></a>
+    <a href="#" class="item"><img src="user.png"><span>Conta</span></a>
+</div>
+
+<!-- RODAPÉ -->
+<footer class="rodape">
+
+    <div class="rodape-top">
+        <img src="logo.png" class="rodape-logo">
+
+        <h3>Contato</h3>
+        <p>(62) 99999-9999</p>
+        <p>contato@personalizadosgoias.com</p>
+        <p>Rua X, Nº 00 – Goiânia / GO</p>
+    </div>
+
+    <div class="rodape-col">
+        <h3>Links úteis</h3>
+        <a href="#">Produtos</a>
+        <a href="#">Empresa</a>
+        <a href="#">Termos</a>
+        <a href="#">Contato</a>
+    </div>
+
+    <div class="rodape-col">
+        <h3>Newsletter</h3>
+        <p>Receba promoções e novidades</p>
+        <input type="email" placeholder="Seu e-mail">
+        <button class="btn-news">ENVIAR</button>
+    </div>
+
+    <div class="rodape-bottom">
+        <p>© 2025 Personalizados Goiás – CNPJ: 00.000.000/0001-00</p>
+        <div class="pagamentos">
+            <img src="visa.png">
+            <img src="master.png">
+            <img src="elo.png">
+            <img src="hiper.png">
+        </div>
+    </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

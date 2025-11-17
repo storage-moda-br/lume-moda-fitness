@@ -1,0 +1,384 @@
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:"Poppins", sans-serif;
+}
+
+body{
+  background:#f5f5f5;
+}
+
+/* CABEÇALHO FINAL */
+.topo{
+    background:#ff6a00;
+    padding:12px 15px;
+    display:flex;
+    align-items:center;
+    gap:15px;
+}
+
+.topo-logo-area{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+/* Ajuste do logo */
+.logo-header{
+    height:55px !important;  /* AUMENTEI A ALTURA */
+    width:auto !important;
+    max-width:160px !important;
+    object-fit:contain !important;
+}
+
+/* Nome da loja */
+.nome-loja{
+    color:white;
+    font-size:20px;
+    font-weight:700;
+    letter-spacing:1px;
+    white-space:nowrap;
+}
+
+/* --- MENU LATERAL ESTILO ENVIADO --- */
+.menu-mobile{
+  position:fixed;
+  top:0;
+  left:-300px;
+  width:300px;
+  height:100%;
+  background:#1e1e1e;
+  transition:.35s;
+  z-index:9999;
+  padding:15px;
+  overflow-y:auto;
+}
+
+.menu-mobile.open{
+  left:0;
+}
+
+.menu-header{
+  display:flex;
+  justify-content:flex-end;
+  margin-bottom:15px;
+}
+
+.close-btn{
+  background:none;
+  border:none;
+  color:#fff;
+  font-size:26px;
+}
+
+.menu-search{
+  display:flex;
+  gap:8px;
+  margin-bottom:20px;
+}
+
+.menu-search input{
+  flex:1;
+  padding:12px;
+  border:none;
+  border-radius:6px;
+  background:#333;
+  color:white;
+}
+
+.btn-search{
+  background:#d22641;
+  border:none;
+  border-radius:6px;
+  padding:12px 15px;
+  color:white;
+  font-size:16px;
+}
+
+.menu-list li{
+  list-style:none;
+  border-bottom:1px solid #2f2f2f;
+}
+
+.menu-list a{
+  display:block;
+  padding:18px 0;
+  color:white;
+  font-size:17px;
+  letter-spacing:1px;
+  text-decoration:none;
+  font-weight:600;
+}
+
+/* --- BANNERS --- */
+.banner-area{
+  overflow:hidden;
+}
+
+.banner-slider{
+  display:flex;
+  animation:slide 10s infinite;
+}
+
+.banner img{
+  width:100%;
+}
+
+@keyframes slide{
+  0%{transform:translateX(0);}
+  33%{transform:translateX(-100%);}
+  66%{transform:translateX(-200%);}
+  100%{transform:translateX(0);}
+}
+
+/* --- PRODUTOS --- */
+.titulo-sec{
+  padding:15px;
+  font-size:22px;
+  color:#333;
+}
+
+.produtos-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  padding:10px;
+}
+
+.produto{
+  background:#fff;
+  border-radius:10px;
+  padding:10px;
+  text-align:center;
+}
+
+.produto img{
+  width:100%;
+  height:150px;
+  object-fit:cover;
+  border-radius:8px;
+}
+
+.produto h3{
+  font-size:14px;
+  margin:8px 0;
+}
+
+/* --- BARRA INFERIOR MOBILE --- */
+.barra-inferior{
+  position:fixed;
+  bottom:0;
+  left:0;
+  width:100%;
+  background:white;
+  display:flex;
+  justify-content:space-around;
+  padding:10px 0 6px;
+  border-top:1px solid #ddd;
+  z-index:999;
+}
+
+.barra-inferior img{
+  width:22px;
+}
+
+.barra-inferior span{
+  font-size:11px;
+  color:#666;
+}
+
+/* --- RODAPÉ --- */
+.rodape{
+  background:#0d6efd;
+  color:white;
+  padding:30px 20px;
+  margin-bottom:60px;
+}
+
+.rodape-logo{
+  width:120px;
+  margin-bottom:15px;
+}
+
+.rodape-col{
+  margin:25px 0;
+}
+
+.rodape-col h3{
+  margin-bottom:10px;
+}
+
+.rodape-col a{
+  display:block;
+  color:white;
+  margin:4px 0;
+  text-decoration:none;
+}
+
+input{
+  width:100%;
+  padding:10px;
+  border-radius:8px;
+  border:none;
+  margin:8px 0;
+}
+
+.btn-news{
+  width:100%;
+  padding:10px;
+  background:#cc0000;
+  border:none;
+  color:white;
+  font-weight:bold;
+  border-radius:8px;
+}
+
+.rodape-bottom{
+  margin-top:25px;
+  text-align:center;
+}
+
+.pagamentos img{
+  width:45px;
+  margin:5px;
+}
+
+/* DESKTOP */
+@media(min-width:900px){
+  .produtos-grid{
+    grid-template-columns:repeat(4,1fr);
+  }
+
+  .banner-area img{
+    height:300px;
+    object-fit:cover;
+  }
+
+  .topo{
+    padding:20px 40px;
+  }
+
+  .barra-inferior{
+    display:none;
+  }
+
+  .rodape{
+    display:flex;
+    justify-content:space-between;
+  }
+}
+
+header img {
+    height:40px !important;
+    width:auto !important;
+    max-width:120px !important;
+    object-fit:contain !important;
+}
+
+/* BOTÃO DO MENU - HAMBURGUER MODERNO */
+.menu-btn{
+    background:none;
+    border:none;
+    padding:5px;
+    display:flex;
+    align-items:center;
+    cursor:pointer;
+}
+
+.menu-icon{
+    width:25px;
+    height:2px;
+    background:white;
+    position:relative;
+    display:block;
+    border-radius:2px;
+}
+
+.menu-icon::before,
+.menu-icon::after{
+    content:"";
+    width:25px;
+    height:2px;
+    background:white;
+    position:absolute;
+    left:0;
+    border-radius:2px;
+}
+
+.menu-icon::before{
+    top:-7px; /* barra de cima */
+}
+
+.menu-icon::after{
+    top:7px;  /* barra de baixo */
+}
+
+
+/* PADRÃO PROFISSIONAL PARA IMAGENS DE PRODUTOS */
+.produto img{
+    width: 100%;
+    height: 260px;              /* altura mais realista como no modelo */
+    object-fit: contain !important; /* MOSTRA A IMAGEM INTEIRA */
+    background: #f4f4f4;        /* fundo igual ao exemplo */
+    padding: 15px;              /* espaço ao redor do produto */
+    border-radius: 10px;
+}
+
+/* --- NOVO LAYOUT DE PRODUTOS PROFISSIONAL --- */
+
+.produtos-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+    padding:15px;
+}
+
+/* Card do produto */
+.produto{
+    background:white;
+    border-radius:12px;
+    padding:15px;
+    box-shadow:0 2px 6px rgba(0,0,0,0.05);
+}
+
+/* Área da imagem */
+.produto-img-box{
+    background:#f4f4f4;
+    width:100%;
+    height:220px;
+    border-radius:10px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+}
+
+/* Imagem dentro da área */
+.produto-img-box img{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    padding:15px;
+}
+
+/* Informações do produto */
+.categoria{
+    font-size:12px;
+    color:#777;
+    margin-top:10px;
+    letter-spacing:1px;
+}
+
+.produto h3{
+    font-size:15px;
+    margin:5px 0 8px 0;
+    color:#333;
+}
+
+/* Descrição curta */
+.prod-desc{
+    font-size:12px;
+    color:#888;
+    line-height:1.3;
+}
