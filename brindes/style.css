@@ -32,14 +32,15 @@ body{
     object-fit:contain !important;
 }
 
-/* Nome da loja */
-.nome-loja{
-    color:white;
-    font-size:20px;
-    font-weight:700;
-    letter-spacing:1px;
-    white-space:nowrap;
+.nome-loja {
+    font-size: 14px !important;
+    font-weight: 600;
+    color: #fff;
+    line-height: 16px;
+    white-space: normal !important;
+    word-break: break-word;
 }
+
 
 /* --- MENU LATERAL ESTILO ENVIADO --- */
 .menu-mobile{
