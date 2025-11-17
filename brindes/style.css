@@ -5,9 +5,10 @@
   font-family:"Poppins", sans-serif;
 }
 
-body{
-  background:#f5f5f5;
+body {
+    background: #f2f2f2; /* cinza claro apenas no fundo externo */
 }
+
 
 /* CABEÇALHO FINAL */
 .topo{
@@ -336,32 +337,33 @@ header img {
 }
 
 /* Card do produto */
-.produto{
-    background:white;
-    border-radius:12px;
-    padding:15px;
-    box-shadow:0 2px 6px rgba(0,0,0,0.05);
+.produto {
+    background: #ffffff; /* branco total */
+    padding: 18px;
+    border-radius: 25px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
 }
+
 
 /* Área da imagem */
-.produto-img-box{
-    background:#f4f4f4;
-    width:100%;
-    height:220px;
-    border-radius:10px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    overflow:hidden;
+.produto-img-box {
+    width: 100%;
+    background: #fff; /* agora é branco */
+    border-radius: 15px;
+    padding: 20px; /* mais espaço interno para imagem crescer */
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-/* Imagem dentro da área */
-.produto-img-box img{
-    width:100%;
-    height:100%;
-    object-fit:contain;
-    padding:15px;
+.produto-img-box img {
+    width: 80%;      /* AUMENTA A IMAGEM */
+    max-width: 230px;
+    height: auto;
+    object-fit: contain;
 }
+
 
 /* Informações do produto */
 .categoria{
