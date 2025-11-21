@@ -275,3 +275,26 @@ body { background:#f8f9fa; color:#111; font-family:'Poppins', sans-serif; }
 .compra-popup .icon {
   font-size: 1.3rem;
 }
+
+/* SEÇÃO DE SELOS DE CONFIANÇA */
+.selos-confianca {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin: 25px 0;
+  padding: 0 20px;
+}
+
+.selos-confianca img {
+  width: 100%;
+  max-width: 480px; /* tamanho ideal no PC */
+  height: auto;
+  display: block;
+}
+
+/* MOBILE */
+@media (max-width: 600px) {
+  .selos-confianca img {
+    max-width: 320px;  /* perfeito para celular */
+  }
+}
