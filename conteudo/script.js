@@ -47,7 +47,8 @@ menuLateral.addEventListener("click", (e) => {
 // LIGA O ITEM "Sobre" DO MENU PARA ABRIR O MODAL
 // -------------------------
 
-const itemSobre = document.querySelector(".menu-item:nth-child(1)");
+const itemSobre = document.querySelector(".menu-item:nth-child(4)");
+
 itemSobre.addEventListener("click", () => {
   menuLateral.classList.remove("ativo"); // fecha menu
   abrirSobre(); // abre modal Sobre
@@ -59,7 +60,8 @@ itemSobre.addEventListener("click", () => {
 
 const privacidadeModal = document.getElementById("privacidadeModal");
 const closePriv = document.querySelector(".closePrivacidade");
-const itemPrivacidade = document.querySelector(".menu-item:nth-child(3)");
+const itemPrivacidade = document.querySelector(".menu-item:nth-child(2)");
+
 
 itemPrivacidade.addEventListener("click", () => {
   menuLateral.classList.remove("ativo");
@@ -81,7 +83,8 @@ window.addEventListener("click", e => {
 
 const termosModal = document.getElementById("termosModal");
 const closeTermos = document.querySelector(".closeTermos");
-const itemTermos = document.querySelector(".menu-item:nth-child(4)");
+const itemTermos = document.querySelector(".menu-item:nth-child(3)");
+
 
 itemTermos.addEventListener("click", () => {
   menuLateral.classList.remove("ativo");
