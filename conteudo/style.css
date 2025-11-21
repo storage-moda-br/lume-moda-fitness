@@ -1,0 +1,217 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background:#f8f9fa; color:#111; font-family:'Poppins', sans-serif; }
+
+/* Header */
+.header {
+  position: sticky; top: 0; z-index: 1000;
+  display:flex; justify-content:space-between; align-items:center;
+  background:#111; color:#fff; padding:10px 20px;
+}
+.logo-container { display:flex; align-items:center; gap:10px; }
+.logo { height:70px; width:auto; max-width:180px; }
+.menu-btn { font-size:1.8rem; background:none; color:#fff; border:none; cursor:pointer; }
+
+/* Banner vazio (altura pronta pra imagem futura) */
+
+.banner {
+  width: 100%;
+  height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-bottom: 3px solid #007BFF;
+  position: relative;
+  color: white;
+  text-align: center;
+  background: linear-gradient(135deg, #0b0f18 0%, #0a2a5f 50%, #0b0f18 100%);
+  background-size: 300% 300%;
+  animation: bannerMove 10s ease-in-out infinite alternate;
+}
+
+@keyframes bannerMove {
+  0% { background-position: left center; }
+  100% { background-position: right center; }
+}
+
+.banner-inner {
+  z-index: 1;
+  padding: 0 16px;
+}
+
+.banner h2 {
+  margin: 0 0 6px 0;
+  font-weight: 700;
+  line-height: 1.1;
+  font-size: clamp(20px, 3.4vw, 34px);
+  text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+}
+
+.banner p {
+  margin: 0;
+  font-weight: 500;
+  opacity: .95;
+  font-size: clamp(13px, 1.6vw, 18px);
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .banner { height: 110px; }
+}
+
+@media (min-width: 1600px) {
+  .banner { height: 160px; }
+}
+
+/* ajuste fino por breakpoint */
+@media (max-width: 768px) {
+  .banner { height: 110px; }
+}
+
+@media (min-width: 1600px) {
+  .banner { height: 160px; }
+}
+
+
+/* Grid de produtos */
+.produtos {
+  display:grid; gap:20px; padding:30px 20px;
+  grid-template-columns: 1fr; /* mobile */
+}
+
+/* Tablet: 2 colunas */
+@media (min-width: 640px) {
+  .produtos { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* Desktop: 3 colunas (2 filas de 3 p/ 6 itens) */
+@media (min-width: 1024px) {
+  .produtos { grid-template-columns: repeat(3, 1fr); }
+}
+
+.produto-card {
+  background:#fff; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,.1);
+  padding:15px; text-align:center; transition:transform .2s ease;
+}
+.produto-card:hover { transform: translateY(-5px); }
+.produto-card img { width:100%; height:auto; border-radius:8px; }
+.produto-card h3 { margin:10px 0 5px; font-size:1.1rem; }
+.produto-card p { font-size:.9rem; color:#555; }
+.preco { display:block; font-weight:600; margin:10px 0; color:#007BFF; }
+
+
+.btn-whats {
+  display:inline-block; background:#007BFF; color:#fff; padding:10px 16px;
+  border-radius:8px; text-decoration:none; font-weight:600; transition:background .3s;
+}
+.btn-whats:hover { background:#005ecb; }
+
+/* WhatsApp flutuante */
+.whatsapp-float {
+  position:fixed; right:20px; bottom:90px; /* sobe um pouco p/ não colidir com o rodapé fixo */
+  background:#25D366; border-radius:50%; width:60px; height:60px;
+  display:flex; justify-content:center; align-items:center;
+  box-shadow:0 4px 10px rgba(0,0,0,.2); transition:transform .2s;
+}
+.whatsapp-float:hover { transform: scale(1.08); }
+.whatsapp-float img { width:32px; height:32px; }
+
+/* Modal */
+.modal {
+  display: none; /* <-- mantém oculto até clicar no menu */
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(0, 0, 0, 0.6);
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background:#fff; border-radius:10px; padding:20px; max-width:420px; text-align:center;
+}
+.close { float:right; cursor:pointer; font-size:1.4rem; color:#111; }
+
+/* Rodapé fixo */
+.footer {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background:#111; color:#fff; text-align:center; padding:14px 10px;
+  z-index: 1500;
+}
+/* dá espaço no fim da página para o rodapé fixo não cobrir conteúdo */
+body { padding-bottom: 64px; }
+
+/* Responsividade extra */
+@media (max-width: 600px) {
+  .logo { height:35px; }
+  .banner { height: 160px; }
+}
+
+/* Descrição dos produtos alinhada à esquerda e justificada */
+.produto-card p {
+  text-align: justify !important;
+  text-justify: inter-word;
+}
+
+/* Limita o tamanho dos cards no PC */
+.produto-card {
+    max-width: 360px;
+    margin: 0 auto;
+}
+
+/* Deixa os cards centralizados na grid */
+.produtos {
+    justify-items: center;
+}
+/* MENU LATERAL NOVO */
+.menu-lateral {
+  position: fixed;
+  top: 0;
+  right: -100%;
+  width: 70%;
+  height: 100%;
+  background: #111;
+  color: white;
+  z-index: 3000;
+  transition: .35s ease;
+  padding-top: 30px;
+}
+
+.menu-lateral.ativo {
+  right: 0;
+}
+
+.menu-box {
+  padding: 20px;
+}
+
+.menu-close {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 32px;
+  cursor: pointer;
+  position: absolute;
+  top: 10px;
+  right: 16px;
+}
+
+.menu-lista {
+  list-style: none;
+  margin-top: 40px;
+  padding: 0;
+}
+
+.menu-item {
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+.menu-item:last-child {
+  border-bottom: none;
+}
+
+.menu-item:hover {
+  color: #007BFF;
+}
