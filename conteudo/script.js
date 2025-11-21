@@ -98,7 +98,7 @@ closeTermos.addEventListener("click", () => {
 window.addEventListener("click", e => {
   if (e.target === termosModal) termosModal.style.display = "none";
 });
-// Produtos que podem aparecer no popup
+// MENSAGENS ROTATIVAS DO POPUP
 const mensagensPopup = [
   "Alguém de São Paulo acabou de comprar <strong>Limpa Nome 2026</strong>.",
   "Cliente do Rio de Janeiro adquiriu o <strong>Curso Viver de IA</strong>.",
@@ -107,25 +107,28 @@ const mensagensPopup = [
   "Compra feita agora: <strong>Crie seu próprio SaaS com IA</strong> — Recife."
 ];
 
+// FUNÇÃO QUE MOSTRA O POPUP
 function mostrarPopup() {
   const popup = document.getElementById("popupCompra");
   const texto = document.getElementById("popupTexto");
 
-  // Seleciona uma mensagem aleatória
+  if (!popup || !texto) return; // proteção se html faltar
+
+  // seleciona mensagem aleatória
   const msg = mensagensPopup[Math.floor(Math.random() * mensagensPopup.length)];
 
   texto.innerHTML = msg;
   popup.classList.add("show");
 
-  // some após 6 segundos
+  // remove depois de 6 segundos
   setTimeout(() => {
     popup.classList.remove("show");
   }, 6000);
 
-  // próximo popup entre 20 e 45 segundos
+  // agenda próxima exibição entre 20 e 45 segundos
   const intervalo = Math.floor(Math.random() * (45000 - 20000)) + 20000;
   setTimeout(mostrarPopup, intervalo);
 }
 
-// primeiro popup após 5 segundos
+// inicia 1º popup após 5 segundos
 setTimeout(mostrarPopup, 5000);
