@@ -1,0 +1,142 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+body {
+  background: #000;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.page-wrapper {
+  width: 100%;
+  padding: 16px;
+  display: flex;
+  justify-content: center;
+}
+
+.reward-card {
+  width: 100%;
+  max-width: 420px;
+  border-radius: 24px;
+  overflow: hidden;
+  background: #0b1b3a; /* borda azul escura do card */
+}
+
+/* TOPO AMARELO — tamanho ideal */
+.card-header {
+  background: #ffcc00;
+  padding: 2px 0;              /* leve folga em cima e baixo */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* LOGO — proporcional e grande */
+.game-logo {
+  height: 155px;                 /* aumenta a logo */
+  width: auto;
+  max-width: 80%;               /* evita exagero */
+  display: block;
+}
+
+
+
+
+
+
+/* CORPO AZUL */
+.card-body {
+  background: linear-gradient(180deg, #114b96 0%, #0b326a 100%);
+  padding: 20px 18px 24px;
+  text-align: center;
+  color: #fff;
+}
+
+.headline {
+  font-size: 1.1rem;
+  line-height: 1.4;
+  margin-bottom: 14px;
+}
+
+.highlight {
+  color: #ffd54f;
+  font-weight: 700;
+}
+
+.divider {
+  width: 60%;
+  height: 2px;
+  margin: 8px auto 20px;
+  background: #ffd54f;
+}
+
+/* BOTÕES PRINCIPAIS */
+.main-btn {
+  width: 100%;
+  border: none;
+  border-radius: 14px;
+  padding: 14px 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.12s ease;
+  color: #fff;
+}
+
+.main-btn:active {
+  transform: scale(0.97);
+  opacity: 0.9;
+}
+
+.black-btn {
+  background: #111;
+  border: 2px solid #fff;
+}
+
+.blue-btn {
+  background: radial-gradient(circle at top, #1e8cff, #0061e0);
+  border: 2px solid #ffffffc0;
+}
+
+/* BOTÃO DE STATUS */
+.status-btn {
+  width: 100%;
+  margin-top: 10px;
+  border-radius: 10px;
+  border: none;
+  padding: 10px 8px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  background: #ffb300;
+  color: #111;
+  cursor: default;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+}
+
+.status-btn.verifying {
+  background: #fdd835;
+}
+
+.status-btn.completed {
+  background: #43a047;
+  color: #fff;
+}
+
+@media (min-width: 480px) {
+  .headline {
+    font-size: 1.15rem;
+  }
+  .main-btn {
+    font-size: 1rem;
+  }
+}
