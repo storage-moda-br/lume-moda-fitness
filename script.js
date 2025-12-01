@@ -458,10 +458,15 @@ function renderRanking(){
 
   // Titulo premium dinâmico
   const tituloEl = document.querySelector('#rankingModal .modal-content h2');
-  if (tituloEl){
+ if (tituloEl){
     const agora = new Date();
-    tituloEl.textContent = `Ranking Novembro de 2025`;
-  }
+    const nomeMes = agora.toLocaleDateString('pt-BR',{ month:'long' })
+                         .replace(/^./, c => c.toUpperCase());
+    const ano = agora.getFullYear();
+
+    tituloEl.textContent = `Ranking ${nomeMes} de ${ano}`;
+}
+
 
   let entries = Object.entries(trophyCountsMes || {}).filter(
     ([nome]) => nome && nome.trim() !== "" && nome.trim().toLowerCase() !== "null"
